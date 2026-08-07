@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.3.0-dev2
+
+- Added first live progress-preserving mid-stage crop rescheduler for V3.1.0 b14.
+- Added the required `UnityEngine.CoreModule.dll` compile reference for `GameManager.Instance` / MonoBehaviour-linked V3.1 APIs.
+- Confirmed and uses V3.1 `WorldBlockTicker.InvalidateScheduledBlockUpdate` and `AddScheduledBlockUpdate`.
+- Electrical transitions are observed on PowerConsumerToggle toggle, received-power, propagated-power, and disconnect paths.
+- Remaining scheduled time is converted back to equivalent vanilla work using the old effective multiplier, then rescheduled using the new effective multiplier.
+- Overlapping lights still use the highest active multiplier; transitions that do not change the effective multiplier do not reschedule.
+- This first live candidate intentionally uses the already-validated `IsPowered && IsToggled` state; upstream relay-only propagation is deferred until direct transition behavior is proven.
+- Save/restart persistence of transition metadata is not yet claimed by this development build; this build is for live ON/OFF/tier-transition validation first.
+
 ## 0.5.1.0
 
 - Changed the grow-light height rule from fixed Y+6 to Y+1 through Y+10 above the farm plot.

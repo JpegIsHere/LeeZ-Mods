@@ -4,16 +4,11 @@ using System.Collections.Generic;
 namespace LeezGrowLights
 {
     /// <summary>
-    /// V3.1 electrical-state adapter validated against the installed-game API probe.
-    ///
-    /// Confirmed V3.1 members:
-    /// - TileEntityPowered.IsPowered
-    /// - TileEntityPoweredBlock.IsToggled
-    /// - TileEntityPowered.GetPowerItem()
-    /// - PowerConsumerToggle.IsPowered / IsToggled
+    /// V3.1 electrical-state adapter validated against the installed-game API.
     ///
     /// A grow light is active only when it is both powered and switched on.
-    /// Unknown powered tile shapes fail safe as OFF and are logged once.
+    /// Growth timing is server-authoritative; clients use the synced state only
+    /// for placement/sunlight preview behavior.
     /// </summary>
     internal static class PowerStateResolver
     {
@@ -26,13 +21,9 @@ namespace LeezGrowLights
             TileEntity tileEntity = world.GetTileEntity(blockPos);
             if (tileEntity == null) return false;
 
-            // Normal player-powered block path. ceilingLight01_player is expected to
-            // resolve through this shape (or a subclass) in V3.1.
             if (tileEntity is TileEntityPoweredBlock poweredBlock)
                 return poweredBlock.IsPowered && poweredBlock.IsToggled;
 
-            // Controlled fallback for another TileEntityPowered implementation that
-            // exposes its toggle on the underlying PowerConsumerToggle.
             if (tileEntity is TileEntityPowered poweredTile)
             {
                 if (!poweredTile.IsPowered) return false;
@@ -41,12 +32,14 @@ namespace LeezGrowLights
                 if (powerItem is PowerConsumerToggle toggle)
                     return toggle.IsPowered && toggle.IsToggled;
 
-                ReportUnknownShapeOnce(tileEntity,
+                ReportUnknownShapeOnce(
+                    tileEntity,
                     "TileEntityPowered had power but its PowerItem was not PowerConsumerToggle.");
                 return false;
             }
 
-            ReportUnknownShapeOnce(tileEntity,
+            ReportUnknownShapeOnce(
+                tileEntity,
                 "Tile entity is not TileEntityPowered/TileEntityPoweredBlock.");
             return false;
         }
@@ -60,7 +53,8 @@ namespace LeezGrowLights
             }
 
             LeezLog.Warning(
-                "Grow-light tile entity '" + typeName + "' could not be validated as powered+switched. " +
+                "Grow-light tile entity '" + typeName +
+                "' could not be validated as powered+switched. " +
                 reason + " Lamp will fail safe as OFF.");
         }
     }

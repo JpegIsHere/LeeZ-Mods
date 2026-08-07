@@ -2,18 +2,21 @@
 
 Target test build: **7 Days to Die V3.1.0 (b14)**.
 
-Legend: `PASS` = observed in-game/build output; `IMPLEMENTED` = code path exists but the exact boundary scenario still needs an isolated test; `PENDING` = not complete.
+Legend: `PASS` = observed in-game/build output; `IMPLEMENTED` = code path exists but the exact scenario still needs an isolated test; `PENDING` = not complete.
 
 ## Build and startup
 
 | Test | Status | Notes |
 |---|---|---|
-| Release build | PASS | 0 warnings, 0 errors on the V3.1 test installation |
-| DLL discovered by mod loader | PASS | `LeezGrowLights 0.5.1.0` loaded |
+| Stable v0.5.1 Release build | PASS | 0 warnings, 0 errors on the V3.1 test installation |
+| v0.5.3-dev1 Release build | FAIL (fixed in dev2) | missing explicit `UnityEngine.CoreModule.dll` reference for `GameManager.Instance` / `MonoBehaviour` type chain |
+| v0.5.3-dev2 Release build | PENDING | project now includes `UnityEngine.CoreModule.dll`; awaiting user rebuild |
+| DLL discovered by mod loader | PASS | stable v0.5.1 and probe v0.5.2 loaded |
 | crop scheduling hook | PASS | installed at startup |
 | crop tick-rate hook | PASS | installed at startup |
 | crop update context hook | PASS | installed at startup |
 | sunlight substitution hooks | PASS | 11 crop/base methods patched during startup |
+| V3.1 ticker API probe | PASS | confirmed live ticker invalidation/add APIs, scheduled entry time and `GetWBT()` |
 
 ## Electrical behavior
 
@@ -23,6 +26,7 @@ Legend: `PASS` = observed in-game/build output; `IMPLEMENTED` = code path exists
 | powered + switched on | PASS | active lamp detected |
 | switched off | PASS | state transition observed during testing |
 | power draw | IMPLEMENTED | XML currently requests 10 W for each tier |
+| electrical transition Harmony hooks | IMPLEMENTED | v0.5.3-dev2 hooks toggle, power-received/update and disconnect paths |
 
 ## Coverage and underground farming
 
@@ -35,7 +39,7 @@ Legend: `PASS` = observed in-game/build output; `IMPLEMENTED` = code path exists
 | X/Z radius 3 rejected | PENDING | isolate and record explicit boundary test |
 | Y+1 valid | IMPLEMENTED | range includes 1; isolate explicit boundary test |
 | Y+10 valid | PASS | active T6 detected 10 blocks above farm plot |
-| Y+11 rejected | PENDING | next boundary test |
+| Y+11 rejected | PENDING | boundary test still pending |
 
 ## Tier multipliers
 
@@ -50,16 +54,27 @@ Legend: `PASS` = observed in-game/build output; `IMPLEMENTED` = code path exists
 
 Overlap behavior is implemented as highest-active-multiplier-wins and should receive an isolated multi-light test before release.
 
-## Pending correctness tests
+## Mid-stage progress preservation
 
-- Turn light on midway through a crop stage and preserve only earned vanilla progress.
-- Turn light off midway through a crop stage without losing or gifting progress.
+| Test | Status | Notes |
+|---|---|---|
+| live V3.1 ticker lookup | PASS | probe confirmed `scheduledTicksDict` and `WorldBlockTickerEntry.scheduledTime` |
+| invalidate/re-add scheduled crop tick | IMPLEMENTED | v0.5.3-dev2 uses validated `InvalidateScheduledBlockUpdate` and `AddScheduledBlockUpdate` |
+| remaining-work conversion old -> new multiplier | IMPLEMENTED | queued remaining ticks are converted back to equivalent vanilla work before rescheduling |
+| T6 ON -> OFF | PENDING | expect ~4x expansion of remaining ticks |
+| T6 OFF -> ON | PENDING | expect ~4x reduction of remaining ticks |
+| T1 -> T6 / T6 -> T1 | PENDING | preserve already-earned progress |
+| lower tier toggled while T6 remains effective | PENDING | should not reschedule because effective multiplier is unchanged |
+| direct power loss/restoration | PENDING | transition hooks implemented; live behavior not yet proven |
+| save/reload during partial stage | PENDING | not claimed by v0.5.3-dev2 |
+
+## Pending correctness / release tests
+
 - Remove a lamp midway through a stage.
-- Save/reload during partially accelerated growth.
-- Multiple overlapping tiers: confirm only highest active tier wins.
 - Dedicated server with remote client.
 - Long-duration crop survival in a sealed room while powered.
 - Loss of power underground and vanilla survival response.
+- Performance with dense farms / many lamps.
 
 ## Colour system (future)
 

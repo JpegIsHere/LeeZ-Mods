@@ -45,6 +45,7 @@ namespace LeezGrowLights
 
             InstallGrowthSpeedPatches(harmony, plantType);
             InstallSunlightSubstitutionPatches(harmony, plantType);
+            InstallPowerTransitionPatches(harmony);
         }
 
         private static void InstallGrowthSpeedPatches(Harmony harmony, Type plantType)
@@ -141,6 +142,71 @@ namespace LeezGrowLights
                 LeezLog.Error("No crop sunlight-check methods could be patched.");
             else
                 LeezLog.Info("Grow-light sunlight substitution installed on " + installed + " crop method(s).");
+        }
+
+        private static void InstallPowerTransitionPatches(Harmony harmony)
+        {
+            Type powerToggleType = AccessTools.TypeByName("PowerConsumerToggle");
+            if (powerToggleType == null)
+            {
+                LeezLog.Warning(
+                    "PowerConsumerToggle was not found; live mid-stage rescheduling was not installed.");
+                return;
+            }
+
+            MethodInfo prefix = AccessTools.Method(
+                typeof(PowerTransitionPatches), nameof(PowerTransitionPatches.Prefix));
+            MethodInfo postfix = AccessTools.Method(
+                typeof(PowerTransitionPatches), nameof(PowerTransitionPatches.Postfix));
+
+            string[] transitionMethods =
+            {
+                "set_IsToggled",
+                "HandlePowerReceived",
+                "HandlePowerUpdate",
+                "HandleDisconnect"
+            };
+
+            var patchedTokens = new HashSet<int>();
+            int installed = 0;
+
+            foreach (string methodName in transitionMethods)
+            {
+                MethodInfo method = FindPreferredMethodByName(powerToggleType, methodName);
+                if (method == null || !patchedTokens.Add(method.MetadataToken))
+                {
+                    LeezLog.Warning(
+                        "Electrical transition hook not found/duplicate: PowerConsumerToggle." +
+                        methodName);
+                    continue;
+                }
+
+                try
+                {
+                    harmony.Patch(
+                        method,
+                        prefix: new HarmonyMethod(prefix),
+                        postfix: new HarmonyMethod(postfix));
+
+                    installed++;
+                    LeezLog.Info(
+                        "Mid-stage electrical transition hook installed: " +
+                        DescribeDetailed(method));
+                }
+                catch (Exception ex)
+                {
+                    LeezLog.Warning(
+                        "Could not patch electrical transition " +
+                        Describe(method) + ": " + ex.Message);
+                }
+            }
+
+            if (installed == 0)
+                LeezLog.Warning("No live electrical transition hooks were installed.");
+            else
+                LeezLog.Info(
+                    "Progress-preserving mid-stage rescheduler armed on " +
+                    installed + " electrical transition method(s).");
         }
 
         private static MethodInfo FindPreferredMethodByName(Type type, string name)

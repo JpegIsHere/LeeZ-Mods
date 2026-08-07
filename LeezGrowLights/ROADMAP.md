@@ -13,11 +13,17 @@
 
 Goal: power changes during an already-scheduled crop stage must affect only future growth time.
 
-- [ ] Map the V3.1 world/block ticker API.
-- [ ] Determine safe invalidation/rescheduling path for crop ticks.
-- [ ] Preserve accumulated progress across ON -> OFF, OFF -> ON and lamp removal.
+- [x] Map the V3.1 world/block ticker API.
+- [x] Confirm safe invalidation/rescheduling path for crop ticks: `InvalidateScheduledBlockUpdate` + `AddScheduledBlockUpdate`.
+- [x] Implement first remaining-progress conversion/reschedule candidate for ON -> OFF and OFF -> ON transitions (`0.5.3-dev2`).
+- [ ] Live-validate T6 ON -> OFF -> ON tick expansion/reduction.
+- [ ] Live-validate T1 -> T6 and T6 -> T1 transitions.
+- [ ] Validate overlapping tiers where the effective highest multiplier does not change.
+- [ ] Handle lamp removal mid-stage.
 - [ ] Handle save/reload correctly.
-- [ ] Keep behavior server-authoritative.
+- [ ] Validate direct power loss/restoration.
+- [ ] Validate upstream relay-only propagation before claiming it supported.
+- [ ] Keep behavior server-authoritative on dedicated server / remote client.
 
 ## 0.7 — colour system
 

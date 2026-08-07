@@ -2,11 +2,14 @@
 
 A powered grow-light mod for **7 Days to Die V3.1.x** that enables enclosed/underground farming and accelerates crop growth while a qualifying LeeZ grow light is powered and switched on.
 
-**Current mod version:** `0.5.1.0`  
+**Current development branch:** `0.5.3-dev2` (`ModInfo.xml` version `0.5.3.0`)  
+**Stable main branch:** `0.5.1.0`  
 **Validated game build:** `V 3.1.0 (b14)`  
-**Status:** functional in-game development build; final multiplayer/dedicated-server and mid-stage timing work remains.
+**Status:** core underground grow-light system is proven in-game; the first progress-preserving mid-stage power-transition implementation is now in development testing.
 
 ## What works now
+
+Verified on the stable/core runtime:
 
 - Six grow-light tiers (T1-T6).
 - Normal vanilla electrical wiring and on/off behavior.
@@ -19,6 +22,15 @@ A powered grow-light mod for **7 Days to Die V3.1.x** that enables enclosed/unde
 - Power and switch state are checked from the V3.1 powered tile entity APIs.
 - Crop placement/survival/growth light checks remain vanilla-controlled except that an active LeeZ light temporarily satisfies the crop's sunlight threshold.
 - Harmony crop hooks and sunlight-substitution hooks load successfully on V3.1.0 b14.
+
+Implemented on `dev/midstage-reschedule-probe` in `0.5.3-dev2` and awaiting live validation:
+
+- V3.1 `WorldBlockTicker` scheduled-entry lookup.
+- `InvalidateScheduledBlockUpdate(position, blockID)` + `AddScheduledBlockUpdate(position, blockID, ticks)` rescheduling.
+- Mid-stage conversion of remaining queued time back to equivalent vanilla work using the old effective multiplier.
+- Re-scheduling only the remaining work using the new effective multiplier.
+- Electrical transition hooks for direct toggle, received-power, propagated-power and disconnect paths on `PowerConsumerToggle`.
+- Required `UnityEngine.CoreModule.dll` compile reference for the new `GameManager.Instance` transition path.
 
 ## Grow-light tiers
 
@@ -51,6 +63,19 @@ An active LeeZ light acts as an artificial sunlight source inside its coverage a
 
 The mod does **not** globally disable crop sunlight rules.
 
+## Mid-stage power transitions
+
+The development branch now contains the first exact rescheduling candidate. When the effective multiplier changes, it reads the crop's queued scheduled time, converts the remaining ticks back into equivalent vanilla work using the old multiplier, invalidates the old scheduled update, then schedules the remaining work using the new multiplier.
+
+Conceptually:
+
+```text
+remaining vanilla work = remaining queued ticks * old multiplier
+new remaining ticks    = remaining vanilla work / new multiplier
+```
+
+This is intended to preserve progress already earned before an ON/OFF or tier transition. It is **implemented but not yet claimed as passed** until the v0.5.3-dev2 live tests are completed.
+
 ## Installation / build
 
 Copy the `LeezGrowLights/` directory from this repository into your game `Mods/` folder so the game sees:
@@ -72,6 +97,13 @@ cd /d "C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die"
 msbuild "Mods\LeezGrowLights\Source\LeezGrowLights.csproj" /p:Configuration=Release
 ```
 
+The v0.5.3 development project references:
+
+- `Assembly-CSharp.dll`
+- `LogLibrary.dll`
+- `UnityEngine.CoreModule.dll`
+- TFP Harmony's `0Harmony.dll`
+
 A successful Release build writes `LeezGrowLights.dll` into the mod root. The DLL/PDB are ignored by Git.
 
 See [docs/BUILDING.md](docs/BUILDING.md) for custom paths and details.
@@ -80,45 +112,47 @@ See [docs/BUILDING.md](docs/BUILDING.md) for custom paths and details.
 
 Confirmed during V3.1 in-game testing:
 
-- project builds with zero warnings/errors on the test installation;
+- stable v0.5.1 project builds with zero warnings/errors on the test installation;
 - mod DLL loads;
 - crop scheduling and tick-rate Harmony hooks install;
 - sunlight substitution hooks install;
 - underground/enclosed planting works with an active grow light;
 - T6 is detected active and applies a 4x multiplier;
 - a lamp 10 blocks above a farm plot is detected as valid;
-- tiered grow-light behavior works in-game.
+- tiered grow-light behavior works in-game;
+- the live V3.1 ticker probe confirmed `WorldBase.GetWBT()`, `WorldBlockTicker.InvalidateScheduledBlockUpdate`, `AddScheduledBlockUpdate`, `scheduledTicksDict`, `WorldBlockTickerEntry.scheduledTime`, and `GameTimer` tick access.
 
-Still explicitly pending:
+Pending for v0.5.3-dev2:
 
-- an isolated Y+11 boundary test;
-- exact preservation of crop progress when power changes part-way through a scheduled growth stage;
+- successful compile after adding `UnityEngine.CoreModule.dll` reference;
+- live T6 ON -> OFF -> ON mid-stage rescheduling test;
+- T1 -> T6 and T6 -> T1 transitions;
+- overlapping-tier transition where the highest effective multiplier does not change;
+- save/reload during partially accelerated growth;
 - dedicated-server / remote-client validation;
+- isolated Y+11 and X/Z radius-3 boundary tests;
 - colour selection, persistence, synchronization and runtime tinting;
 - removal or gating of temporary diagnostic logging before a polished release.
 
-See [TESTING.md](TESTING.md) for the full matrix.
+See [TESTING.md](TESTING.md) and [MIDSTAGE_TESTING.md](MIDSTAGE_TESTING.md) for the test matrix.
 
 ## Repository map
 
 ```text
 Config/                    XML blocks, recipes, progression and localization
 Source/                    C# runtime and MSBuild project
-  Harmony/                 Harmony installation and crop hooks
-  Runtime/                 grow-light scanning, power checks and scheduling context
+  Harmony/                 Harmony installation, crop hooks and electrical transition hooks
+  Runtime/                 scanning, power checks, growth scheduling and ticker adapter
 docs/                      design, API validation and development decisions
 docs/reference/            successful V3.1 API probe output
 docs/images/               early design/reference screenshots
 tools/                     V3.1 API probe script
 CHANGELOG.md               version history
 ROADMAP.md                 next development stages
-TESTING.md                 verified vs pending test matrix
+TESTING.md                 verified vs implemented vs pending test matrix
+MIDSTAGE_TESTING.md        v0.5.3 mid-stage transition test procedure
 ModInfo.xml                7DTD mod metadata
 ```
-
-## Important implementation note
-
-The current speed hook adjusts the scheduled vanilla crop tick rate using the active multiplier at scheduling/update time. Exact **mid-stage** power transitions remain a known design problem: turning a light on or off after a crop update has already been queued should eventually reschedule while preserving earned progress. That is tracked in the roadmap rather than being presented as complete.
 
 ## License
 

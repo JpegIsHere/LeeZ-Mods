@@ -24,6 +24,47 @@ namespace LeezGrowLights
         }
 
         /// <summary>
+        /// Same server-authoritative lookup without the per-crop boost diagnostic.
+        /// Used by electrical transition handling where many nearby plants can be sampled.
+        /// </summary>
+        internal static float GetBestActiveMultiplierQuiet(WorldBase world, Vector3i plantPos)
+        {
+            if (world == null || world.IsRemote()) return 1f;
+            Vector3i farmPos = plantPos + Vector3i.down;
+            return ScanFarmFootprint(world, farmPos, false);
+        }
+
+        internal static bool TryGetGrowLightCoverage(
+            Block block,
+            out int radius,
+            out int minVerticalOffset,
+            out int maxVerticalOffset)
+        {
+            radius = DefaultRadius;
+            minVerticalOffset = DefaultMinVerticalOffsetFromFarm;
+            maxVerticalOffset = DefaultMaxVerticalOffsetFromFarm;
+
+            if (!TryGetProperty(block, "LeezGrowTier", out _))
+                return false;
+
+            radius = Math.Max(0, GetIntProperty(block, "LeezGrowRadius", DefaultRadius));
+            minVerticalOffset = Math.Max(
+                1,
+                GetIntProperty(
+                    block,
+                    "LeezGrowMinFarmBlockVerticalOffset",
+                    DefaultMinVerticalOffsetFromFarm));
+            maxVerticalOffset = Math.Max(
+                minVerticalOffset,
+                GetIntProperty(
+                    block,
+                    "LeezGrowMaxFarmBlockVerticalOffset",
+                    DefaultMaxVerticalOffsetFromFarm));
+
+            return true;
+        }
+
+        /// <summary>
         /// True when a powered/switched LeeZ grow light can substitute for sunlight at this
         /// position. Placement APIs have varied between game versions, so the supplied position
         /// is tested both as a plant position and as a farm-block position.
@@ -67,15 +108,12 @@ namespace LeezGrowLights
                         if (!TryGetProperty(lightBlock, "LeezGrowTier", out string tierText))
                             continue;
 
-                        int radius = GetIntProperty(lightBlock, "LeezGrowRadius", DefaultRadius);
-                        int minVerticalOffset = GetIntProperty(
-                            lightBlock,
-                            "LeezGrowMinFarmBlockVerticalOffset",
-                            DefaultMinVerticalOffsetFromFarm);
-                        int maxVerticalOffset = GetIntProperty(
-                            lightBlock,
-                            "LeezGrowMaxFarmBlockVerticalOffset",
-                            DefaultMaxVerticalOffsetFromFarm);
+                        if (!TryGetGrowLightCoverage(
+                                lightBlock,
+                                out int radius,
+                                out int minVerticalOffset,
+                                out int maxVerticalOffset))
+                            continue;
 
                         if (Math.Abs(dx) > radius || Math.Abs(dz) > radius)
                             continue;

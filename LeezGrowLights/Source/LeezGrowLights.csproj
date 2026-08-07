@@ -49,22 +49,33 @@
       <HintPath>$(GameManagedPath)\LogLibrary.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameManagedPath)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Diagnostics\TickerApiDiagnostics.cs" />
     <Compile Include="Harmony\Init.cs" />
     <Compile Include="Harmony\PatchInstaller.cs" />
     <Compile Include="Harmony\PlantGrowthPatches.cs" />
+    <Compile Include="Harmony\PowerTransitionPatches.cs" />
     <Compile Include="Harmony\SunlightSubstitutionPatches.cs" />
     <Compile Include="Runtime\GrowthScheduleContext.cs" />
     <Compile Include="Runtime\GrowLightScanner.cs" />
     <Compile Include="Runtime\PowerStateResolver.cs" />
+    <Compile Include="Runtime\TickerScheduleAccessor.cs" />
     <Compile Include="Runtime\LeezLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
-<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="API_VALIDATION_V3.1.md" />
+    <None Include="BUILDING.md" />
+    <None Include="RuntimeDesign.md" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
