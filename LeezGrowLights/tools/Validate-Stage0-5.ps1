@@ -145,7 +145,8 @@ $localizationPath = Join-Path $modRoot "Config\Localization.csv"
 $localization = @(Import-Csv $localizationPath)
 foreach ($tier in 1..6) {
     foreach ($key in @("leezGrowLightT$tier", "leezGrowLightT${tier}Desc", "leezGrowLightUnlockT$tier")) {
-        Assert-True (($localization | Where-Object { $_.Key -eq $key }).Count -eq 1) "Stage 2 localization key exists: $key"
+        $matches = @($localization | Where-Object { $_.Key -eq $key })
+        Assert-True ($matches.Count -eq 1) "Stage 2 localization key exists: $key"
     }
 }
 
