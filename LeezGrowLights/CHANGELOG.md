@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.3.0-dev4
+
+- Fixed the explicit old-style C# project manifest so the active transition engine and removal patches are actually compiled: `GrowLightTransitionRescheduler.cs`, `BlockRemovalPatches.cs`, and the new removal installer are now included.
+- Wired physical grow-light removal into the V3.1 `BlockPowered.OnBlockRemoved` path so removal can use the same progress-preserving transition engine as electrical changes.
+- Made removal capture prefer Harmony's concrete block instance, with `BlockValue` as a fallback, to reduce dependence on an exact V3 callback signature.
+- Updated the runtime banner to `v0.5.3-dev4`.
+- Added a Stage 0-5 static audit/evidence record. Live V3.1 build/startup, boundary, tier-to-tier, source/relay, and removal validation still remain release-gate work.
+
 ## 0.5.3.0-dev3
 
 - Live V3.1 test confirmed progress-preserving mid-stage rescheduling.
