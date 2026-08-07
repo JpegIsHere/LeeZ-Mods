@@ -9,14 +9,15 @@ namespace LeezGrowLights
         {
             try
             {
-                LeezLog.Info("Loading V3.1 grow-light runtime candidate v0.5.3-dev5");
+                LeezLog.Info("Loading V3.1 grow-light runtime candidate v0.7.0-dev1");
                 Harmony harmony = new Harmony(_modInstance.Name);
                 PatchInstaller.Install(harmony);
                 BlockRemovalInstaller.Install(harmony);
+                GrowLightColourInstaller.Install(harmony);
             }
             catch (Exception ex)
             {
-                LeezLog.Error("Runtime initialisation failed. Grow-light acceleration will remain disabled.\n" + ex);
+                LeezLog.Error("Runtime initialisation failed. Grow-light runtime will remain partially disabled.\n" + ex);
             }
         }
     }
