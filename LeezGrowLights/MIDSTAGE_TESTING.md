@@ -1,31 +1,49 @@
-# v0.5.3-dev2 live mid-stage test
+# v0.5.3-dev3 live mid-stage test
 
-This build is the first implementation candidate for progress-preserving power changes.
+The direct power/toggle rescheduler has now passed its first V3.1 live tests.
 
-## Primary test
+## Confirmed live behavior
 
-1. Plant a crop under a powered T6.
-2. Let it run part-way through the stage.
-3. Switch the T6 OFF.
-4. The log should show:
-   `Mid-stage crop rescheduled ... 4x -> 1x`
-5. Switch it ON again later.
-6. The log should show:
-   `Mid-stage crop rescheduled ... 1x -> 4x`
+Observed on **7 Days to Die V3.1.0 (b14)**:
 
-The reported remaining tick count should expand when switching OFF and shrink when
-switching ON.
+- T6 `1x -> 4x`: remaining scheduled time reduced to approximately one quarter.
+  - example: `105436 -> 26359` ticks
+- T6 `4x -> 1x`: remaining scheduled time expanded by exactly four times.
+  - example: `26055 -> 104220` ticks
+- T6 OFF period followed by `1x -> 4x`:
+  - example: `103945 -> 25986` ticks
+- T4 `1x -> 1.5x`:
+  - example: `24870 -> 16580` ticks
+- T4 `1.5x -> 1x`:
+  - example: `16774 -> 25161` ticks
 
-## Also test
+These results match the intended remaining-work conversion:
+
+```text
+remaining vanilla work = remaining queued ticks * old multiplier
+new remaining ticks    = remaining vanilla work / new multiplier
+```
+
+This validates that progress already earned before a direct lamp power/toggle transition is preserved and only the remaining work changes speed.
+
+## dev3 startup check
+
+v0.5.3-dev2 installed three transition hooks successfully but produced a non-fatal Harmony warning for inherited `HandleDisconnect` discovery.
+
+v0.5.3-dev3 fixes that by patching the declaring implementation directly:
+
+`PowerItem.HandleDisconnect()`
+
+Expected dev3 startup result: four electrical transition hooks installed with no LeeZ Harmony warning.
+
+## Remaining mid-stage tests
 
 - T1 -> T6 effective transition.
 - T6 -> T1 effective transition.
-- A lower-tier overlapping lamp toggled while T6 remains active: no reschedule should occur.
-- Direct loss/restoration of electrical power.
-
-Upstream relay-only propagation is not claimed by this dev build yet.
-
-## Not claimed by this dev build yet
-
-Full save/restart persistence validation will be handled after live transition behavior
-is proven in V3.1.
+- Lower-tier lamp toggled while an active T6 still wins: no reschedule should occur.
+- Direct source power loss/restoration, not just the lamp's own toggle.
+- Lamp removal midway through a stage.
+- Save/reload during a partially accelerated stage.
+- Chunk unload/reload.
+- Dedicated server / remote client authority.
+- Upstream relay-only propagation.
