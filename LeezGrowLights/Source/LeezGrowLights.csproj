@@ -60,6 +60,8 @@
   <ItemGroup>
     <Compile Include="Harmony\BlockRemovalInstaller.cs" />
     <Compile Include="Harmony\BlockRemovalPatches.cs" />
+    <Compile Include="Harmony\GrowLightColourInstaller.cs" />
+    <Compile Include="Harmony\GrowLightColourPatches.cs" />
     <Compile Include="Harmony\Init.cs" />
     <Compile Include="Harmony\PatchInstaller.cs" />
     <Compile Include="Harmony\PlantGrowthPatches.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="Runtime\GrowthScheduleContext.cs" />
     <Compile Include="Runtime\GrowLightColourPalette.cs" />
     <Compile Include="Runtime\GrowLightColourState.cs" />
+    <Compile Include="Runtime\GrowLightColourVisual.cs" />
     <Compile Include="Runtime\GrowLightScanner.cs" />
     <Compile Include="Runtime\GrowLightTransitionRescheduler.cs" />
     <Compile Include="Runtime\PowerStateResolver.cs" />
