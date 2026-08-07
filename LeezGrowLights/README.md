@@ -2,14 +2,14 @@
 
 A powered grow-light mod for **7 Days to Die V3.1.x** that enables enclosed/underground farming and accelerates crop growth while a qualifying LeeZ grow light is powered and switched on.
 
-**Current development branch:** `0.5.3-dev2` (`ModInfo.xml` version `0.5.3.0`)  
+**Current development branch:** `0.5.3-dev3` (`ModInfo.xml` version `0.5.3.0`)  
 **Stable main branch:** `0.5.1.0`  
 **Validated game build:** `V 3.1.0 (b14)`  
-**Status:** core underground grow-light system is proven in-game; the first progress-preserving mid-stage power-transition implementation is now in development testing.
+**Status:** core underground grow-light behavior and direct progress-preserving mid-stage power/toggle transitions are proven in-game. Save/reload, lamp-removal, overlap edge cases and dedicated-server validation remain.
 
 ## What works now
 
-Verified on the stable/core runtime:
+Verified in-game:
 
 - Six grow-light tiers (T1-T6).
 - Normal vanilla electrical wiring and on/off behavior.
@@ -22,15 +22,8 @@ Verified on the stable/core runtime:
 - Power and switch state are checked from the V3.1 powered tile entity APIs.
 - Crop placement/survival/growth light checks remain vanilla-controlled except that an active LeeZ light temporarily satisfies the crop's sunlight threshold.
 - Harmony crop hooks and sunlight-substitution hooks load successfully on V3.1.0 b14.
-
-Implemented on `dev/midstage-reschedule-probe` in `0.5.3-dev2` and awaiting live validation:
-
-- V3.1 `WorldBlockTicker` scheduled-entry lookup.
-- `InvalidateScheduledBlockUpdate(position, blockID)` + `AddScheduledBlockUpdate(position, blockID, ticks)` rescheduling.
-- Mid-stage conversion of remaining queued time back to equivalent vanilla work using the old effective multiplier.
-- Re-scheduling only the remaining work using the new effective multiplier.
-- Electrical transition hooks for direct toggle, received-power, propagated-power and disconnect paths on `PowerConsumerToggle`.
-- Required `UnityEngine.CoreModule.dll` compile reference for the new `GameManager.Instance` transition path.
+- Mid-stage T6 `1x <-> 4x` transitions preserve earned progress and reschedule only remaining crop work.
+- Mid-stage T4 `1x <-> 1.5x` transitions also reschedule proportionally.
 
 ## Grow-light tiers
 
@@ -65,7 +58,7 @@ The mod does **not** globally disable crop sunlight rules.
 
 ## Mid-stage power transitions
 
-The development branch now contains the first exact rescheduling candidate. When the effective multiplier changes, it reads the crop's queued scheduled time, converts the remaining ticks back into equivalent vanilla work using the old multiplier, invalidates the old scheduled update, then schedules the remaining work using the new multiplier.
+The development branch now contains a live-validated direct rescheduler. When the effective multiplier changes, it reads the crop's queued scheduled time, converts the remaining ticks back into equivalent vanilla work using the old multiplier, invalidates the old scheduled update, then schedules the remaining work using the new multiplier.
 
 Conceptually:
 
@@ -74,7 +67,19 @@ remaining vanilla work = remaining queued ticks * old multiplier
 new remaining ticks    = remaining vanilla work / new multiplier
 ```
 
-This is intended to preserve progress already earned before an ON/OFF or tier transition. It is **implemented but not yet claimed as passed** until the v0.5.3-dev2 live tests are completed.
+Live examples from V3.1.0 b14:
+
+```text
+T6 1x -> 4x: 105436 -> 26359 ticks
+T6 4x -> 1x:  26055 -> 104220 ticks
+T6 1x -> 4x: 103945 -> 25986 ticks
+T4 1x -> 1.5x: 24870 -> 16580 ticks
+T4 1.5x -> 1x: 16774 -> 25161 ticks
+```
+
+These ratios match the intended rule: progress already earned before the transition stays earned; only future growth rate changes.
+
+v0.5.3-dev3 also corrects the non-fatal inherited-method Harmony warning from dev2 by patching the declaring `PowerItem.HandleDisconnect()` implementation directly.
 
 ## Installation / build
 
@@ -113,22 +118,23 @@ See [docs/BUILDING.md](docs/BUILDING.md) for custom paths and details.
 Confirmed during V3.1 in-game testing:
 
 - stable v0.5.1 project builds with zero warnings/errors on the test installation;
-- mod DLL loads;
+- v0.5.3-dev2 compiled and loaded successfully after adding `UnityEngine.CoreModule.dll`;
 - crop scheduling and tick-rate Harmony hooks install;
 - sunlight substitution hooks install;
 - underground/enclosed planting works with an active grow light;
 - T6 is detected active and applies a 4x multiplier;
 - a lamp 10 blocks above a farm plot is detected as valid;
 - tiered grow-light behavior works in-game;
-- the live V3.1 ticker probe confirmed `WorldBase.GetWBT()`, `WorldBlockTicker.InvalidateScheduledBlockUpdate`, `AddScheduledBlockUpdate`, `scheduledTicksDict`, `WorldBlockTickerEntry.scheduledTime`, and `GameTimer` tick access.
+- the live V3.1 ticker probe confirmed `WorldBase.GetWBT()`, `WorldBlockTicker.InvalidateScheduledBlockUpdate`, `AddScheduledBlockUpdate`, `scheduledTicksDict`, `WorldBlockTickerEntry.scheduledTime`, and `GameTimer` tick access;
+- direct T6 and T4 mid-stage multiplier transitions preserve earned progress and reschedule remaining work at the expected ratio.
 
-Pending for v0.5.3-dev2:
+Still pending:
 
-- successful compile after adding `UnityEngine.CoreModule.dll` reference;
-- live T6 ON -> OFF -> ON mid-stage rescheduling test;
-- T1 -> T6 and T6 -> T1 transitions;
+- confirm v0.5.3-dev3 startup installs the corrected disconnect hook with no LeeZ warning;
+- T1 -> T6 and T6 -> T1 transition tests;
 - overlapping-tier transition where the highest effective multiplier does not change;
-- save/reload during partially accelerated growth;
+- lamp removal mid-stage;
+- save/reload and chunk unload/reload during partially accelerated growth;
 - dedicated-server / remote-client validation;
 - isolated Y+11 and X/Z radius-3 boundary tests;
 - colour selection, persistence, synchronization and runtime tinting;
@@ -150,7 +156,7 @@ tools/                     V3.1 API probe script
 CHANGELOG.md               version history
 ROADMAP.md                 next development stages
 TESTING.md                 verified vs implemented vs pending test matrix
-MIDSTAGE_TESTING.md        v0.5.3 mid-stage transition test procedure
+MIDSTAGE_TESTING.md        v0.5.3 mid-stage transition test procedure/results
 ModInfo.xml                7DTD mod metadata
 ```
 
