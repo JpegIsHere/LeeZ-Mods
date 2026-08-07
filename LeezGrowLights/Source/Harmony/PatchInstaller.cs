@@ -159,46 +159,55 @@ namespace LeezGrowLights
             MethodInfo postfix = AccessTools.Method(
                 typeof(PowerTransitionPatches), nameof(PowerTransitionPatches.Postfix));
 
-            string[] transitionMethods =
+            string[] toggleTransitionMethods =
             {
                 "set_IsToggled",
                 "HandlePowerReceived",
-                "HandlePowerUpdate",
-                "HandleDisconnect"
+                "HandlePowerUpdate"
             };
 
             var patchedTokens = new HashSet<int>();
             int installed = 0;
 
-            foreach (string methodName in transitionMethods)
+            foreach (string methodName in toggleTransitionMethods)
             {
                 MethodInfo method = FindPreferredMethodByName(powerToggleType, methodName);
-                if (method == null || !patchedTokens.Add(method.MetadataToken))
+                if (method == null)
                 {
                     LeezLog.Warning(
-                        "Electrical transition hook not found/duplicate: PowerConsumerToggle." +
+                        "Electrical transition hook not found: PowerConsumerToggle." +
                         methodName);
                     continue;
                 }
 
-                try
-                {
-                    harmony.Patch(
-                        method,
-                        prefix: new HarmonyMethod(prefix),
-                        postfix: new HarmonyMethod(postfix));
+                installed += PatchPowerTransitionMethod(
+                    harmony,
+                    method,
+                    prefix,
+                    postfix,
+                    patchedTokens);
+            }
 
-                    installed++;
-                    LeezLog.Info(
-                        "Mid-stage electrical transition hook installed: " +
-                        DescribeDetailed(method));
-                }
-                catch (Exception ex)
-                {
-                    LeezLog.Warning(
-                        "Could not patch electrical transition " +
-                        Describe(method) + ": " + ex.Message);
-                }
+            // HandleDisconnect is implemented on PowerItem and inherited by
+            // PowerConsumerToggle. Harmony requires the declaring implementation.
+            MethodInfo disconnectMethod = AccessTools.Method(
+                typeof(PowerItem),
+                "HandleDisconnect",
+                Type.EmptyTypes);
+
+            if (disconnectMethod == null)
+            {
+                LeezLog.Warning(
+                    "Electrical transition hook not found: PowerItem.HandleDisconnect");
+            }
+            else
+            {
+                installed += PatchPowerTransitionMethod(
+                    harmony,
+                    disconnectMethod,
+                    prefix,
+                    postfix,
+                    patchedTokens);
             }
 
             if (installed == 0)
@@ -207,6 +216,37 @@ namespace LeezGrowLights
                 LeezLog.Info(
                     "Progress-preserving mid-stage rescheduler armed on " +
                     installed + " electrical transition method(s).");
+        }
+
+        private static int PatchPowerTransitionMethod(
+            Harmony harmony,
+            MethodInfo method,
+            MethodInfo prefix,
+            MethodInfo postfix,
+            HashSet<int> patchedTokens)
+        {
+            if (method == null || !patchedTokens.Add(method.MetadataToken))
+                return 0;
+
+            try
+            {
+                harmony.Patch(
+                    method,
+                    prefix: new HarmonyMethod(prefix),
+                    postfix: new HarmonyMethod(postfix));
+
+                LeezLog.Info(
+                    "Mid-stage electrical transition hook installed: " +
+                    DescribeDetailed(method));
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                LeezLog.Warning(
+                    "Could not patch electrical transition " +
+                    Describe(method) + ": " + ex.Message);
+                return 0;
+            }
         }
 
         private static MethodInfo FindPreferredMethodByName(Type type, string name)
