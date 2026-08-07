@@ -58,6 +58,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Harmony\BlockRemovalInstaller.cs" />
+    <Compile Include="Harmony\BlockRemovalPatches.cs" />
     <Compile Include="Harmony\Init.cs" />
     <Compile Include="Harmony\PatchInstaller.cs" />
     <Compile Include="Harmony\PlantGrowthPatches.cs" />
@@ -65,6 +67,7 @@
     <Compile Include="Harmony\SunlightSubstitutionPatches.cs" />
     <Compile Include="Runtime\GrowthScheduleContext.cs" />
     <Compile Include="Runtime\GrowLightScanner.cs" />
+    <Compile Include="Runtime\GrowLightTransitionRescheduler.cs" />
     <Compile Include="Runtime\PowerStateResolver.cs" />
     <Compile Include="Runtime\TickerScheduleAccessor.cs" />
     <Compile Include="Runtime\LeezLog.cs" />

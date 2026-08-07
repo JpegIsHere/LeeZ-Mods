@@ -3,13 +3,14 @@ namespace LeezGrowLights
     /// <summary>
     /// Preserves crop progress when a LeeZ grow light is physically removed/destroyed.
     ///
-    /// Prefix runs while the lamp still exists, capturing each affected crop's effective
-    /// multiplier. Postfix runs after vanilla removal, re-scans remaining overlapping lamps,
-    /// and reschedules only crops whose effective multiplier changed.
+    /// Prefix runs on the V3.1 block-removal callback, captures each affected crop's
+    /// effective multiplier, then Postfix re-scans remaining overlapping lamps and
+    /// reschedules only crops whose effective multiplier changed.
     /// </summary>
     internal static class BlockRemovalPatches
     {
         public static void Prefix(
+            object __instance,
             object[] __args,
             ref GrowLightTransitionRescheduler.TransitionState __state)
         {
@@ -46,10 +47,16 @@ namespace LeezGrowLights
                 }
             }
 
-            if (world == null || world.IsRemote() || !foundPos || !foundBlockValue)
+            if (world == null || world.IsRemote() || !foundPos)
                 return;
 
-            Block removedBlock = blockValue.Block;
+            // Harmony supplies the concrete block instance for the removal callback.
+            // Prefer that over the BlockValue argument so this remains resilient if the
+            // V3 method signature changes while still passing world/position.
+            Block removedBlock = __instance as Block;
+            if (removedBlock == null && foundBlockValue)
+                removedBlock = blockValue.Block;
+
             if (removedBlock == null)
                 return;
 

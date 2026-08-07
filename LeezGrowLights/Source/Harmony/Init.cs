@@ -3,19 +3,16 @@ using HarmonyLib;
 
 namespace LeezGrowLights
 {
-    /// <summary>
-    /// 7 Days to Die mod entry point.
-    /// V3.x uses IModApi.InitMod(Mod).
-    /// </summary>
     public sealed class ModApi : IModApi
     {
         public void InitMod(Mod _modInstance)
         {
             try
             {
-                LeezLog.Info("Loading V3.1 grow-light runtime candidate v0.5.3-dev3");
+                LeezLog.Info("Loading V3.1 grow-light runtime candidate v0.5.3-dev4");
                 Harmony harmony = new Harmony(_modInstance.Name);
                 PatchInstaller.Install(harmony);
+                BlockRemovalInstaller.Install(harmony);
             }
             catch (Exception ex)
             {
