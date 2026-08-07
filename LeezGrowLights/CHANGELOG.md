@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.3.0-dev3
+
+- Live V3.1 test confirmed progress-preserving mid-stage rescheduling.
+- T6 `1x -> 4x` quartered remaining scheduled ticks and `4x -> 1x` multiplied remaining ticks by four.
+- T4 `1x <-> 1.5x` transitions also produced the expected proportional reschedule.
+- Fixed the non-fatal `HandleDisconnect` Harmony warning by patching the declaring `PowerItem.HandleDisconnect()` implementation directly.
+- Direct toggle/power transitions are now live-validated; save/reload and dedicated-server validation remain pending.
+
 ## 0.5.3.0-dev2
 
 - Added first live progress-preserving mid-stage crop rescheduler for V3.1.0 b14.
