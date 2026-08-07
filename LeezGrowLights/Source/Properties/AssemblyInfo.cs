@@ -7,5 +7,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("LeezGrowLights")]
 [assembly: ComVisible(false)]
 [assembly: Guid("b31ad3c2-9a13-47b4-954e-c21f9d6d0bb2")]
-[assembly: AssemblyVersion("0.5.1.0")]
-[assembly: AssemblyFileVersion("0.5.1.0")]
+[assembly: AssemblyVersion("0.5.2.0")]
+[assembly: AssemblyFileVersion("0.5.2.0")]
