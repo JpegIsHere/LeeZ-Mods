@@ -34,6 +34,26 @@ namespace LeezGrowLights
             return ScanFarmFootprint(world, farmPos, false);
         }
 
+        /// <summary>
+        /// Removal-transition lookup that behaves as though one specific lamp position is already
+        /// gone. V3.1 can invoke OnBlockRemoved before the world block slot is cleared, so a normal
+        /// post-callback scan can still see the lamp that is in the process of being removed.
+        /// </summary>
+        internal static float GetBestActiveMultiplierQuietExcluding(
+            WorldBase world,
+            Vector3i plantPos,
+            Vector3i excludedLightPos)
+        {
+            if (world == null || world.IsRemote()) return 1f;
+            Vector3i farmPos = plantPos + Vector3i.down;
+            return ScanFarmFootprint(
+                world,
+                farmPos,
+                false,
+                true,
+                excludedLightPos);
+        }
+
         internal static bool TryGetGrowLightCoverage(
             Block block,
             out int radius,
@@ -86,6 +106,21 @@ namespace LeezGrowLights
 
         private static float ScanFarmFootprint(WorldBase world, Vector3i farmPos, bool logBoost)
         {
+            return ScanFarmFootprint(
+                world,
+                farmPos,
+                logBoost,
+                false,
+                default(Vector3i));
+        }
+
+        private static float ScanFarmFootprint(
+            WorldBase world,
+            Vector3i farmPos,
+            bool logBoost,
+            bool excludeLight,
+            Vector3i excludedLightPos)
+        {
             float best = 1f;
 
             // Valid grow-light height: 1 through 10 blocks above the supporting farm plot.
@@ -101,6 +136,10 @@ namespace LeezGrowLights
                     for (int dz = -DefaultRadius; dz <= DefaultRadius; dz++)
                     {
                         Vector3i lightPos = new Vector3i(farmPos.x + dx, lightY, farmPos.z + dz);
+
+                        if (excludeLight && SamePosition(lightPos, excludedLightPos))
+                            continue;
+
                         BlockValue lightValue = world.GetBlock(lightPos);
                         Block lightBlock = lightValue.Block;
                         if (lightBlock == null) continue;
@@ -146,6 +185,11 @@ namespace LeezGrowLights
             }
 
             return best;
+        }
+
+        private static bool SamePosition(Vector3i left, Vector3i right)
+        {
+            return left.x == right.x && left.y == right.y && left.z == right.z;
         }
 
         private static void LogLampStateChange(

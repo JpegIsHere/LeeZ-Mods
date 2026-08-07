@@ -9,7 +9,7 @@ namespace LeezGrowLights
         {
             try
             {
-                LeezLog.Info("Loading V3.1 grow-light runtime candidate v0.5.3-dev4");
+                LeezLog.Info("Loading V3.1 grow-light runtime candidate v0.5.3-dev5");
                 Harmony harmony = new Harmony(_modInstance.Name);
                 PatchInstaller.Install(harmony);
                 BlockRemovalInstaller.Install(harmony);

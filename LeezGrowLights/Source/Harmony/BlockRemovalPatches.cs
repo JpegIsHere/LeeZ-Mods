@@ -6,6 +6,10 @@ namespace LeezGrowLights
     /// Prefix runs on the V3.1 block-removal callback, captures each affected crop's
     /// effective multiplier, then Postfix re-scans remaining overlapping lamps and
     /// reschedules only crops whose effective multiplier changed.
+    ///
+    /// V3.1 can invoke OnBlockRemoved before the world block slot is cleared. Removal
+    /// transitions therefore mark the captured lamp position to be ignored during the
+    /// post-callback scan so the rescheduler observes the effective state after removal.
     /// </summary>
     internal static class BlockRemovalPatches
     {
@@ -72,7 +76,15 @@ namespace LeezGrowLights
             __state = GrowLightTransitionRescheduler.Capture(
                 world,
                 blockPos,
-                removedBlock);
+                removedBlock,
+                excludeLampOnApply: true);
+
+            if (__state != null)
+            {
+                LeezLog.Info(
+                    "Grow-light removal transition captured at " + blockPos +
+                    " for " + __state.Plants.Count + " crop(s).");
+            }
         }
 
         public static void Postfix(GrowLightTransitionRescheduler.TransitionState __state)

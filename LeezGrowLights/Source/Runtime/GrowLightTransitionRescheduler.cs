@@ -16,6 +16,7 @@ namespace LeezGrowLights
         {
             public WorldBase World;
             public Vector3i LampPos;
+            public bool ExcludeLampOnApply;
             public readonly List<PlantSnapshot> Plants = new List<PlantSnapshot>();
         }
 
@@ -29,7 +30,8 @@ namespace LeezGrowLights
         internal static TransitionState Capture(
             WorldBase world,
             Vector3i lampPos,
-            Block lampBlock)
+            Block lampBlock,
+            bool excludeLampOnApply = false)
         {
             if (world == null || world.IsRemote() || lampBlock == null)
                 return null;
@@ -46,7 +48,8 @@ namespace LeezGrowLights
             var state = new TransitionState
             {
                 World = world,
-                LampPos = lampPos
+                LampPos = lampPos,
+                ExcludeLampOnApply = excludeLampOnApply
             };
 
             // Current XML: at most 5*5*10 = 250 possible farm positions for one lamp.
@@ -99,8 +102,14 @@ namespace LeezGrowLights
                 if (currentBlockId != plant.BlockId)
                     continue;
 
-                float newMultiplier =
-                    GrowLightScanner.GetBestActiveMultiplierQuiet(world, plant.Position);
+                float newMultiplier = state.ExcludeLampOnApply
+                    ? GrowLightScanner.GetBestActiveMultiplierQuietExcluding(
+                        world,
+                        plant.Position,
+                        state.LampPos)
+                    : GrowLightScanner.GetBestActiveMultiplierQuiet(
+                        world,
+                        plant.Position);
 
                 if (Math.Abs(newMultiplier - plant.OldMultiplier) <= 0.0001f)
                     continue;
