@@ -55,7 +55,7 @@ Write-Host ""
 Assert-Equal $modInfo.xml.Version.value "0.5.3.0" "Stage 0 package version"
 
 $initSource = Read-Text "LeezGrowLights\Source\Harmony\Init.cs"
-Assert-True ($initSource.Contains("v0.5.3-dev4")) "Stage 0 runtime banner is dev4"
+Assert-True ($initSource.Contains("v0.5.3-dev5")) "Stage 0 runtime banner is dev5"
 
 # Stage 1: explicit old-style project compile manifest and hook wiring.
 [xml]$project = Read-Text "LeezGrowLights\Source\LeezGrowLights.csproj"
@@ -157,11 +157,13 @@ Assert-True ($scanner.Contains("DefaultMinVerticalOffsetFromFarm = 1")) "Stage 3
 Assert-True ($scanner.Contains("DefaultMaxVerticalOffsetFromFarm = 10")) "Stage 3 scanner maximum vertical offset is 10"
 Assert-True ($scanner.Contains("if (multiplier > best)")) "Stage 4 scanner uses highest active multiplier"
 Assert-True ($scanner.Contains("HasActiveSunlightReplacement") -and $scanner.Contains("ScanFarmFootprint")) "Stage 3 sunlight replacement delegates to farm-footprint scanning"
+Assert-True ($scanner.Contains("GetBestActiveMultiplierQuietExcluding") -and $scanner.Contains("SamePosition(lightPos, excludedLightPos)")) "Stage 5 removal scan can exclude the lamp being removed"
 
 # Stage 5: shared transition/equality guard and remaining-work conversion.
 $transition = Read-Text "LeezGrowLights\Source\Runtime\GrowLightTransitionRescheduler.cs"
 Assert-True ($transition.Contains("Math.Abs(newMultiplier - plant.OldMultiplier) <= 0.0001f")) "Stage 5 unchanged effective multiplier skips reschedule"
 Assert-True ($transition.Contains("TickerScheduleAccessor.RescheduleRemainingWork")) "Stage 5 shared transition calls ticker rescheduler"
+Assert-True ($transition.Contains("ExcludeLampOnApply") -and $transition.Contains("GetBestActiveMultiplierQuietExcluding")) "Stage 5 removal transition applies an exclusion-aware re-scan"
 
 $ticker = Read-Text "LeezGrowLights\Source\Runtime\TickerScheduleAccessor.cs"
 Assert-True ($ticker.Contains("oldRemainingTicks * (double)oldMultiplier")) "Stage 5 converts remaining ticks back to vanilla work"
@@ -169,6 +171,7 @@ Assert-True ($ticker.Contains("remainingVanillaWork / newMultiplier")) "Stage 5 
 
 $removalPatch = Read-Text "LeezGrowLights\Source\Harmony\BlockRemovalPatches.cs"
 Assert-True ($removalPatch.Contains("GrowLightTransitionRescheduler.Capture")) "Stage 5 removal captures old effective state"
+Assert-True ($removalPatch.Contains("excludeLampOnApply: true")) "Stage 5 removal capture marks the removed lamp for exclusion"
 Assert-True ($removalPatch.Contains("GrowLightTransitionRescheduler.Apply")) "Stage 5 removal applies new effective state"
 
 Write-Host ""
