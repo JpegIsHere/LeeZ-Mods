@@ -54,6 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Diagnostics\TickerApiDiagnostics.cs" />
     <Compile Include="Harmony\Init.cs" />
     <Compile Include="Harmony\PatchInstaller.cs" />
     <Compile Include="Harmony\PlantGrowthPatches.cs" />
