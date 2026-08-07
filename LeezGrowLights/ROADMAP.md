@@ -15,13 +15,17 @@ Goal: power changes during an already-scheduled crop stage must affect only futu
 
 - [x] Map the V3.1 world/block ticker API.
 - [x] Confirm safe invalidation/rescheduling path for crop ticks: `InvalidateScheduledBlockUpdate` + `AddScheduledBlockUpdate`.
-- [x] Implement first remaining-progress conversion/reschedule candidate for ON -> OFF and OFF -> ON transitions (`0.5.3-dev2`).
-- [ ] Live-validate T6 ON -> OFF -> ON tick expansion/reduction.
+- [x] Implement remaining-progress conversion/rescheduling for direct ON -> OFF and OFF -> ON transitions.
+- [x] Live-validate T6 ON -> OFF -> ON tick expansion/reduction.
+- [x] Live-validate proportional T4 `1x <-> 1.5x` transitions.
+- [x] Preserve already-earned progress for direct lamp toggle transitions.
+- [ ] Confirm v0.5.3-dev3 installs the corrected `PowerItem.HandleDisconnect()` hook with no warning.
 - [ ] Live-validate T1 -> T6 and T6 -> T1 transitions.
 - [ ] Validate overlapping tiers where the effective highest multiplier does not change.
 - [ ] Handle lamp removal mid-stage.
 - [ ] Handle save/reload correctly.
-- [ ] Validate direct power loss/restoration.
+- [ ] Validate direct source power loss/restoration.
+- [ ] Validate chunk unload/reload.
 - [ ] Validate upstream relay-only propagation before claiming it supported.
 - [ ] Keep behavior server-authoritative on dedicated server / remote client.
 
