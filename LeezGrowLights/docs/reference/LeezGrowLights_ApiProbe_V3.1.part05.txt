@@ -1,0 +1,104 @@
+  System.Void IsMovementBlockedAny(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean IsPlant()
+  System.Void IsSeeThrough(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean IsTileEntitySavedInPrefab()
+  System.Void IsUnderwater(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void LateInit()
+  System.Single MaxStepHeight(BlockValue blockDef, BlockFaceFlag stepSides)
+  System.Single MaxStepHeight(Vector3i blockPos, BlockValue blockDef, UnityEngine.Vector3 entityPos)
+  System.Object MemberwiseClone()
+  System.Single MinStepHeight(Vector3i blockPos, BlockValue blockDef, UnityEngine.Vector3 entityPos)
+  System.Single MinStepHeight(BlockValue blockDef, BlockFaceFlag stepSides)
+  System.Void OnBlockActivated(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockActivated(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockAdded(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockDamaged(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockDestroyedBy(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockDestroyedByExplosion(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockEntityTransformAfterActivated(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockEntityTransformBeforeActivated(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockLoaded(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockPickedUp(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockPlaceBefore(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockPlaced(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockRemoved(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockReset(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockStartsToFall(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockUnloaded(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnBlockValueChanged(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnEntityCollidedWithBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnEntityWalking(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnNeighborBlockChange(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnTriggerAddedFromPrefab(BlockTrigger _trigger, Vector3i _blockPos, BlockValue _blockValue, FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] _questTags)
+  System.Void OnTriggerChanged(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnTriggerChanged(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnTriggered(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnTriggerRefresh(BlockTrigger _trigger, BlockValue _bv, FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] questTag)
+  System.Void overlapsWithOtherBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void PickupOrDrop(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void PlaceBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void PlaceProp(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void Refresh(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void RenderDecorations(Vector3i _worldPos, BlockValue _blockValue, UnityEngine.Vector3 _drawPos, UnityEngine.Vector3[] _vertices, LightingAround _lightingAround, TextureFullArray _textureFullArray, VoxelMesh[] _meshes, INeighborBlockCache _nBlocks)
+  System.Void RotateHoldingBlock(ItemClassBlock+ItemBlockInventoryData _blockInventoryData, System.Boolean _increaseRotation, System.Boolean _playSoundOnRotation)
+  System.Boolean RotateVerticesOnCollisionCheck(BlockValue _blockValue)
+  System.Void set_IsNotifyOnLoadUnload(System.Boolean value)
+  System.Void set_Properties(DynamicProperties value)
+  System.Void set_ShapeCategories(System.Collections.Generic.List`1[[ShapesFromXml+ShapeCategory, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] value)
+  System.Void SetBlockName(System.String _blockName)
+  Block SetLightValue(System.Single _lightValueInPercent)
+  System.Void SetSideTextureId(System.Int32 _textureId, System.Int32 channel)
+  System.Void SetSideTextureId(System.String[] _texIds, System.Int32 channel)
+  System.Boolean ShowModelOnFall()
+  System.Void SpawnDestroyFX(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void SpawnDestroyParticleEffect(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void SpawnDowngradeFX(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void SpawnFX(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean SupportsRotation(System.Byte _rotation)
+  System.Boolean SupportsRotationFromMask(System.Int32 rotationMask)
+  System.Void takeItemWithTimer(Vector3i _blockPos, BlockValue _blockValue, EntityPlayerLocal _player, System.Single _takeDelay)
+  System.Boolean takeItemWithTimerCanTake(Vector3i _blockPos, EntityAlive _player)
+  BlockValue ToBlockValue()
+  System.String ToString()
+  System.Void UpdateTick(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void UseBuffsWhenWalkedOn(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+
+============================================================
+TYPE: WorldBase
+TYPE LOOKUP ERROR: MethodInvocationException: Exception calling "GetType" with "3" argument(s): "Non-abstract, non-.cctor method in an interface."
+NOT FOUND
+
+============================================================
+TYPE: TileEntity
+FullName: TileEntity
+BaseType: System.Object
+IsInterface: False
+
+PROPERTIES:
+  Block block
+  BlockValue blockValue
+  System.Boolean bWaitingForServerResponse
+  System.Boolean IsRemoving
+  System.Collections.Generic.List`1[[ITileEntityChangedListener, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] listeners
+  Vector3i localChunkPos
+  LockTargetType LockTargetType
+
+FIELDS:
+  System.Collections.Generic.List`1[[ITileEntityChangedListener, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] _listeners
+  System.Boolean <IsRemoving>k__BackingField
+  System.Boolean bDisableModifiedCheck
+  System.Boolean bUserAccessing
+  <unknown> chunk
+  Vector3i chunkPos
+  XUiEvent_TileEntityDestroyed Destroyed
+  System.Byte handleCounter
+  System.UInt64 heapMapLastTime
+  System.UInt64 heapMapUpdateTime
+  System.Byte lockHandleWaitingFor
+  System.Int32 readVersion
+  System.Int32 Version
+
+METHODS:
+  System.Void add_Destroyed(XUiEvent_TileEntityDestroyed value)
+  System.Boolean CanLockLocally(ILockContext _context, System.UInt16 _channel)
+  System.Boolean CanLockOnServer(System.Int32 _lockingPlayerId, ILockContext _context, System.UInt16 _channel)

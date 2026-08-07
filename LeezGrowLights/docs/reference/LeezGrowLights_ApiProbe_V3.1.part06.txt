@@ -1,0 +1,192 @@
+  TileEntity Clone()
+  System.Void CopyFrom(TileEntity _other)
+  System.Void emitHeatMapEvent(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean Equals(System.Object obj)
+  System.Void Finalize()
+  Block get_block()
+  BlockValue get_blockValue()
+  System.Boolean get_bWaitingForServerResponse()
+  System.Boolean get_IsRemoving()
+  System.Collections.Generic.List`1[[ITileEntityChangedListener, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] get_listeners()
+  Vector3i get_localChunkPos()
+  LockTargetType get_LockTargetType()
+  System.Void GetChunk(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Int32 GetHashCode()
+  System.Int32 GetLegacyForkVersion()
+  LockTargetType GetLockTargetType()
+  TileEntityType GetTileEntityType()
+  System.Type GetType()
+  System.Void InstantiateFromRead(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void IsActive(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void IsByWater(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean IsSharedLock(System.UInt16 _channel)
+  System.Boolean IsUserAccessing()
+  System.Object MemberwiseClone()
+  System.Void NotifyListeners()
+  System.Void OnDestroy()
+  System.Void OnLoad()
+  System.Void OnLockedLocal(System.Boolean _success, ILockContext _context, System.UInt16 _channel)
+  System.Void OnLockedServer(System.Boolean _success, System.Int32 _lockingPlayerID, ILockContext _context, System.UInt16 _channel)
+  System.Void OnReadComplete()
+  System.Void OnRemove(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnSetLocalChunkPosition()
+  System.Void OnUnload(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnUnlockedServer(System.Int32 _unlockingPlayerID, System.UInt16 _channel)
+  System.Void read(PooledBinaryReader _br, TileEntity+StreamModeRead _eStreamMode)
+  System.Void remove_Destroyed(XUiEvent_TileEntityDestroyed value)
+  System.Void ReplacedBy(BlockValue _bvOld, BlockValue _bvNew, TileEntity _teNew)
+  System.Void Reset(FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] questTags)
+  System.Void set_IsRemoving(System.Boolean value)
+  System.Void set_localChunkPos(Vector3i value)
+  System.Void SetChunk(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void SetChunkModified()
+  System.Void SetDisableModifiedCheck(System.Boolean _b)
+  System.Void SetHandle(System.Byte _handle)
+  System.Void SetModified()
+  System.Void setModified()
+  System.Void SetUserAccessing(System.Boolean _bUserAccessing)
+  System.String ToString()
+  UnityEngine.Vector3 ToWorldCenterPos()
+  Vector3i ToWorldPos()
+  System.Void UpdateTick(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void UpgradeDowngradeFrom(TileEntity _other)
+  System.Boolean UseLocalVersioning()
+  System.Void write(PooledBinaryWriter _bw, TileEntity+StreamModeWrite _eStreamMode)
+
+============================================================
+TYPE: TileEntityPowered
+FullName: TileEntityPowered
+BaseType: TileEntity
+IsInterface: False
+
+PROPERTIES:
+  Block block
+  UnityEngine.Transform BlockTransform
+  BlockValue blockValue
+  System.Boolean bWaitingForServerResponse
+  System.Int32 ChildCount
+  System.Boolean IsPlayerPlaced
+  System.Boolean IsPowered
+  System.Boolean IsRemoving
+  System.Collections.Generic.List`1[[ITileEntityChangedListener, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] listeners
+  Vector3i localChunkPos
+  LockTargetType LockTargetType
+  System.Int32 PowerUsed
+  System.Int32 RequiredPower
+
+FIELDS:
+  System.Collections.Generic.List`1[[ITileEntityChangedListener, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] _listeners
+  System.Boolean <IsRemoving>k__BackingField
+  System.Boolean activateDirty
+  System.Boolean bDisableModifiedCheck
+  UnityEngine.Transform blockTransform
+  System.Boolean bUserAccessing
+  System.Single CenteredPitch
+  System.Single CenteredYaw
+  <unknown> chunk
+  Vector3i chunkPos
+  System.Collections.Generic.List`1[[IWireNode, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] currentWireNodes
+  System.Byte handleCounter
+  System.UInt64 heapMapLastTime
+  System.UInt64 heapMapUpdateTime
+  System.Boolean isPlayerPlaced
+  System.Boolean isPowered
+  System.Byte lockHandleWaitingFor
+  System.Boolean needBlockData
+  Vector3i parentPosition
+  PowerItem PowerItem
+  PowerItem+PowerItemTypes PowerItemType
+  System.Int32 readVersion
+  System.Int32 requiredPower
+  System.Int32 ver
+  System.String WindowGroupToOpen
+  System.Collections.Generic.List`1[[Vector3i, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] wireDataList
+  UnityEngine.Vector3 WireOffset
+  System.Boolean wiresDirty
+
+METHODS:
+  System.Boolean Activate(System.Boolean activated)
+  System.Boolean ActivateOnce()
+  System.Void add_Destroyed(XUiEvent_TileEntityDestroyed value)
+  System.Void AddWireData(Vector3i child)
+  System.Boolean CanHaveParent(IPowered powered)
+  System.Boolean CanLockLocally(ILockContext _context, System.UInt16 _channel)
+  System.Boolean CanLockOnServer(System.Int32 _lockingPlayerId, ILockContext _context, System.UInt16 _channel)
+  System.Void CheckForNewWires()
+  TileEntity Clone()
+  System.Void CopyFrom(TileEntity _other)
+  PowerItem CreatePowerItem()
+  PowerItem CreatePowerItemForTileEntity(System.UInt16 blockID)
+  System.Void CreateWireDataFromPowerItem()
+  System.Void DrawWires()
+  System.Void emitHeatMapEvent(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean Equals(System.Object obj)
+  System.Void Finalize()
+  Block get_block()
+  UnityEngine.Transform get_BlockTransform()
+  BlockValue get_blockValue()
+  System.Boolean get_bWaitingForServerResponse()
+  System.Int32 get_ChildCount()
+  System.Boolean get_IsPlayerPlaced()
+  System.Boolean get_IsPowered()
+  System.Boolean get_IsRemoving()
+  System.Collections.Generic.List`1[[ITileEntityChangedListener, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] get_listeners()
+  Vector3i get_localChunkPos()
+  LockTargetType get_LockTargetType()
+  System.Int32 get_PowerUsed()
+  System.Int32 get_RequiredPower()
+  System.Void GetChunk(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Int32 GetHashCode()
+  System.Int32 GetLegacyForkVersion()
+  LockTargetType GetLockTargetType()
+  Vector3i GetParent()
+  PowerItem GetPowerItem()
+  System.Int32 GetRequiredPower()
+  TileEntityType GetTileEntityType()
+  System.Type GetType()
+  UnityEngine.Vector3 GetWireOffset()
+  System.Boolean HasParent()
+  System.Void InitializePowerData()
+  System.Void IsActive(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void IsByWater(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean IsSharedLock(System.UInt16 _channel)
+  System.Boolean IsUserAccessing()
+  System.Void MarkChanged()
+  System.Void MarkWireDirty()
+  System.Object MemberwiseClone()
+  System.Void NotifyListeners()
+  System.Void OnDestroy()
+  System.Void OnLoad()
+  System.Void OnLockedLocal(System.Boolean _success, ILockContext _context, System.UInt16 _channel)
+  System.Void OnLockedServer(System.Boolean _success, System.Int32 _lockingPlayerID, ILockContext _context, System.UInt16 _channel)
+  System.Void OnReadComplete()
+  System.Void OnRemove(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnSetLocalChunkPosition()
+  System.Void OnUnload(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void OnUnlockedServer(System.Int32 _unlockingPlayerID, System.UInt16 _channel)
+  System.Void read(PooledBinaryReader _br, TileEntity+StreamModeRead _eStreamMode)
+  System.Void remove_Destroyed(XUiEvent_TileEntityDestroyed value)
+  System.Void RemoveParentWithWiringTool(System.Int32 wiringEntityID)
+  System.Void RemoveWires()
+  System.Void ReplacedBy(BlockValue _bvOld, BlockValue _bvNew, TileEntity _teNew)
+  System.Void Reset(FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] questTags)
+  System.Void SendWireData()
+  System.Void set_BlockTransform(UnityEngine.Transform value)
+  System.Void set_IsPlayerPlaced(System.Boolean value)
+  System.Void set_IsRemoving(System.Boolean value)
+  System.Void set_localChunkPos(Vector3i value)
+  System.Void set_RequiredPower(System.Int32 value)
+  System.Void SetChunk(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void SetChunkModified()
+  System.Void SetDisableModifiedCheck(System.Boolean _b)
+  System.Void SetHandle(System.Byte _handle)
+  System.Void SetModified()
+  System.Void setModified()
+  System.Void SetParentWithWireTool(IPowered newParentTE, System.Int32 wiringEntityID)
+  System.Void SetUserAccessing(System.Boolean _bUserAccessing)
+  System.Void SetValuesFromBlock(System.UInt16 blockID)
+  System.Void SetWireData(System.Collections.Generic.List`1[[Vector3i, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] wireChildren)
+  System.String ToString()
+  UnityEngine.Vector3 ToWorldCenterPos()
+  Vector3i ToWorldPos()
+  System.Void UpdateTick(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)

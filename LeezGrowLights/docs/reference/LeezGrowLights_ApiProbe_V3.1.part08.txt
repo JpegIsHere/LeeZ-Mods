@@ -1,0 +1,56 @@
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  [LOADER] TypeLoadException: Non-abstract, non-.cctor method in an interface.
+  BlockCompositeTileEntity
+  BlockElectricWire
+  BlockPowered
+  BlockPoweredDoor
+  BlockPoweredLight
+  BlockPoweredTrap
+  BlockPowerSource
+  IFeaturePhysicalCapabilities
+  IFeatureSavedInPrefab
+  IFeatureTriggerCapability
+  ITileEntityFeature
+  MultiBlockManager+FeatureFlags
+  MultiBlockManager+FeatureRequirement
+  PowerConsumer
+  PowerConsumerSingle
+  PowerConsumerToggle
+  TEFeatureAbs
+  TEFeatureAreaRepair
+  TEFeatureCanvas
+  TEFeatureCombine
+  TEFeatureDoor
+  TEFeatureExplodable
+  TEFeatureLandClaim
+  TEFeatureLockPickable
+  TEFeaturePickup
+  TEFeatureSignable
+  TEFeatureStorage
+  TileEntityComposite
+  TileEntityCompositeData
+  TileEntityFeatureData
+  TileEntityFeatureData+FeatureDataSorterByName
+  TileEntityPowered
+  TileEntityPoweredBlock
+  TileEntityPoweredMeleeTrap
+  TileEntityPoweredRangedTrap
+  TileEntityPoweredTrigger
+  TileEntityPowerSource
+  XUiC_PrefabFeatureEditorList
+  XUiC_PrefabFeatureEditorList+FeatureChangedDelegate
+  XUiC_PrefabFeatureEditorList+FeatureEntry
+
+============================================================
+PROBE COMPLETED

@@ -1,0 +1,33 @@
+# Build output
+**/*.dll
+**/*.pdb
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# Game/runtime logs
+*.log
+output_log_*.txt
+BacktraceLogs/
+
+# Local game assemblies / dependencies
+Assembly-CSharp.dll
+LogLibrary.dll
+0Harmony.dll
+7DaysToDie_Data/
+
+# Packages and archives
+*.zip
+*.7z
+*.rar
+
+# OS/editor noise
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+
+# Temporary API-probe output (curated reports belong under project docs/reference/)
+LeezGrowLights_ApiProbe.txt

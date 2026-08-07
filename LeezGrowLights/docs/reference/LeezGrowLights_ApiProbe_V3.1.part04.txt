@@ -1,0 +1,140 @@
+  System.Collections.Generic.List`1[[Block+SItemNameCount, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] RepairItems
+  System.Collections.Generic.List`1[[Block+SItemNameCount, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] RepairItemsMeshDamage
+  System.Int32 requiredPower
+  System.Single ResourceScale
+  System.Boolean SelectAlternates
+  System.Boolean SellableToTrader
+  BlockShape shape
+  BlockValue SiblingBlock
+  System.Single SlopeMaxCos
+  System.Int32 SmallDecorationRadius
+  System.String SortOrder
+  System.String SoundHitAdditional
+  System.String SoundPickup
+  System.String SoundPlace
+  System.Boolean StabilityFull
+  System.Boolean StabilityIgnore
+  System.Boolean StabilitySupport
+  System.Int32 Stacknumber
+  System.Int32 Stage2Health
+  System.Int32 StartDamage
+  FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] Tags
+  System.Single TakeDelay
+  TerrainAlignmentMode terrainAlignmentMode
+  System.Int32 TerrainTAIndex
+  Block+TextureInfo[] textureInfos
+  UnityEngine.Color tintColor
+  UnityEngine.Vector3 tintColorV
+  System.String TraderStageTemplate
+  System.Int32 uiBackgroundTextureId
+  RecipeUnlockData[] unlockedBy
+  BlockValue UpgradeBlock
+  System.Single UpgradeExp
+  System.String UpgradeSound
+  System.UInt32[] UVModesPerSide
+  System.Single VehicleHitScale
+  System.Boolean WaterClipEnabled
+  UnityEngine.Plane WaterClipPlane
+  BlockFaceFlag WaterFlowMask
+  DataItem`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] Weight
+
+METHODS:
+  System.Void ActivateBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void ActivateBlockOnce(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void AddDroppedId(EnumDropEvent _eEvent, System.String _name, System.Int32 _minCount, System.Int32 _maxCount, System.Single _prob, System.Single _resourceScale, System.Single _stickChance, System.String _toolCategory, System.String _tag)
+  System.Int32 AlternateBlockCount()
+  System.Int32 AutoShapeAlternateShapeNameIndex(System.String _shapeName)
+  System.Boolean AutoShapeSupportsShapeName(System.String _shapeName)
+  System.Boolean CanBlocksReplaceOrGroundCover()
+  System.Void CanPlaceBlockAt(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void CanPlantStay(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean CanRepair(BlockValue _blockValue)
+  System.Void CheckUpdate(BlockValue _oldBV, BlockValue _newBV, System.Boolean& bUpdateMesh, System.Boolean& bUpdateNotify, System.Boolean& bUpdateLight)
+  System.Boolean ContainsAlternateBlock(System.String block)
+  System.Byte convertRotation(BlockValue _oldBV, BlockValue _newBV)
+  System.Void CopyDroppedFrom(Block _other)
+  System.Void CreateTileEntity(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void DamageBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void DoExchangeAction(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Collections.IEnumerator drawWiresLater(IPowered powered)
+  System.Void DropItemsOnEvent(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean Equals(System.Object obj)
+  System.Boolean FilterIndexType(BlockValue bv)
+  System.Void Finalize()
+  System.Void ForceAnimationState(BlockValue _blockValue, BlockEntityData _ebcd)
+  System.Boolean get_AllowBlockTriggers()
+  BlockActivationCommand[] get_CustomCmds()
+  System.Boolean get_IsCollideArrows()
+  System.Boolean get_IsCollideBullets()
+  System.Boolean get_IsCollideMelee()
+  System.Boolean get_IsCollideMovement()
+  System.Boolean get_IsCollideRockets()
+  System.Boolean get_IsCollideSight()
+  System.Boolean get_IsNotifyOnLoadUnload()
+  DynamicProperties get_Properties()
+  System.Int32 get_RequiredPower()
+  System.Collections.Generic.List`1[[ShapesFromXml+ShapeCategory, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] get_ShapeCategories()
+  RecipeUnlockData[] get_UnlockedBy()
+  System.Int32 GetActivationDistanceSq()
+  System.Void GetActivationText(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  Block GetAltBlock(System.Int32 _typeId)
+  System.String[] GetAltBlockNames()
+  Block[] GetAltBlocks()
+  BlockValue GetAltBlockValue(System.Int32 typeID)
+  System.Int32 GetAlternateBlockIndex(System.String block)
+  System.String GetAutoShapeBlockName()
+  Block GetAutoShapeHelperBlock()
+  System.String GetAutoShapeShapeName()
+  EAutoShapeType GetAutoShapeType()
+  System.Void GetBlockActivationCommands(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.String GetBlockName()
+  BlockValue GetBlockValueFromProperty(System.String _propValue)
+  System.Collections.Generic.IList`1[[UnityEngine.Bounds, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] GetClipBoundsList(BlockValue _blockValue, UnityEngine.Vector3 _blockPos)
+  System.Void GetCollidingAABB(BlockValue _blockValue, System.Int32 _x, System.Int32 _y, System.Int32 _z, System.Single _distortedAddY, UnityEngine.Bounds _aabb, System.Collections.Generic.List`1[[UnityEngine.Bounds, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] _aabbList)
+  System.Void GetCollisionAABB(BlockValue _blockValue, System.Int32 _x, System.Int32 _y, System.Int32 _z, System.Single _distortedAddY, System.Collections.Generic.List`1[[UnityEngine.Bounds, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] _result)
+  System.Void GetCollisionCollisionHash(System.Security.Cryptography.IncrementalHash calcHash)
+  UnityEngine.Color GetColorForSide(BlockValue _blockValue, BlockFace _side)
+  System.String GetCustomDescription(Vector3i _blockPos, BlockValue _bv)
+  System.String GetDestroyParticle(BlockValue _blockValue)
+  System.Single GetExplosionResistance()
+  System.Void GetFreePlacementPosition(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Single GetHardness()
+  System.Int32 GetHashCode()
+  System.String GetIconName()
+  BlockFace getInventoryFace()
+  System.Byte GetLightValue(BlockValue _blockValue)
+  System.String GetLocalizedAutoShapeShapeName()
+  System.String GetLocalizedBlockName()
+  System.String GetLocalizedBlockName(ItemValue _itemValueRef)
+  UnityEngine.Color GetMapColor(BlockValue _blockValue, UnityEngine.Vector3 _normal, System.Int32 _yPos)
+  MaterialBlock GetMaterialForSide(BlockValue _blockValue, BlockFace _side)
+  System.String GetParticleForSide(BlockValue _blockValue, BlockFace _side)
+  UnityEngine.Vector2 GetPathOffset(System.Int32 _rotation)
+  System.Void GetPlaceAltBlockValue(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Int32 GetPlacementDistanceSq()
+  System.Int32 GetShownMaxDamage()
+  System.Int32 GetSideTextureId(BlockValue _blockValue, BlockFace _side, System.Int32 channel)
+  System.Void GetStepHeight(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.UInt64 GetTickRate()
+  System.Type GetType()
+  System.Int32 GetUiBackgroundTextureId(BlockValue _blockValue, BlockFace _side, System.Int32 channel)
+  Block+UVMode GetUVMode(System.Int32 side, System.Int32 channel)
+  UnityEngine.Rect getUVRectFromSideAndMetadata(System.Int32 _meshIndex, BlockFace _side, UnityEngine.Vector3 _worldPos, BlockValue _blockValue)
+  UnityEngine.Rect getUVRectFromSideAndMetadata(System.Int32 _meshIndex, BlockFace _side, UnityEngine.Vector3[] _vertices, BlockValue _blockValue)
+  System.Int32 GetWeight()
+  System.Void GroundAlign(BlockEntityData _data)
+  System.Void HandleTrigger(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean HasAllFastTags(FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] _tags)
+  System.Boolean HasAnyFastTags(FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] _tags)
+  System.Void HasBlockActivationCommands(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean HasCollidingAABB(BlockValue _blockValue, System.Int32 _x, System.Int32 _y, System.Int32 _z, System.Single _distortedAddY, UnityEngine.Bounds _aabb)
+  System.Boolean HasItemsToDropForEvent(EnumDropEvent _eEvent)
+  System.Boolean HasTag(BlockTags _tag)
+  System.Void Init()
+  System.Void intersectRayWithBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean IsElevator()
+  System.Boolean IsElevator(System.Int32 rotation)
+  System.Boolean IsHealthShownInUI(HitInfoDetails _hit, BlockValue _bv)
+  System.Void IsMovementBlocked(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void IsMovementBlocked(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void IsMovementBlocked(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)

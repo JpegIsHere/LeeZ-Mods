@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+    <!--
+      V0.2 visual/power scaffold.
+      Uses the vanilla player ceiling-light behavior for wiring/on-off control,
+      but swaps the visible prefab to the White LED Light Panel seen in the supplied screenshot.
+
+      Vanilla panel prefab:
+        @:Entities/Electrical/lightPanelLEDPrefab.prefab
+
+      Runtime grow-speed and selectable color still require the LeezGrowLights DLL.
+    -->
+    <append xpath="/blocks">
+        <block name="leezGrowLightT1">
+            <property name="Extends" value="ceilingLight01_player" />
+            <property name="CreativeMode" value="Player" />
+            <property name="CustomIcon" value="lightPanelLEDWhite" />
+            <property name="Model" value="@:Entities/Electrical/lightPanelLEDPrefab.prefab" />
+            <property name="ModelOffset" value="0,.545,0" />
+            <property name="HandleFace" value="Top" />
+            <property name="RequiredPower" value="10" />
+            <property name="DescriptionKey" value="leezGrowLightT1Desc" />
+            <property name="LeezGrowTier" value="1" />
+            <property name="LeezGrowMultiplier" value="1.2" />
+            <property name="LeezGrowRadius" value="2" />
+            <property name="LeezGrowMinFarmBlockVerticalOffset" value="1" />
+            <property name="LeezGrowMaxFarmBlockVerticalOffset" value="10" />
+            <property name="LeezGrowAllowedColors" value="Blue,Green,Red,Purple,White,Yellow" />
+            <property name="LeezGrowDefaultColor" value="White" />
+        </block>
+
+        <block name="leezGrowLightT2">
+            <property name="Extends" value="ceilingLight01_player" />
+            <property name="CreativeMode" value="Player" />
+            <property name="CustomIcon" value="lightPanelLEDWhite" />
+            <property name="Model" value="@:Entities/Electrical/lightPanelLEDPrefab.prefab" />
+            <property name="ModelOffset" value="0,.545,0" />
+            <property name="HandleFace" value="Top" />
+            <property name="RequiredPower" value="10" />
+            <property name="DescriptionKey" value="leezGrowLightT2Desc" />
+            <property name="LeezGrowTier" value="2" />
+            <property name="LeezGrowMultiplier" value="1.3" />
+            <property name="LeezGrowRadius" value="2" />
+            <property name="LeezGrowMinFarmBlockVerticalOffset" value="1" />
+            <property name="LeezGrowMaxFarmBlockVerticalOffset" value="10" />
+            <property name="LeezGrowAllowedColors" value="Blue,Green,Red,Purple,White,Yellow" />
+            <property name="LeezGrowDefaultColor" value="White" />
+        </block>
+
+        <block name="leezGrowLightT3">
+            <property name="Extends" value="ceilingLight01_player" />
+            <property name="CreativeMode" value="Player" />
+            <property name="CustomIcon" value="lightPanelLEDWhite" />
+            <property name="Model" value="@:Entities/Electrical/lightPanelLEDPrefab.prefab" />
+            <property name="ModelOffset" value="0,.545,0" />
+            <property name="HandleFace" value="Top" />
+            <property name="RequiredPower" value="10" />
+            <property name="DescriptionKey" value="leezGrowLightT3Desc" />
+            <property name="LeezGrowTier" value="3" />
+            <property name="LeezGrowMultiplier" value="1.4" />
+            <property name="LeezGrowRadius" value="2" />
+            <property name="LeezGrowMinFarmBlockVerticalOffset" value="1" />
+            <property name="LeezGrowMaxFarmBlockVerticalOffset" value="10" />
+            <property name="LeezGrowAllowedColors" value="Blue,Green,Red,Purple,White,Yellow" />
+            <property name="LeezGrowDefaultColor" value="White" />
+        </block>
+
+        <block name="leezGrowLightT4">
+            <property name="Extends" value="ceilingLight01_player" />
+            <property name="CreativeMode" value="Player" />
+            <property name="CustomIcon" value="lightPanelLEDWhite" />
+            <property name="Model" value="@:Entities/Electrical/lightPanelLEDPrefab.prefab" />
+            <property name="ModelOffset" value="0,.545,0" />
+            <property name="HandleFace" value="Top" />
+            <property name="RequiredPower" value="10" />
+            <property name="DescriptionKey" value="leezGrowLightT4Desc" />
+            <property name="LeezGrowTier" value="4" />
+            <property name="LeezGrowMultiplier" value="1.5" />
+            <property name="LeezGrowRadius" value="2" />
+            <property name="LeezGrowMinFarmBlockVerticalOffset" value="1" />
+            <property name="LeezGrowMaxFarmBlockVerticalOffset" value="10" />
+            <property name="LeezGrowAllowedColors" value="Blue,Green,Red,Purple,White,Yellow" />
+            <property name="LeezGrowDefaultColor" value="White" />
+        </block>
+
+        <block name="leezGrowLightT5">
+            <property name="Extends" value="ceilingLight01_player" />
+            <property name="CreativeMode" value="Player" />
+            <property name="CustomIcon" value="lightPanelLEDWhite" />
+            <property name="Model" value="@:Entities/Electrical/lightPanelLEDPrefab.prefab" />
+            <property name="ModelOffset" value="0,.545,0" />
+            <property name="HandleFace" value="Top" />
+            <property name="RequiredPower" value="10" />
+            <property name="DescriptionKey" value="leezGrowLightT5Desc" />
+            <property name="LeezGrowTier" value="5" />
+            <property name="LeezGrowMultiplier" value="1.6" />
+            <property name="LeezGrowRadius" value="2" />
+            <property name="LeezGrowMinFarmBlockVerticalOffset" value="1" />
+            <property name="LeezGrowMaxFarmBlockVerticalOffset" value="10" />
+            <property name="LeezGrowAllowedColors" value="Blue,Green,Red,Purple,White,Yellow" />
+            <property name="LeezGrowDefaultColor" value="White" />
+        </block>
+
+        <block name="leezGrowLightT6">
+            <property name="Extends" value="ceilingLight01_player" />
+            <property name="CreativeMode" value="Player" />
+            <property name="CustomIcon" value="lightPanelLEDWhite" />
+            <property name="Model" value="@:Entities/Electrical/lightPanelLEDPrefab.prefab" />
+            <property name="ModelOffset" value="0,.545,0" />
+            <property name="HandleFace" value="Top" />
+            <property name="RequiredPower" value="10" />
+            <property name="DescriptionKey" value="leezGrowLightT6Desc" />
+            <property name="LeezGrowTier" value="6" />
+            <property name="LeezGrowMultiplier" value="4.0" />
+            <property name="LeezGrowRadius" value="2" />
+            <property name="LeezGrowMinFarmBlockVerticalOffset" value="1" />
+            <property name="LeezGrowMaxFarmBlockVerticalOffset" value="10" />
+            <property name="LeezGrowAllowedColors" value="Blue,Green,Red,Purple,White,Yellow" />
+            <property name="LeezGrowDefaultColor" value="White" />
+        </block>
+
+    </append>
+</configs>

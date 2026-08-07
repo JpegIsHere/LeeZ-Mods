@@ -1,0 +1,242 @@
+LeezGrowLights V3.1 API probe - resilient reflection build
+Generated: 2026-08-07T16:42:31.7037092+10:00
+PowerShell: 5.1.19041.6456
+CLR: 4.0.30319.42000
+Assembly: C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\7DaysToDie_Data\Managed\Assembly-CSharp.dll
+
+============================================================
+TYPE: BlockPlantGrowing
+FullName: BlockPlantGrowing
+BaseType: BlockPlant
+IsInterface: False
+
+PROPERTIES:
+  System.Boolean AllowBlockTriggers
+  BlockActivationCommand[] CustomCmds
+  System.Boolean IsCollideArrows
+  System.Boolean IsCollideBullets
+  System.Boolean IsCollideMelee
+  System.Boolean IsCollideMovement
+  System.Boolean IsCollideRockets
+  System.Boolean IsCollideSight
+  System.Boolean IsNotifyOnLoadUnload
+  DynamicProperties Properties
+  System.Collections.Generic.List`1[[ShapesFromXml+ShapeCategory, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] ShapeCategories
+  RecipeUnlockData[] UnlockedBy
+
+FIELDS:
+  System.Collections.Generic.List`1[[ShapesFromXml+ShapeCategory, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] <ShapeCategories>k__BackingField
+  System.String ActionSkillGroup
+  System.Int32 activationDistance
+  EBlockRotationClasses AllowedRotations
+  System.String autoShapeBaseName
+  Block autoShapeHelper
+  System.String autoShapeShapeName
+  EAutoShapeType AutoShapeType
+  System.Boolean bGrowOnTopEnabled
+  System.Boolean bHasPlacementWireframe
+  System.Int32 BigDecorationRadius
+  System.Boolean bImposterDontBlock
+  System.Boolean bImposterExclude
+  System.Boolean bImposterExcludeAndStop
+  System.Boolean bIsPlant
+  System.String blockAddedEvent
+  System.String blockDestroyedEvent
+  System.String blockDowngradedToEvent
+  System.String blockDowngradeEvent
+  System.Int32 blockID
+  System.Int32 BlockingType
+  MaterialBlock blockMaterial
+  System.String blockName
+  BlockPlacement BlockPlacementHelper
+  System.Byte BlocksMovement
+  BlockTags BlockTag
+  System.Boolean bMapColor2Set
+  System.Boolean bMapColorSet
+  System.Boolean bNotifyOnLoadUnload
+  System.Boolean bRestrictSubmergedPlacement
+  System.Boolean bShowModelOnFall
+  System.String[] BuffsWhenWalkedOn
+  System.Boolean bUserHidden
+  System.Boolean CanBlocksReplace
+  System.Boolean CanDecorateOnSlopes
+  System.Boolean CanMobsSpawnOn
+  System.Boolean CanPickup
+  System.Boolean CanPlayersSpawnOn
+  BlockActivationCommand[] cmds
+  System.Int32 Count
+  System.Single CraftComponentExp
+  System.Single CraftComponentTime
+  System.String CraftingSkillGroup
+  EnumCreativeMode CreativeMode
+  System.Single CropGrowthModifier
+  BlockActivationCommand[] customCmds
+  System.String CustomIcon
+  UnityEngine.Color CustomIconTint
+  System.String CustomPlaceSound
+  System.Int32 cUVModeBits
+  System.Int32 cUVModeMask
+  System.Int32 cUVModeSides
+  System.Single Damage
+  System.String deathParticleName
+  UnityEngine.Color defaultTintColor
+  System.SByte Density
+  System.String DescriptionKey
+  System.Single DestroyExp
+  System.String DestroyFX
+  System.Boolean DisableCover
+  Block+EnumDisplayInfo DisplayInfo
+  System.String DisplayType
+  BlockValue DowngradeBlock
+  System.String DowngradeFX
+  DynamicProperties dynamicProperties
+  System.Int32 EconomicBundleSize
+  System.Single EconomicSellScale
+  System.Single EconomicValue
+  System.Boolean EnablePassThroughDamage
+  System.Single FallDamage
+  System.Int32 fertileLevel
+  System.String[] FilterTags
+  System.Int32 FuelValue
+  System.Single GroundAlignDistance
+  System.String[] GroupNames
+  BlockValue growOnTop
+  System.Single growthDeviation
+  System.Single growthRate
+  BlockFace HandleFace
+  System.Boolean HarvestOverdamage
+  System.Boolean HasTileEntity
+  System.Single HeatMapStrength
+  System.Boolean IgnoreKeystoneOverlay
+  System.Int32 ImposterExchange
+  System.Byte ImposterExchangeTexIdx
+  System.String IndexName
+  System.Boolean IsCheckCollideWithEntity
+  System.Boolean IsDecoration
+  System.Boolean IsDistantDecoration
+  System.Boolean IsExplosionAffected
+  System.Boolean IsLimited
+  System.Boolean isMultiBlock
+  System.Boolean isOversized
+  System.Boolean isPlantGrowingIfAnythingOnTop
+  System.Boolean isPlantGrowingRandom
+  System.Boolean IsProp
+  System.Boolean IsRandomlyTick
+  System.Boolean IsReplaceRandom
+  System.Boolean IsSleeperBlock
+  System.Boolean IsTemporaryBlock
+  System.Boolean IsTerrainDecoration
+  System.Collections.Generic.List`1[[ItemStack, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] itemsDropped
+  System.Collections.Generic.Dictionary`2[[EnumDropEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Collections.Generic.List`1[[Block+SItemDropProb, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] itemsToDrop
+  System.String ItemTypeIcon
+  System.Int32 lightLevelGrow
+  System.Int32 lightLevelStay
+  System.Int32 lightOpacity
+  System.Byte lightValue
+  System.String localizedBlockName
+  BlockValue LockpickDowngradeBlock
+  System.Single LootExp
+  System.Single LPHardnessScale
+  UnityEngine.Color MapColor
+  UnityEngine.Color MapColor2
+  Vector2i MapElevMinMax
+  System.Single MapSpecular
+  System.Int32 MaxDamage
+  System.Int32 MaxDamagePlusDowngrades
+  System.Int32 MergeIntoId
+  System.Int32[] MergeIntoTexIds
+  System.Byte MeshIndex
+  System.Int32 MirrorSibling
+  System.Single MovementFactor
+  Block+MultiBlockArray multiBlockPos
+  BlockValue nextPlant
+  System.Boolean NoScrapping
+  UnityEngine.Bounds oversizedBounds
+  System.Single PathOffsetX
+  System.Single PathOffsetZ
+  System.Int32 PathType
+  System.String PickedUpItemValue
+  System.String PickupSource
+  System.String PickupTarget
+  Block[] placeAltBlockClasses
+  System.String[] placeAltBlockNames
+  System.Single PlaceExp
+  System.Int32 placementDistance
+  System.Boolean PlaceRandomRotation
+  System.String PropFertileLevel
+  System.String PropGrowIfAnythinOnTop
+  System.String PropGrowOnTop
+  System.String PropGrowthDeviation
+  System.String PropGrowthRate
+  System.String PropIsGrowOnTopEnabled
+  System.String PropIsRandom
+  System.String PropLightLevelGrow
+  System.String PropLightLevelStay
+  System.String PropNext
+  System.String PropPlantGrowing
+  BlockRadiusEffect[] RadiusEffects
+  System.Boolean RefundOnUnload
+  System.Collections.Generic.List`1[[BlockFace, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] RemovePaintOnDowngrade
+  System.Collections.Generic.List`1[[Block+SItemNameCount, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] RepairItems
+  System.Collections.Generic.List`1[[Block+SItemNameCount, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] RepairItemsMeshDamage
+  System.Single ResourceScale
+  System.Boolean SelectAlternates
+  System.Boolean SellableToTrader
+  BlockShape shape
+  BlockValue SiblingBlock
+  System.Single SlopeMaxCos
+  System.Int32 SmallDecorationRadius
+  System.String SortOrder
+  System.String SoundHitAdditional
+  System.String SoundPickup
+  System.String SoundPlace
+  System.Boolean StabilityFull
+  System.Boolean StabilityIgnore
+  System.Boolean StabilitySupport
+  System.Int32 Stacknumber
+  System.Int32 Stage2Health
+  System.Int32 StartDamage
+  FastTags`1[[TagGroup+Global, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] Tags
+  TerrainAlignmentMode terrainAlignmentMode
+  System.Int32 TerrainTAIndex
+  Block+TextureInfo[] textureInfos
+  UnityEngine.Color tintColor
+  UnityEngine.Vector3 tintColorV
+  System.String TraderStageTemplate
+  System.Int32 uiBackgroundTextureId
+  RecipeUnlockData[] unlockedBy
+  BlockValue UpgradeBlock
+  System.Single UpgradeExp
+  System.String UpgradeSound
+  System.UInt32[] UVModesPerSide
+  System.Single VehicleHitScale
+  System.Boolean WaterClipEnabled
+  UnityEngine.Plane WaterClipPlane
+  BlockFaceFlag WaterFlowMask
+  DataItem`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] Weight
+
+METHODS:
+  System.Void ActivateBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void ActivateBlockOnce(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void AddDroppedId(EnumDropEvent _eEvent, System.String _name, System.Int32 _minCount, System.Int32 _maxCount, System.Single _prob, System.Single _resourceScale, System.Single _stickChance, System.String _toolCategory, System.String _tag)
+  System.Void addScheduledTick(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Int32 AlternateBlockCount()
+  System.Int32 AutoShapeAlternateShapeNameIndex(System.String _shapeName)
+  System.Boolean AutoShapeSupportsShapeName(System.String _shapeName)
+  System.Boolean CanBlocksReplaceOrGroundCover()
+  System.Void CanGrowOn(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void CanPlaceBlockAt(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void CanPlantStay(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean CanRepair(BlockValue _blockValue)
+  System.Void CheckPlantAlive(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void CheckUpdate(BlockValue _oldBV, BlockValue _newBV, System.Boolean& bUpdateMesh, System.Boolean& bUpdateNotify, System.Boolean& bUpdateLight)
+  System.Boolean ContainsAlternateBlock(System.String block)
+  System.Byte convertRotation(BlockValue _oldBV, BlockValue _newBV)
+  System.Void CopyDroppedFrom(Block _other)
+  System.Void DamageBlock(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void DoExchangeAction(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Void DropItemsOnEvent(<parameters unavailable: MethodInvocationException: Exception calling "GetParameters" with "0" argument(s): "Non-abstract, non-.cctor method in an interface.">)
+  System.Boolean Equals(System.Object obj)
+  System.Boolean FilterIndexType(BlockValue bv)
+  System.Void Finalize()
+  System.Void ForceAnimationState(BlockValue _blockValue, BlockEntityData _ebcd)
