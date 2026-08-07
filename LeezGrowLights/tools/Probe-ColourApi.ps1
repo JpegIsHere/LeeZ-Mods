@@ -56,7 +56,7 @@ function Add-TypeReport {
     try { $Lines.Add("FullName: $($type.FullName)") } catch { }
     try { $Lines.Add("BaseType: $($type.BaseType)") } catch { }
 
-    $memberPattern = "Activ|Command|Text|Light|Color|Colour|Write|Read|Save|Load|SetBlock|RPC|TileEntity|Prefab|Transform|GameObject|Custom|Data|Sync|Net"
+    $memberPattern = "Activ|Command|Text|Light|Color|Colour|Write|Read|Save|Load|SetBlock|RPC|TileEntity|Prefab|Transform|GameObject|Custom|Data|Sync|Net|Value|Window|Open|Close|Apply|Set|Get"
 
     $Lines.Add("")
     $Lines.Add("MATCHING PROPERTIES:")
@@ -102,18 +102,27 @@ try {
     $typeNames = @(
         "Block",
         "BlockPowered",
+        "BlockPoweredLight",
+        "BlockLight",
         "BlockEntityData",
-        "WorldBase",
-        "World",
         "GameManager",
-        "Chunk",
         "TileEntity",
         "TileEntityPowered",
         "TileEntityPoweredBlock",
-        "TileEntityElectricityLightBlock",
+        "TileEntityLight",
         "PowerItem",
         "PowerConsumerToggle",
         "BlockActivationCommand",
+        "LightManager",
+        "LightManager+NetPackageLight",
+        "LightState",
+        "LightStateType",
+        "UpdateLight",
+        "XUiC_LightEditor",
+        "XUiC_LightEditor+LightValues",
+        "XUiC_PoweredGenericWindowGroup",
+        "XUiC_PoweredSpotlightWindowGroup",
+        "NetPackageTileEntity",
         "ConnectionManager"
     )
 
