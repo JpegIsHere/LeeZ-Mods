@@ -13,9 +13,13 @@ namespace LeezGrowLights
         {
             try
             {
-                LeezLog.Info("Loading V3.1 underground-farming runtime candidate v0.5.1.0");
+                LeezLog.Info("Loading V3.1 underground-farming runtime candidate v0.5.2-dev1");
                 Harmony harmony = new Harmony(_modInstance.Name);
                 PatchInstaller.Install(harmony);
+
+                // Temporary development diagnostic for the exact V3.1 world block ticker API.
+                // Remove after the mid-stage rescheduling implementation is validated.
+                TickerApiDiagnostics.DumpOnce();
             }
             catch (Exception ex)
             {
