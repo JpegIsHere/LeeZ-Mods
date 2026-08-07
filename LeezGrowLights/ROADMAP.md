@@ -23,9 +23,9 @@ Goal: power changes during an already-scheduled crop stage must affect only futu
 - [ ] Live-validate T1 -> T6 and T6 -> T1 transitions.
 - [ ] Validate overlapping tiers where the effective highest multiplier does not change.
 - [ ] Handle lamp removal mid-stage.
-- [ ] Handle save/reload correctly.
+- [x] Handle save/reload correctly.
 - [ ] Validate direct source power loss/restoration.
-- [ ] Validate chunk unload/reload.
+- [x] Validate chunk unload/reload.
 - [ ] Validate upstream relay-only propagation before claiming it supported.
 - [ ] Keep behavior server-authoritative on dedicated server / remote client.
 
@@ -33,6 +33,8 @@ Goal: power changes during an already-scheduled crop stage must affect only futu
 
 Allowed colours: Blue, Green, Red, Purple, White, Yellow.
 
+- [x] Create isolated colour-system development branch and palette/state foundation.
+- [x] Add a V3.1 colour API probe before choosing persistence/network hooks.
 - [ ] Player colour-selection interaction/UI.
 - [ ] Persist selected colour per placed light.
 - [ ] Multiplayer synchronization.
