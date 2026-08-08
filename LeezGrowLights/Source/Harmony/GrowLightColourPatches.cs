@@ -5,7 +5,8 @@ namespace LeezGrowLights
 {
     internal static class GrowLightColourPatches
     {
-        private const string ColourCommandPrefix = "Grow light colour:";
+        private const string ColourCommandIdPrefix = "growlightcolour_";
+        private const string LegacyColourCommandPrefix = "Grow light colour:";
 
         public static void ActivationCommandsPostfix(
             object __instance,
@@ -34,9 +35,12 @@ namespace LeezGrowLights
                 ? GrowLightColourState.Get(value)
                 : GrowLightColourPalette.Default;
 
+            // V3.1 treats BlockActivationCommand.text as the command/localization token.
+            // The radial menu resolves blockcommand_<token>, so use one stable token per
+            // colour rather than embedding display text directly in this field.
             BlockActivationCommand colourCommand = new BlockActivationCommand
             {
-                text = ColourCommandPrefix + " " + selected,
+                text = BuildColourCommandId(selected),
                 iconColor = GrowLightColourPalette.ToUnityColour(selected),
                 activateTime = 0f,
                 highlighted = false
@@ -55,7 +59,7 @@ namespace LeezGrowLights
 
             LeezLog.Info(
                 "Grow-light colour command exposed at index " + originalLength +
-                " as '" + colourCommand.text + "'.");
+                " as token '" + colourCommand.text + "' (" + selected + ").");
         }
 
         public static bool ActivatedPrefix(
@@ -72,8 +76,8 @@ namespace LeezGrowLights
                 return true;
 
             // V3.1 BlockPoweredLight.OnBlockActivated identifies radial commands by the
-            // string _commandName, not by an integer index. Vanilla light toggling uses
-            // the command name "light", so only our dynamic colour label is intercepted.
+            // string _commandName. dev8 uses stable growlightcolour_<colour> tokens, while
+            // the legacy display-text prefix remains accepted for dev7 compatibility.
             if (!IsColourCommandName(commandName))
                 return true;
 
@@ -161,6 +165,11 @@ namespace LeezGrowLights
             }
         }
 
+        private static string BuildColourCommandId(GrowLightColour colour)
+        {
+            return ColourCommandIdPrefix + colour.ToString().ToLowerInvariant();
+        }
+
         private static bool TryGetCommandName(
             MethodBase originalMethod,
             object[] args,
@@ -204,8 +213,11 @@ namespace LeezGrowLights
                 return false;
 
             return commandName.StartsWith(
-                ColourCommandPrefix,
-                StringComparison.OrdinalIgnoreCase);
+                       ColourCommandIdPrefix,
+                       StringComparison.OrdinalIgnoreCase) ||
+                   commandName.StartsWith(
+                       LegacyColourCommandPrefix,
+                       StringComparison.OrdinalIgnoreCase);
         }
 
         private static ParameterInfo[] SafeParameters(MethodBase method)
