@@ -44,27 +44,38 @@ Allowed colours: Blue, Green, Red, Purple, White, Yellow.
 
 Known-good colour source baseline: `0a1967e94dcd153e8ad8ff40de545b8b9245903b` (`v0.7.0-dev8`).
 
-Dev8 live validation: `Grow light colour: Blue` displayed correctly; one selection advanced the label and visible lamp to Green immediately.
+Dev8 live colour validation: `Grow light colour: Blue` displayed correctly; one selection advanced the label and visible lamp to Green immediately.
 
-**Next active section: Multiplayer Light Sync.** See `docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md`.
+Multiplayer Light Sync remains pending. See `docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md`.
 
 Also see `docs/COLOUR_DEV7_HANDOFF.md` and `TESTING.md` for the validated colour baseline.
 
-### Deferred 0.7.x interaction: brightness
+### 0.7.x interaction: brightness
 
-Requested follow-up feature: cosmetic player-controlled lamp brightness. This is intentionally deferred until Multiplayer Light Sync is addressed.
+Brightness is implemented on `dev/colour-system` as a **dev8 live-test candidate**. See `docs/BRIGHTNESS_DEV8_HANDOFF.md`.
 
-- [ ] Add a second radial command for brightness.
-- [ ] Define a small brightness-level cycle (for example Dim, Normal, Bright, Very Bright, Maximum).
-- [ ] Reuse the proven live block-entity cache and adjust child Unity `Light.intensity`.
-- [ ] Persist brightness per placed lamp while preserving compatibility with existing dev8 colour values.
-- [ ] Keep brightness independent of crop growth, coverage, artificial sunlight and electrical power draw.
-- [ ] Validate brightness save/reload and immediate live updates.
+- [x] Add a second radial command for brightness.
+- [x] Define five brightness levels: Dim, Normal, Bright, Very Bright, Maximum.
+- [x] Reuse the proven live block-entity cache and adjust child Unity `Light.intensity`.
+- [x] Persist brightness per placed lamp while preserving compatibility with existing dev7 colour values.
+- [x] Keep brightness independent in source from crop growth, coverage, artificial sunlight and electrical power draw.
+- [ ] Live-validate the full brightness cycle and friendly radial localization.
+- [ ] Live-validate immediate visual updates without reload.
+- [ ] Live-validate colour/brightness preservation when changing either setting.
+- [ ] Live-validate brightness save/quit/restart persistence.
+- [ ] Live-validate powered-light off/on behaviour without intensity compounding or drift.
+- [ ] Live-validate relative intensity multipliers on at least two grow-light tiers.
+- [ ] Live-regression crop growth, coverage, artificial sunlight, tier rules and power draw.
+- [ ] Validate legacy/dev7 `meta2` values `1..6` still restore the same colour at Normal brightness.
+
+Brightness multipliers in the candidate are Dim `0.35x`, Normal `1.00x`, Bright `1.50x`, Very Bright `2.00x`, Maximum `3.00x`, relative to each Unity light's vanilla/base intensity.
+
+Remote-client colour and brightness authoring remain blocked until server-authoritative routing is implemented.
 
 ## 0.8 — multiplayer and release hardening
 
 - [ ] Dedicated server validation.
-- [ ] Remote-client placement, colour and state tests.
+- [ ] Remote-client placement, colour, brightness and state tests.
 - [ ] Performance test with dense farms / many lamps.
 - [ ] Remove development-only logging.
 - [ ] Final recipe/unlock/power-balance pass.
