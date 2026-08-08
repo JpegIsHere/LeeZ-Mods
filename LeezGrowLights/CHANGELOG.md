@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.3.0-dev6
+
+- Added orientation-aware grow-light geometry.
+- Down-facing panels now use the full 5x5 footprint only when the lamp is Y+2 through Y+10 above the supporting farm block; Y+1 is no longer valid for downward illumination.
+- Added directional horizontal coverage: a horizontal panel illuminates only a 2x2 area in front of its emitting face, aligned with the plant-block level.
+- Up-facing panels and horizontally facing-away panels provide no LeeZ sunlight substitution or growth multiplier.
+- Unified orientation-aware geometry under the same scanner used by both sunlight substitution and growth acceleration.
+- Added a V3.1 runtime rotation resolver that discovers a Quaternion rotation source through reflection. Unknown advanced rotations fail closed rather than granting incorrect grow benefits; basic 0..3 rotations retain a safe downward fallback if no helper is discoverable.
+- Added XML metadata for horizontal width, depth and farm-block vertical alignment, and changed the downward minimum vertical offset metadata from 1 to 2 for all six tiers.
+- Expanded transition capture to include the Y+1 farm alignment needed by horizontal lamps while preserving the existing effective-multiplier equality guard.
+- Updated the runtime banner to `v0.5.3-dev6` and updated the Stage 0-5 static validator for the new geometry.
+- Dev6 is a new live-validation candidate; build/startup and directional-orientation behavior are not yet claimed as PASS.
+
 ## 0.5.3.0-dev5
 
 - Fixed active grow-light physical removal by making the removal-specific re-scan exclude the block position being removed. This avoids re-detecting the old lamp during `BlockPowered.OnBlockRemoved` timing.
