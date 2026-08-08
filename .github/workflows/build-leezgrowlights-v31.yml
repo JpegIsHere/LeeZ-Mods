@@ -85,6 +85,60 @@ jobs:
           "GAME_MANAGED=$managed" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "HARMONY_DLL=$harmony" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Probe V3.1 light intensity writers
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $cecil = Get-ChildItem $env:GAME_DIR -Recurse -Filter Mono.Cecil.dll | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $cecil) { throw 'Mono.Cecil.dll not found in server install.' }
+          Add-Type -Path $cecil
+
+          $assemblyPath = Join-Path $env:GAME_MANAGED 'Assembly-CSharp.dll'
+          $module = [Mono.Cecil.ModuleDefinition]::ReadModule($assemblyPath)
+
+          function Get-AllTypes([Mono.Cecil.TypeDefinition]$type) {
+            $type
+            foreach ($nested in $type.NestedTypes) { Get-AllTypes $nested }
+          }
+
+          Write-Host '=== Methods writing UnityEngine.Light.intensity ==='
+          $matches = @()
+          foreach ($root in $module.Types) {
+            foreach ($type in (Get-AllTypes $root)) {
+              foreach ($method in $type.Methods) {
+                if (-not $method.HasBody) { continue }
+                $instructions = $method.Body.Instructions
+                for ($i = 0; $i -lt $instructions.Count; $i++) {
+                  $operand = $instructions[$i].Operand
+                  if ($null -eq $operand) { continue }
+                  $text = $operand.ToString()
+                  if ($text -notmatch 'UnityEngine\.Light::set_intensity') { continue }
+
+                  $matches += $method.FullName
+                  Write-Host ("WRITER {0}" -f $method.FullName)
+                  $start = [Math]::Max(0, $i - 8)
+                  $end = [Math]::Min($instructions.Count - 1, $i + 5)
+                  for ($j = $start; $j -le $end; $j++) {
+                    Write-Host ("  IL_{0:X4}: {1}" -f $instructions[$j].Offset, $instructions[$j].ToString())
+                  }
+                }
+              }
+            }
+          }
+          Write-Host ("Intensity writer count: {0}" -f ($matches | Select-Object -Unique).Count)
+
+          Write-Host '=== BlockPoweredLight relevant IL ==='
+          $bpl = $module.Types | Where-Object { $_.Name -eq 'BlockPoweredLight' } | Select-Object -First 1
+          if ($bpl) {
+            foreach ($method in ($bpl.Methods | Where-Object { $_.Name -in @('updateLightState','OnBlockEntityTransformAfterActivated','OnBlockActivated') })) {
+              Write-Host ("METHOD {0}" -f $method.FullName)
+              if (-not $method.HasBody) { Write-Host '  <no body>'; continue }
+              foreach ($instruction in $method.Body.Instructions) {
+                Write-Host ("  IL_{0:X4}: {1}" -f $instruction.Offset, $instruction.ToString())
+              }
+            }
+          }
+
       - name: Probe V3.1 block metadata capacity
         shell: pwsh
         run: |
@@ -169,7 +223,7 @@ jobs:
       - name: Upload DLL
         uses: actions/upload-artifact@v4
         with:
-          name: LeezGrowLights-v0.7.0-dev8-v31
+          name: LeezGrowLights-v0.7.0-dev9-v31
           path: artifact/
           if-no-files-found: error
           retention-days: 14
