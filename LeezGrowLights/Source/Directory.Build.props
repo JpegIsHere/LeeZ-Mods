@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Include="Harmony\GrowLightColourInstaller.cs" />
+    <Compile Include="Harmony\GrowLightColourPatches.cs" />
+    <Compile Include="Runtime\GrowLightColourNetwork.cs" />
+    <Compile Include="Runtime\GrowLightColourPalette.cs" />
+    <Compile Include="Runtime\GrowLightColourState.cs" />
+    <Compile Include="Runtime\GrowLightColourVisual.cs" />
+  </ItemGroup>
+</Project>
