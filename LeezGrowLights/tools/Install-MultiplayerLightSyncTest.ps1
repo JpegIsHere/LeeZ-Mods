@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$CandidateRef = "3878d16df91e2f9d695adf145b0b7115a83755d1"
+$CandidateRef = "6874bc41dbed1a5efc5bbced8cbd1d85676a29ee"
 $ArchiveUrl = "https://codeload.github.com/JpegIsHere/LeeZ-Mods/zip/$CandidateRef"
 
 function Resolve-GamePath {
