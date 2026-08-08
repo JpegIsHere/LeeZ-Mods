@@ -6,30 +6,51 @@ using System.Reflection;
 namespace LeezGrowLights
 {
     /// <summary>
-    /// Stores the selected LeeZ colour in BlockValue.meta2.
+    /// Stores the selected LeeZ colour and cosmetic brightness in BlockValue.meta2.
     ///
-    /// Stored value 0 is reserved for legacy/uninitialised blocks and maps to White.
-    /// Values 1..6 map to the six GrowLightColour enum values + 1. The powered
-    /// light's electrical toggle state remains in TileEntityPoweredBlock.isToggled;
+    /// Stored value 0 is reserved for legacy/uninitialised blocks and maps to
+    /// White + Normal. Existing dev7 values 1..6 keep their original colours and
+    /// also map to Normal brightness. The remaining values encode the same six
+    /// colours at Dim, Bright, Very Bright, and Maximum brightness.
+    ///
+    /// Electrical toggle state remains in TileEntityPoweredBlock.isToggled;
     /// changing this metadata therefore does not replace the powered tile entity.
     /// </summary>
     internal static class GrowLightColourState
     {
         private const byte StorageOffset = 1;
-        private const byte MaxStoredValue = 6;
+        private const int ColourCount = 6;
+        private const byte MaxStoredValue = 30;
 
         public static GrowLightColour Get(BlockValue blockValue)
         {
-            byte stored = blockValue.meta2;
-            if (stored < StorageOffset || stored > MaxStoredValue)
+            if (!TryDecode(blockValue.meta2, out GrowLightColour colour, out _))
                 return GrowLightColourPalette.Default;
 
-            return (GrowLightColour)(stored - StorageOffset);
+            return colour;
+        }
+
+        public static GrowLightBrightness GetBrightness(BlockValue blockValue)
+        {
+            if (!TryDecode(blockValue.meta2, out _, out GrowLightBrightness brightness))
+                return GrowLightBrightnessPalette.Default;
+
+            return brightness;
         }
 
         public static BlockValue WithColour(BlockValue blockValue, GrowLightColour colour)
         {
-            blockValue.meta2 = (byte)((byte)colour + StorageOffset);
+            GrowLightBrightness brightness = GetBrightness(blockValue);
+            blockValue.meta2 = Encode(colour, brightness);
+            return blockValue;
+        }
+
+        public static BlockValue WithBrightness(
+            BlockValue blockValue,
+            GrowLightBrightness brightness)
+        {
+            GrowLightColour colour = Get(blockValue);
+            blockValue.meta2 = Encode(colour, brightness);
             return blockValue;
         }
 
@@ -38,6 +59,32 @@ namespace LeezGrowLights
             Vector3i position,
             BlockValue currentValue,
             GrowLightColour colour)
+        {
+            return TryPersistUpdatedValue(
+                world,
+                position,
+                currentValue,
+                WithColour(currentValue, colour));
+        }
+
+        public static bool TrySetBrightness(
+            WorldBase world,
+            Vector3i position,
+            BlockValue currentValue,
+            GrowLightBrightness brightness)
+        {
+            return TryPersistUpdatedValue(
+                world,
+                position,
+                currentValue,
+                WithBrightness(currentValue, brightness));
+        }
+
+        private static bool TryPersistUpdatedValue(
+            WorldBase world,
+            Vector3i position,
+            BlockValue currentValue,
+            BlockValue updatedValue)
         {
             if (world == null)
                 return false;
@@ -49,7 +96,6 @@ namespace LeezGrowLights
                 return false;
             }
 
-            BlockValue updatedValue = WithColour(currentValue, colour);
             if (updatedValue.rawData == currentValue.rawData)
                 return true;
 
@@ -73,7 +119,7 @@ namespace LeezGrowLights
                 {
                     setBlockRpc.Invoke(world, new object[] { change });
                     LeezLog.Info(
-                        "Grow-light colour persisted through " + DescribeMethod(setBlockRpc) + ".");
+                        "Grow-light visual state persisted through " + DescribeMethod(setBlockRpc) + ".");
                     return true;
                 }
 
@@ -95,7 +141,7 @@ namespace LeezGrowLights
                 if (batchMethod == null)
                 {
                     LeezLog.Warning(
-                        "No compatible SetBlockRPC/SetBlocksRPC method was found for grow-light colour persistence.");
+                        "No compatible SetBlockRPC/SetBlocksRPC method was found for grow-light visual-state persistence.");
                     return false;
                 }
 
@@ -107,7 +153,7 @@ namespace LeezGrowLights
 
                 batchMethod.Invoke(manager, args);
                 LeezLog.Info(
-                    "Grow-light colour persisted through " + DescribeMethod(batchMethod) + ".");
+                    "Grow-light visual state persisted through " + DescribeMethod(batchMethod) + ".");
                 return true;
             }
             catch (Exception ex)
@@ -116,8 +162,76 @@ namespace LeezGrowLights
                     ? ex.InnerException
                     : ex;
                 LeezLog.Warning(
-                    "Could not persist grow-light colour at " + position + ": " + display.Message);
+                    "Could not persist grow-light visual state at " + position + ": " + display.Message);
                 return false;
+            }
+        }
+
+        private static bool TryDecode(
+            byte stored,
+            out GrowLightColour colour,
+            out GrowLightBrightness brightness)
+        {
+            colour = GrowLightColourPalette.Default;
+            brightness = GrowLightBrightnessPalette.Default;
+
+            if (stored < StorageOffset || stored > MaxStoredValue)
+                return false;
+
+            int zeroBased = stored - StorageOffset;
+            int colourIndex = zeroBased % ColourCount;
+            int brightnessBucket = zeroBased / ColourCount;
+
+            colour = (GrowLightColour)colourIndex;
+            brightness = BrightnessFromStorageBucket(brightnessBucket);
+            return true;
+        }
+
+        private static byte Encode(
+            GrowLightColour colour,
+            GrowLightBrightness brightness)
+        {
+            int colourIndex = (byte)colour;
+            if (colourIndex < 0 || colourIndex >= ColourCount)
+                colourIndex = (byte)GrowLightColourPalette.Default;
+
+            int brightnessBucket = BrightnessToStorageBucket(brightness);
+            return (byte)(StorageOffset + colourIndex + brightnessBucket * ColourCount);
+        }
+
+        private static int BrightnessToStorageBucket(GrowLightBrightness brightness)
+        {
+            switch (brightness)
+            {
+                case GrowLightBrightness.Dim:
+                    return 1;
+                case GrowLightBrightness.Bright:
+                    return 2;
+                case GrowLightBrightness.VeryBright:
+                    return 3;
+                case GrowLightBrightness.Maximum:
+                    return 4;
+                case GrowLightBrightness.Normal:
+                default:
+                    return 0;
+            }
+        }
+
+        private static GrowLightBrightness BrightnessFromStorageBucket(int bucket)
+        {
+            switch (bucket)
+            {
+                case 1:
+                    return GrowLightBrightness.Dim;
+                case 2:
+                    return GrowLightBrightness.Bright;
+                case 3:
+                    return GrowLightBrightness.VeryBright;
+                case 4:
+                    return GrowLightBrightness.Maximum;
+                case 0:
+                default:
+                    return GrowLightBrightness.Normal;
             }
         }
 
@@ -183,7 +297,7 @@ namespace LeezGrowLights
                     }
 
                     LeezLog.Info(
-                        "Grow-light colour persisted through direct " + DescribeMethod(method) + ".");
+                        "Grow-light visual state persisted through direct " + DescribeMethod(method) + ".");
                     return true;
                 }
                 catch (Exception ex)
