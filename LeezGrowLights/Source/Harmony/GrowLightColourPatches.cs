@@ -114,6 +114,9 @@ namespace LeezGrowLights
 
             if (changed)
             {
+                BlockValue updatedValue = GrowLightColourState.WithColour(value, next);
+                GrowLightColourVisual.TryApplyCached(position, updatedValue);
+
                 LeezLog.Info(
                     "Grow-light colour at " + position +
                     " changed " + current + " -> " + next + ".");
@@ -146,7 +149,16 @@ namespace LeezGrowLights
             if (!foundValue && value.Block == null)
                 return;
 
-            GrowLightColourVisual.Apply(blockEntityData, value);
+            if (TryGetFirstVector3i(__args, out Vector3i position))
+            {
+                GrowLightColourVisual.ApplyAt(position, blockEntityData, value);
+            }
+            else
+            {
+                GrowLightColourVisual.Apply(blockEntityData, value);
+                LeezLog.Warning(
+                    "Grow-light visual hook applied colour but could not cache block position for live refresh.");
+            }
         }
 
         private static bool TryGetCommandName(
