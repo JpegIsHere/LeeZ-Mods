@@ -9,6 +9,7 @@ namespace LeezGrowLights
         private static readonly object Sync = new object();
         private static readonly Dictionary<Block, int> ColourCommandIndices =
             new Dictionary<Block, int>();
+        private static int LastKnownColourCommandIndex = -1;
 
         public static void ActivationCommandsPostfix(
             object __instance,
@@ -19,18 +20,13 @@ namespace LeezGrowLights
             if (!IsGrowLight(block))
                 return;
 
-            // A base-class fallback is also patched in dev2. If both an override and its
-            // base implementation run, do not append a duplicate command.
             if (TryFindExistingColourCommand(__result, out int existingIndex))
             {
                 BlockActivationCommand existing = __result[existingIndex];
                 existing = EnsureEnabled(existing);
                 __result[existingIndex] = existing;
 
-                lock (Sync)
-                {
-                    ColourCommandIndices[block] = existingIndex;
-                }
+                RememberColourCommandIndex(block, existingIndex);
 
                 LeezLog.Info(
                     "Grow-light colour command confirmed at index " + existingIndex + ".");
@@ -38,10 +34,7 @@ namespace LeezGrowLights
             }
 
             int originalLength = __result != null ? __result.Length : 0;
-            lock (Sync)
-            {
-                ColourCommandIndices[block] = originalLength;
-            }
+            RememberColourCommandIndex(block, originalLength);
 
             BlockValue value = FindBlockValue(__args, out bool foundValue)
                 ? FindLastBlockValue(__args)
@@ -59,10 +52,6 @@ namespace LeezGrowLights
                 highlighted = false
             };
 
-            // V3.1 activation commands carry an enabled/Enabled style member. dev1 left
-            // that member at its default value, which can make the radial menu filter the
-            // command out. Use reflection so this remains tolerant of minor member-name
-            // differences between 3.1 patch builds.
             colourCommand = EnsureEnabled(colourCommand);
 
             BlockActivationCommand[] expanded =
@@ -81,6 +70,7 @@ namespace LeezGrowLights
 
         public static bool ActivatedPrefix(
             object __instance,
+            MethodBase __originalMethod,
             object[] __args,
             ref bool __result)
         {
@@ -88,14 +78,46 @@ namespace LeezGrowLights
             if (!IsGrowLight(block))
                 return true;
 
-            if (!TryGetColourCommandIndex(block, out int colourCommandIndex))
-                return true;
-
-            if (!TryGetFirstInt(__args, out int activatedIndex) ||
-                activatedIndex != colourCommandIndex)
+            bool blockSpecificIndex = TryGetColourCommandIndex(block, out int colourCommandIndex);
+            if (!blockSpecificIndex)
             {
+                lock (Sync)
+                {
+                    colourCommandIndex = LastKnownColourCommandIndex;
+                }
+            }
+
+            if (colourCommandIndex < 0)
+            {
+                LeezLog.Warning(
+                    "Grow-light activation observed but no colour command index is known. " +
+                    DescribeActivation(__originalMethod, __args));
                 return true;
             }
+
+            if (!TryGetActivatedCommandIndex(
+                    __originalMethod,
+                    __args,
+                    colourCommandIndex,
+                    out int activatedIndex,
+                    out string indexSource))
+            {
+                LeezLog.Warning(
+                    "Grow-light activation observed but command index could not be resolved; " +
+                    "colourIndex=" + colourCommandIndex + ". " +
+                    DescribeActivation(__originalMethod, __args));
+                return true;
+            }
+
+            LeezLog.Info(
+                "Grow-light activation observed: activatedIndex=" + activatedIndex +
+                " via " + indexSource +
+                ", colourIndex=" + colourCommandIndex +
+                ", indexCache=" + (blockSpecificIndex ? "block" : "fallback") +
+                ". " + DescribeActivation(__originalMethod, __args));
+
+            if (activatedIndex != colourCommandIndex)
+                return true;
 
             WorldBase world = FindFirst<WorldBase>(__args);
             if (world == null || !TryGetFirstVector3i(__args, out Vector3i position))
@@ -111,13 +133,12 @@ namespace LeezGrowLights
 
             if (!foundValue && value.Block == null)
             {
+                LeezLog.Warning(
+                    "Grow-light colour command resolved an empty block value at " + position + ".");
                 __result = false;
                 return false;
             }
 
-            // 0.7.0-dev2 intentionally validates the local/server path first. A remote
-            // client must not author colour state locally; multiplayer command routing is
-            // the next gate after single-player persistence/visual validation.
             if (world.IsRemote())
             {
                 LeezLog.Warning(
@@ -135,6 +156,12 @@ namespace LeezGrowLights
                 LeezLog.Info(
                     "Grow-light colour at " + position +
                     " changed " + current + " -> " + next + ".");
+            }
+            else
+            {
+                LeezLog.Warning(
+                    "Grow-light colour state update returned false at " + position +
+                    " for " + current + " -> " + next + ".");
             }
 
             __result = changed;
@@ -159,6 +186,147 @@ namespace LeezGrowLights
                 return;
 
             GrowLightColourVisual.Apply(blockEntityData, value);
+        }
+
+        private static void RememberColourCommandIndex(Block block, int index)
+        {
+            lock (Sync)
+            {
+                if (block != null)
+                    ColourCommandIndices[block] = index;
+                LastKnownColourCommandIndex = index;
+            }
+        }
+
+        private static bool TryGetActivatedCommandIndex(
+            MethodBase originalMethod,
+            object[] args,
+            int expectedIndex,
+            out int value,
+            out string source)
+        {
+            value = 0;
+            source = null;
+            if (args == null)
+                return false;
+
+            ParameterInfo[] parameters = SafeParameters(originalMethod);
+            int count = Math.Min(parameters.Length, args.Length);
+
+            for (int i = 0; i < count; i++)
+            {
+                if (!(args[i] is int integer))
+                    continue;
+
+                string name = parameters[i].Name ?? string.Empty;
+                string lower = name.ToLowerInvariant();
+                bool activationIndex =
+                    lower.Contains("indexinblockactivationcommands") ||
+                    (lower.Contains("activation") && lower.Contains("index")) ||
+                    (lower.Contains("command") && lower.Contains("index"));
+
+                if (activationIndex)
+                {
+                    value = integer;
+                    source = "parameter '" + name + "'";
+                    return true;
+                }
+            }
+
+            int matchingExpected = 0;
+            int matchedValue = 0;
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] is int integer && integer == expectedIndex)
+                {
+                    matchingExpected++;
+                    matchedValue = integer;
+                }
+            }
+
+            if (matchingExpected == 1)
+            {
+                value = matchedValue;
+                source = "unique int matching exposed colour index";
+                return true;
+            }
+
+            int intCount = 0;
+            int firstInt = 0;
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] is int integer)
+                {
+                    if (intCount == 0)
+                        firstInt = integer;
+                    intCount++;
+                }
+            }
+
+            if (intCount == 1)
+            {
+                value = firstInt;
+                source = "only int argument";
+                return true;
+            }
+
+            if (intCount > 0)
+            {
+                value = firstInt;
+                source = "first-int diagnostic fallback";
+                return true;
+            }
+
+            return false;
+        }
+
+        private static string DescribeActivation(MethodBase method, object[] args)
+        {
+            string methodName = method != null
+                ? (method.DeclaringType != null ? method.DeclaringType.Name + "." : string.Empty) + method.Name
+                : "<unknown method>";
+
+            ParameterInfo[] parameters = SafeParameters(method);
+            var parts = new List<string>();
+            if (args != null)
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    string parameterName = i < parameters.Length
+                        ? parameters[i].Name
+                        : "arg" + i;
+                    object arg = args[i];
+                    string typeName = arg != null ? arg.GetType().Name : "null";
+                    string displayValue;
+                    try
+                    {
+                        displayValue = arg != null ? arg.ToString() : "null";
+                    }
+                    catch
+                    {
+                        displayValue = "<ToString failed>";
+                    }
+
+                    parts.Add(parameterName + ":" + typeName + "=" + displayValue);
+                }
+            }
+
+            return methodName + " args=[" + string.Join(", ", parts.ToArray()) + "]";
+        }
+
+        private static ParameterInfo[] SafeParameters(MethodBase method)
+        {
+            if (method == null)
+                return new ParameterInfo[0];
+
+            try
+            {
+                return method.GetParameters();
+            }
+            catch
+            {
+                return new ParameterInfo[0];
+            }
         }
 
         private static BlockActivationCommand EnsureEnabled(BlockActivationCommand command)
@@ -250,24 +418,6 @@ namespace LeezGrowLights
             }
 
             return null;
-        }
-
-        private static bool TryGetFirstInt(object[] args, out int value)
-        {
-            value = 0;
-            if (args == null)
-                return false;
-
-            foreach (object arg in args)
-            {
-                if (arg is int integer)
-                {
-                    value = integer;
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static bool TryGetFirstVector3i(object[] args, out Vector3i value)
