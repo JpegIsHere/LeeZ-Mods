@@ -19,13 +19,12 @@ Goal: power changes during an already-scheduled crop stage must affect only futu
 - [x] Live-validate T6 ON -> OFF -> ON tick expansion/reduction.
 - [x] Live-validate proportional T4 `1x <-> 1.5x` transitions.
 - [x] Preserve already-earned progress for direct lamp toggle transitions.
-- [ ] Confirm v0.5.3-dev3 installs the corrected `PowerItem.HandleDisconnect()` hook with no warning.
-- [ ] Live-validate T1 -> T6 and T6 -> T1 transitions.
-- [ ] Validate overlapping tiers where the effective highest multiplier does not change.
-- [ ] Handle lamp removal mid-stage.
 - [x] Handle save/reload correctly.
-- [ ] Validate direct source power loss/restoration.
 - [x] Validate chunk unload/reload.
+- [ ] Live-validate T1 -> T6 and T6 -> T1 transitions as an isolated regression test.
+- [ ] Validate overlapping tiers where the effective highest multiplier does not change.
+- [ ] Complete final lamp-removal regression evidence on the latest runtime.
+- [ ] Validate direct source power loss/restoration as an isolated regression test.
 - [ ] Validate upstream relay-only propagation before claiming it supported.
 - [ ] Keep behavior server-authoritative on dedicated server / remote client.
 
@@ -34,17 +33,34 @@ Goal: power changes during an already-scheduled crop stage must affect only futu
 Allowed colours: Blue, Green, Red, Purple, White, Yellow.
 
 - [x] Create isolated colour-system development branch and palette/state foundation.
-- [x] Add a V3.1 colour API probe before choosing persistence/network hooks.
-- [ ] Player colour-selection interaction/UI.
-- [ ] Persist selected colour per placed light.
-- [ ] Multiplayer synchronization.
-- [ ] Tint the actual light component/panel effect at runtime.
-- [ ] Preserve colour through save/reload and reconnect.
+- [x] Probe/diagnose the actual V3.1 activation and persistence contracts.
+- [x] Add player colour-selection radial interaction.
+- [x] Persist selected colour per placed light in `BlockValue.meta2`.
+- [x] Preserve colour through save/quit/restart.
+- [x] Tint the panel/material and child Unity light components.
+- [x] Apply colour changes immediately during live play (dev7 cached `BlockEntityData` refresh).
+- [ ] Fix the cosmetic key-style radial label (`blockcommand_growlightcolour: Blue`).
+- [ ] Add multiplayer/server routing and synchronization for remote colour changes.
+
+Known-good colour baseline: `c7f70f408ba72d8657422caf131a9d2404e5457a` (`v0.7.0-dev7`).
+
+See `docs/COLOUR_DEV7_HANDOFF.md`.
+
+### Optional 0.7.x interaction: brightness
+
+Requested follow-up feature: cosmetic player-controlled lamp brightness.
+
+- [ ] Add a second radial command for brightness.
+- [ ] Define a small brightness-level cycle (for example Dim, Normal, Bright, Very Bright, Maximum).
+- [ ] Reuse dev7 live block-entity cache and adjust child Unity `Light.intensity`.
+- [ ] Persist brightness per placed lamp while preserving compatibility with existing dev7 colour values.
+- [ ] Keep brightness independent of crop growth, coverage, artificial sunlight and electrical power draw.
+- [ ] Validate brightness save/reload and immediate live updates.
 
 ## 0.8 — multiplayer and release hardening
 
 - [ ] Dedicated server validation.
-- [ ] Remote-client placement and state tests.
+- [ ] Remote-client placement, colour and state tests.
 - [ ] Performance test with dense farms / many lamps.
 - [ ] Remove development-only logging.
 - [ ] Final recipe/unlock/power-balance pass.
