@@ -4,11 +4,11 @@ Target game build: **7 Days to Die V3.1.0 (b14)**.
 
 Current development branch: **`dev/colour-system`**  
 Current runtime candidate: **v0.7.0-dev8**  
-Known-good colour code baseline: **`0a1967e94dcd153e8ad8ff40de545b8b9245903b`**
+Known-good colour source baseline: **`0a1967e94dcd153e8ad8ff40de545b8b9245903b`**
 
 Legend: `PASS` = observed in-game/build output; `STATIC VERIFIED` = source/XML/project structure proves the intended rule but exact gameplay still needs a live run; `IMPLEMENTED` = code path exists and is wired but the exact scenario still needs validation; `PENDING` = not complete.
 
-For the detailed earlier Stage 0-5 history, see `docs/STAGE_0_5_STATUS.md` and `MIDSTAGE_TESTING.md`. For the colour-development handoff, see `docs/COLOUR_DEV7_HANDOFF.md`.
+For earlier Stage 0-5 history, see `docs/STAGE_0_5_STATUS.md` and `MIDSTAGE_TESTING.md`. For the current colour architecture, see `docs/COLOUR_DEV7_HANDOFF.md`. For the next section, see `docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md`.
 
 ## Build and startup
 
@@ -63,7 +63,7 @@ See `docs/STAGE_0_5_STATUS.md` for detailed evidence and exact ratios.
 | friendly radial-menu localization | PASS | dev8 displays `Grow light colour: Blue` and advances cleanly to `Grow light colour: Green` |
 | dev8 menu + visual regression | PASS | user confirmed selecting once changes both Blue -> Green label and lamp immediately |
 | remote-client colour authoring | PENDING | intentionally rejected until server routing exists |
-| dedicated-server colour synchronization | PENDING | not yet claimed |
+| dedicated-server colour synchronization | PENDING | next development section: Multiplayer Light Sync |
 
 ## Colour implementation milestones
 
@@ -76,14 +76,23 @@ See `docs/STAGE_0_5_STATUS.md` for detailed evidence and exact ratios.
 - dev7: cached live `BlockEntityData` and immediately reapplied the selected tint after each successful write. Live cycle passed.
 - dev8: replaced the raw key-style colour menu with stable per-colour localization tokens. User confirmed `Grow light colour: Blue`, then a single selection advanced both menu and lamp to Green immediately.
 
-## Remaining correctness / release tests
+## Next section: Multiplayer Light Sync
 
-- Dedicated-server / remote-client colour command routing and synchronization.
-- Final regression sweep across Stage 0-5 after colour work.
+Primary pending work:
+
+- route remote-client colour commands to the authoritative server;
+- validate and persist colour changes server-side;
+- propagate authoritative colour state to all clients;
+- refresh each client's live lamp visual from replicated state;
+- validate second-client observation, reconnect, and dedicated-server save/restart;
+- preserve vanilla wiring/power and all existing crop behaviour.
+
+See `docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md` for the starting architecture and test gates.
+
+## Later / release work
+
+- Final regression sweep across Stage 0-5 after multiplayer work.
 - Long-duration sealed-room crop survival under normal play.
 - Performance with dense farms / many lamps.
 - Remove or gate temporary development diagnostics before a polished release.
-
-## Next optional feature
-
-Player-controlled **brightness** is the next planned development topic. It should remain cosmetic and independent of crop growth, coverage and electrical power draw. The recommended starting design is recorded in `docs/COLOUR_DEV7_HANDOFF.md`.
+- Cosmetic player-controlled brightness remains deferred until after Multiplayer Light Sync.
