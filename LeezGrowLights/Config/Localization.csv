@@ -17,3 +17,4 @@ leezGrowLightUnlockT5,progression,Progression,,,,Leez Grow Light Tier 5 (60 Wiri
 leezGrowLightT6,blocks,Block,,,,Leez Grow Light - Tier 6,,,,,,,,,,,,,
 leezGrowLightT6Desc,blocks,Block,,,,Powered grow light. Covers a 5x5 farm-plot area when mounted 1-10 blocks above the farm plots. Tier 6: 4.0x crop growth speed while powered and switched on.,,,,,,,,,,,,,
 leezGrowLightUnlockT6,progression,Progression,,,,Leez Grow Light Tier 6 (75 Wiring 101),,,,,,,,,,,,,
+blockcommand_growlightcolour,blocks,Block,,,,Grow light colour,,,,,,,,,,,,,
