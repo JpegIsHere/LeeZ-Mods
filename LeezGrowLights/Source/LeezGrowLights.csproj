@@ -68,6 +68,7 @@
     <Compile Include="Harmony\PowerTransitionPatches.cs" />
     <Compile Include="Harmony\SunlightSubstitutionPatches.cs" />
     <Compile Include="Runtime\GrowthScheduleContext.cs" />
+    <Compile Include="Runtime\GrowLightColourNetwork.cs" />
     <Compile Include="Runtime\GrowLightColourPalette.cs" />
     <Compile Include="Runtime\GrowLightColourState.cs" />
     <Compile Include="Runtime\GrowLightColourVisual.cs" />

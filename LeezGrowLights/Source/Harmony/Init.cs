@@ -14,6 +14,7 @@ namespace LeezGrowLights
                 PatchInstaller.Install(harmony);
                 BlockRemovalInstaller.Install(harmony);
                 GrowLightColourInstaller.Install(harmony);
+                GrowLightColourNetwork.Install(harmony);
             }
             catch (Exception ex)
             {
