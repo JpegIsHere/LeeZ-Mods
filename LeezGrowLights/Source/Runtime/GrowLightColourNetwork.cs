@@ -23,18 +23,27 @@ namespace LeezGrowLights
 
         public override void read(PooledBinaryReader reader)
         {
+            // V3.1.0 b14's PooledBinaryReader also exposes Span-based overloads.
+            // The mod targets .NET Framework 4.8, whose compiler cannot resolve those
+            // metadata signatures. Bind primitive reads through BinaryReader instead;
+            // PooledBinaryReader inherits it and ReadInt32 is the exact vanilla call.
+            System.IO.BinaryReader binaryReader = reader;
             position = new Vector3i(
-                reader.ReadInt32(),
-                reader.ReadInt32(),
-                reader.ReadInt32());
+                binaryReader.ReadInt32(),
+                binaryReader.ReadInt32(),
+                binaryReader.ReadInt32());
         }
 
         public override void write(PooledBinaryWriter writer)
         {
             base.write(writer);
-            writer.Write(position.x);
-            writer.Write(position.y);
-            writer.Write(position.z);
+
+            // Same b14 compatibility rule as read(): avoid member lookup over the
+            // PooledBinaryWriter Span overload surface when compiling for .NET 4.8.
+            System.IO.BinaryWriter binaryWriter = writer;
+            binaryWriter.Write(position.x);
+            binaryWriter.Write(position.y);
+            binaryWriter.Write(position.z);
         }
 
         public override int GetLength()
