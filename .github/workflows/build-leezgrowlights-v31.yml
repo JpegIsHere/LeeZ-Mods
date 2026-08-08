@@ -29,13 +29,19 @@ jobs:
           Expand-Archive -Path $zip -DestinationPath $steamDir -Force
           $steamCmd = Join-Path $steamDir 'steamcmd.exe'
 
-          # The bootstrap ZIP can contain an older client. Give SteamCMD one dedicated
-          # invocation to update/relaunch itself before issuing app_update; otherwise the
-          # first app command can fail with "Missing configuration" during self-update.
+          # SteamCMD's bootstrapper can update/relaunch itself and return 1 even though
+          # the update succeeded. Native-command errors are therefore ignored only for
+          # these bootstrap invocations; the real app install is checked separately.
+          $oldNativePreference = $PSNativeCommandUseErrorActionPreference
+          $PSNativeCommandUseErrorActionPreference = $false
           & $steamCmd +quit
-          Start-Sleep -Seconds 2
-          if (-not (Test-Path $steamCmd)) { throw 'SteamCMD executable disappeared after self-update.' }
+          Write-Host "Initial SteamCMD bootstrap exit code: $LASTEXITCODE"
+          Start-Sleep -Seconds 4
+          & $steamCmd +quit
+          Write-Host "Second SteamCMD bootstrap exit code: $LASTEXITCODE"
+          $PSNativeCommandUseErrorActionPreference = $oldNativePreference
 
+          if (-not (Test-Path $steamCmd)) { throw 'SteamCMD executable disappeared after self-update.' }
           "STEAMCMD=$steamCmd" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Install 7 Days to Die Dedicated Server
@@ -43,8 +49,21 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $gameDir = Join-Path $env:RUNNER_TEMP '7dtd-server'
-          & $env:STEAMCMD +force_install_dir $gameDir +login anonymous +app_update 294420 validate +quit
-          if ($LASTEXITCODE -ne 0) { throw "SteamCMD failed with exit code $LASTEXITCODE" }
+          $oldNativePreference = $PSNativeCommandUseErrorActionPreference
+          $PSNativeCommandUseErrorActionPreference = $false
+
+          $exitCode = 1
+          for ($attempt = 1; $attempt -le 2; $attempt++) {
+            Write-Host "SteamCMD app_update attempt $attempt"
+            & $env:STEAMCMD +force_install_dir $gameDir +login anonymous +app_update 294420 validate +quit
+            $exitCode = $LASTEXITCODE
+            Write-Host "SteamCMD app_update exit code: $exitCode"
+            if ($exitCode -eq 0 -and (Test-Path $gameDir)) { break }
+            Start-Sleep -Seconds 5
+          }
+
+          $PSNativeCommandUseErrorActionPreference = $oldNativePreference
+          if ($exitCode -ne 0) { throw "SteamCMD failed with exit code $exitCode" }
           "GAME_DIR=$gameDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Locate V3.1 build references
