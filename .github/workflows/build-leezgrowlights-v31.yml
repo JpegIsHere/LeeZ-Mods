@@ -102,7 +102,7 @@ jobs:
           }
 
           Write-Host '=== Methods writing UnityEngine.Light.intensity ==='
-          $matches = @()
+          $writerNames = @()
           foreach ($root in $module.Types) {
             foreach ($type in (Get-AllTypes $root)) {
               foreach ($method in $type.Methods) {
@@ -114,7 +114,7 @@ jobs:
                   $text = $operand.ToString()
                   if ($text -notmatch 'UnityEngine\.Light::set_intensity') { continue }
 
-                  $matches += $method.FullName
+                  $writerNames += $method.FullName
                   Write-Host ("WRITER {0}" -f $method.FullName)
                   $start = [Math]::Max(0, $i - 8)
                   $end = [Math]::Min($instructions.Count - 1, $i + 5)
@@ -125,7 +125,7 @@ jobs:
               }
             }
           }
-          Write-Host ("Intensity writer count: {0}" -f ($matches | Select-Object -Unique).Count)
+          Write-Host ("Intensity writer count: {0}" -f ($writerNames | Select-Object -Unique).Count)
 
           Write-Host '=== BlockPoweredLight relevant IL ==='
           $bpl = $module.Types | Where-Object { $_.Name -eq 'BlockPoweredLight' } | Select-Object -First 1
