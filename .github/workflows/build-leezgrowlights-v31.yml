@@ -1,0 +1,87 @@
+name: Build LeezGrowLights V3.1 DLL
+
+on:
+  push:
+    branches:
+      - dev/colour-system
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install SteamCMD
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $steamDir = Join-Path $env:RUNNER_TEMP 'steamcmd'
+          New-Item -ItemType Directory -Force -Path $steamDir | Out-Null
+          $zip = Join-Path $env:RUNNER_TEMP 'steamcmd.zip'
+          Invoke-WebRequest 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip' -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath $steamDir -Force
+          "STEAMCMD=$steamDir\steamcmd.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install 7 Days to Die Dedicated Server
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $gameDir = Join-Path $env:RUNNER_TEMP '7dtd-server'
+          & $env:STEAMCMD +force_install_dir $gameDir +login anonymous +app_update 294420 validate +quit
+          if ($LASTEXITCODE -ne 0) { throw "SteamCMD failed with exit code $LASTEXITCODE" }
+          "GAME_DIR=$gameDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Locate V3.1 build references
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $managedCandidates = @(
+            (Join-Path $env:GAME_DIR '7DaysToDieServer_Data\Managed'),
+            (Join-Path $env:GAME_DIR '7DaysToDie_Data\Managed')
+          )
+          $managed = $managedCandidates | Where-Object { Test-Path (Join-Path $_ 'Assembly-CSharp.dll') } | Select-Object -First 1
+          if (-not $managed) {
+            Get-ChildItem $env:GAME_DIR -Recurse -Filter Assembly-CSharp.dll | Select-Object -ExpandProperty FullName
+            throw 'Could not locate Assembly-CSharp.dll in the dedicated-server install.'
+          }
+
+          $harmony = Get-ChildItem $env:GAME_DIR -Recurse -Filter 0Harmony.dll | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $harmony) { throw 'Could not locate 0Harmony.dll in the dedicated-server install.' }
+
+          Write-Host "Managed references: $managed"
+          Write-Host "Harmony reference: $harmony"
+          "GAME_MANAGED=$managed" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "HARMONY_DLL=$harmony" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build Release DLL
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          msbuild 'LeezGrowLights\Source\LeezGrowLights.csproj' /t:Rebuild /p:Configuration=Release /p:Platform=AnyCPU /p:GameManagedPath="$env:GAME_MANAGED" /p:HarmonyPath="$env:HARMONY_DLL" /v:minimal
+          if ($LASTEXITCODE -ne 0) { throw "MSBuild failed with exit code $LASTEXITCODE" }
+          if (-not (Test-Path 'LeezGrowLights\LeezGrowLights.dll')) { throw 'Expected LeezGrowLights.dll was not produced.' }
+
+      - name: Stage test DLL
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifact | Out-Null
+          Copy-Item 'LeezGrowLights\LeezGrowLights.dll' 'artifact\LeezGrowLights.dll'
+          if (Test-Path 'LeezGrowLights\LeezGrowLights.pdb') {
+            Copy-Item 'LeezGrowLights\LeezGrowLights.pdb' 'artifact\LeezGrowLights.pdb'
+          }
+          Get-FileHash 'artifact\LeezGrowLights.dll' -Algorithm SHA256 | Format-List
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: LeezGrowLights-v0.7.0-dev8-v31
+          path: artifact/
+          if-no-files-found: error
+          retention-days: 14
