@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.7.0.0-dev7
+
+- Added per-placed LeeZ grow-light colour selection on `dev/colour-system` for V3.1.0 b14.
+- Added six-colour cycle: Blue, Green, Red, Purple, White, Yellow; legacy/uninitialised lights default to White.
+- Kept colour state independent from `TileEntityPoweredBlock.isToggled`, preserving normal powered-light wiring/toggle behaviour.
+- Persisted colour in `BlockValue.meta2` through the V3.1 block-change/RPC path using `BlockChangeInfo` and `BlockValueRef`.
+- Corrected the V3.1 activation contract: `BlockPoweredLight.OnBlockActivated` identifies radial commands by `_commandName` string rather than a numeric command index.
+- Added runtime visual tinting through `BlockEntityData.SetMaterialColor` and child Unity `Light.color` components.
+- dev7 caches live `BlockEntityData` by block position and immediately reapplies the new colour after a successful state write, removing the previous requirement to reload the world/chunk before the visual changed.
+- Live validation confirmed colour names cycle, saved colour survives quit/restart, and dev7 visual colour now updates immediately while playing.
+- Known cosmetic issue: the radial menu may still display key-style text such as `blockcommand_growlightcolour: Blue` despite the localization entry.
+- Remote-client colour authoring remains intentionally blocked until proper server command routing is implemented; multiplayer colour synchronization is not yet claimed.
+- Added `docs/COLOUR_DEV7_HANDOFF.md` with the complete colour-development handoff and brightness-extension starting point.
+
 ## 0.5.3.0-dev4
 
 - Fixed the explicit old-style C# project manifest so the active transition engine and removal patches are actually compiled: `GrowLightTransitionRescheduler.cs`, `BlockRemovalPatches.cs`, and the new removal installer are now included.
