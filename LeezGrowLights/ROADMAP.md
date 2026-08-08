@@ -39,12 +39,14 @@ Allowed colours: Blue, Green, Red, Purple, White, Yellow.
 - [x] Preserve colour through save/quit/restart.
 - [x] Tint the panel/material and child Unity light components.
 - [x] Apply colour changes immediately during live play (dev7 cached `BlockEntityData` refresh).
-- [ ] Fix the cosmetic key-style radial label (`blockcommand_growlightcolour: Blue`).
+- [x] Fix the cosmetic key-style radial label; dev8 displays friendly `Grow light colour: <Colour>` text.
 - [ ] Add multiplayer/server routing and synchronization for remote colour changes.
 
-Known-good colour baseline: `c7f70f408ba72d8657422caf131a9d2404e5457a` (`v0.7.0-dev7`).
+Known-good colour baseline: `0a1967e94dcd153e8ad8ff40de545b8b9245903b` (`v0.7.0-dev8`).
 
-See `docs/COLOUR_DEV7_HANDOFF.md`.
+Dev8 live validation: `Grow light colour: Blue` displayed correctly; one selection advanced the label and visible lamp to Green immediately.
+
+See `docs/COLOUR_DEV7_HANDOFF.md` and `TESTING.md`.
 
 ### Optional 0.7.x interaction: brightness
 
@@ -53,7 +55,7 @@ Requested follow-up feature: cosmetic player-controlled lamp brightness.
 - [ ] Add a second radial command for brightness.
 - [ ] Define a small brightness-level cycle (for example Dim, Normal, Bright, Very Bright, Maximum).
 - [ ] Reuse dev7 live block-entity cache and adjust child Unity `Light.intensity`.
-- [ ] Persist brightness per placed lamp while preserving compatibility with existing dev7 colour values.
+- [ ] Persist brightness per placed lamp while preserving compatibility with existing dev7/dev8 colour values.
 - [ ] Keep brightness independent of crop growth, coverage, artificial sunlight and electrical power draw.
 - [ ] Validate brightness save/reload and immediate live updates.
 
