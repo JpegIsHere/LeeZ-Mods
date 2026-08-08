@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.3.0-dev5
+
+- Fixed active grow-light physical removal by making the removal-specific re-scan exclude the block position being removed. This avoids re-detecting the old lamp during `BlockPowered.OnBlockRemoved` timing.
+- Updated the runtime banner to `v0.5.3-dev5`.
+- Release build on the target V3.1.0 b14 installation passed with 0 warnings and 0 errors.
+- Live startup confirmed the crop scheduling/tick/update hooks, 11 sunlight hooks, all four electrical transition hooks, and the physical-removal hook install cleanly.
+- Live dev5 retest confirmed active effective T6 removal preserves progress and correctly reschedules `4x -> 1x`; observed examples include `207 -> 828` and `28089 -> 112356` ticks.
+- Live dev5 retest confirmed removing lower-tier T1 while T6 remains the effective 4x winner causes no crop reschedule.
+- Live transition evidence now also covers T1 -> T6, T6 -> T1, T6 -> T4, direct source power loss, and lower-tier no-op behavior under T6.
+- Save/reload continuity with an active T6 passed: after reload, switching T6 OFF produced `4x -> 1x`, `1603 -> 6412` ticks.
+- Explicit coverage boundary evidence recorded for X/Z +2 valid, X/Z +3 rejected, Y+10 valid, and Y+11 rejected.
+- Upstream relay-only power transition remains **NOT TESTED** by explicit test choice. Direct source restoration, remaining Stage 3 cases, chunk unload/reload, dedicated-server testing and other lifecycle/release tests remain pending.
+- Added `docs/DEV5_LIVE_VALIDATION_2026-08-07.md` with the detailed live evidence.
+
 ## 0.5.3.0-dev4
 
 - Fixed the explicit old-style C# project manifest so the active transition engine and removal patches are actually compiled: `GrowLightTransitionRescheduler.cs`, `BlockRemovalPatches.cs`, and the new removal installer are now included.
