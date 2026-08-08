@@ -88,6 +88,68 @@ jobs:
           "GAME_MANAGED=$managed" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "HARMONY_DLL=$harmony" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Probe V3.1 block storage layout
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $managed = $env:GAME_MANAGED
+          $resolver = [ResolveEventHandler]{
+            param($sender, $eventArgs)
+            $simple = ([Reflection.AssemblyName]$eventArgs.Name).Name + '.dll'
+            $candidate = Join-Path $managed $simple
+            if (Test-Path $candidate) { return [Reflection.Assembly]::LoadFrom($candidate) }
+            return $null
+          }
+          [AppDomain]::CurrentDomain.add_AssemblyResolve($resolver)
+          try {
+            $asm = [Reflection.Assembly]::LoadFrom((Join-Path $managed 'Assembly-CSharp.dll'))
+            $flags = [Reflection.BindingFlags]'Instance,Static,Public,NonPublic'
+
+            foreach ($typeName in @('BlockValue','TileEntityPoweredBlock','PowerConsumerToggle','BlockPoweredLight')) {
+              $type = $asm.GetType($typeName, $false)
+              Write-Host "=== TYPE $typeName ==="
+              if (-not $type) { Write-Host '<not found>'; continue }
+              Write-Host "Base: $($type.BaseType)"
+              Write-Host '-- Fields --'
+              foreach ($field in ($type.GetFields($flags) | Sort-Object Name)) {
+                Write-Host ("FIELD {0} {1}" -f $field.FieldType.FullName, $field.Name)
+              }
+              Write-Host '-- Properties --'
+              foreach ($prop in ($type.GetProperties($flags) | Sort-Object Name)) {
+                Write-Host ("PROP {0} {1} get={2} set={3}" -f $prop.PropertyType.FullName, $prop.Name, $prop.CanRead, $prop.CanWrite)
+              }
+              if ($typeName -eq 'TileEntityPoweredBlock') {
+                Write-Host '-- Persistence-like methods --'
+                foreach ($method in ($type.GetMethods($flags) | Where-Object { $_.Name -match 'read|write|save|load|data|stream|serialize' } | Sort-Object Name)) {
+                  Write-Host ("METHOD {0}" -f $method.ToString())
+                }
+              }
+            }
+
+            $blockValue = $asm.GetType('BlockValue', $true)
+            $meta2Prop = $blockValue.GetProperty('meta2', $flags)
+            $rawProp = $blockValue.GetProperty('rawData', $flags)
+            $meta2Field = $blockValue.GetField('meta2', $flags)
+            $rawField = $blockValue.GetField('rawData', $flags)
+            Write-Host '=== meta2 assignment probe ==='
+            foreach ($test in @(0,1,6,7,12,13,15,16,19,24,25,30,31,255)) {
+              $boxed = [Activator]::CreateInstance($blockValue)
+              if ($meta2Prop) { $meta2Prop.SetValue($boxed, [byte]$test, $null) }
+              elseif ($meta2Field) { $meta2Field.SetValue($boxed, [byte]$test) }
+              else { throw 'BlockValue meta2 member not found.' }
+
+              if ($meta2Prop) { $readMeta2 = $meta2Prop.GetValue($boxed, $null) }
+              else { $readMeta2 = $meta2Field.GetValue($boxed) }
+              if ($rawProp) { $raw = $rawProp.GetValue($boxed, $null) }
+              elseif ($rawField) { $raw = $rawField.GetValue($boxed) }
+              else { $raw = '<no rawData member>' }
+              Write-Host ("META2 input={0} read={1} raw={2}" -f $test, $readMeta2, $raw)
+            }
+          }
+          finally {
+            [AppDomain]::CurrentDomain.remove_AssemblyResolve($resolver)
+          }
+
       - name: Build Release DLL
         shell: pwsh
         run: |
