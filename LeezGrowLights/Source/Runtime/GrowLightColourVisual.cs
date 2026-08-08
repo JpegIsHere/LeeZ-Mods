@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -11,7 +12,13 @@ namespace LeezGrowLights
         {
             public float BaseIntensity;
             public float LastAppliedIntensity;
+            public float Multiplier;
             public bool HasApplied;
+        }
+
+        private sealed class LightReference
+        {
+            public Light Light;
         }
 
         private static readonly object Sync = new object();
@@ -19,6 +26,8 @@ namespace LeezGrowLights
             new Dictionary<Vector3i, WeakReference>();
         private static readonly ConditionalWeakTable<Light, LightIntensityState> LightIntensityStates =
             new ConditionalWeakTable<Light, LightIntensityState>();
+        private static readonly ConditionalWeakTable<object, LightReference> LightLodLights =
+            new ConditionalWeakTable<object, LightReference>();
 
         public static void Apply(BlockEntityData blockEntityData, BlockValue blockValue)
         {
@@ -68,6 +77,42 @@ namespace LeezGrowLights
                 " / " + GrowLightBrightnessPalette.ToDisplayName(
                     GrowLightColourState.GetBrightness(blockValue)) + ".");
             return true;
+        }
+
+        /// <summary>
+        /// V3.1 LightLOD.FrameUpdate recalculates and writes Unity Light.intensity every
+        /// frame. The normal grow-light visual callback therefore cannot own intensity
+        /// with a one-shot write: vanilla immediately restores its LOD-controlled value.
+        ///
+        /// This Harmony postfix runs after that vanilla writer. Only Light components
+        /// previously seen by the LeeZ visual path have a LightIntensityState, so all
+        /// unrelated vanilla/mod lights pass through untouched. If vanilla did not write
+        /// a new value this frame, current intensity still equals LastAppliedIntensity and
+        /// we skip it, preventing multiplier compounding.
+        /// </summary>
+        public static void LightLodFramePostfix(object __instance)
+        {
+            if (__instance == null)
+                return;
+
+            Light light = ResolveLightLodLight(__instance);
+            if (light == null ||
+                !LightIntensityStates.TryGetValue(light, out LightIntensityState state) ||
+                !state.HasApplied)
+            {
+                return;
+            }
+
+            float currentIntensity = light.intensity;
+            if (Mathf.Approximately(currentIntensity, state.LastAppliedIntensity))
+                return;
+
+            // FrameUpdate has just supplied the current vanilla LOD/power value. Keep it
+            // as the fresh baseline and layer the selected cosmetic multiplier on top.
+            state.BaseIntensity = currentIntensity;
+            float targetIntensity = currentIntensity * state.Multiplier;
+            light.intensity = targetIntensity;
+            state.LastAppliedIntensity = targetIntensity;
         }
 
         private static void ApplyInternal(
@@ -131,17 +176,58 @@ namespace LeezGrowLights
             if (!state.HasApplied ||
                 !Mathf.Approximately(currentIntensity, state.LastAppliedIntensity))
             {
-                // Vanilla may change the light intensity when power/toggle state changes.
+                // Vanilla may change the light intensity when power/toggle/LOD state changes.
                 // Treat that post-vanilla value as the new baseline so cosmetic brightness
                 // remains a multiplier rather than replacing powered-light behaviour.
                 state.BaseIntensity = currentIntensity;
             }
 
-            float multiplier = GrowLightBrightnessPalette.ToIntensityMultiplier(brightness);
-            float targetIntensity = state.BaseIntensity * multiplier;
+            state.Multiplier = GrowLightBrightnessPalette.ToIntensityMultiplier(brightness);
+            float targetIntensity = state.BaseIntensity * state.Multiplier;
             light.intensity = targetIntensity;
             state.LastAppliedIntensity = targetIntensity;
             state.HasApplied = true;
+        }
+
+        private static Light ResolveLightLodLight(object lightLodInstance)
+        {
+            LightReference reference = LightLodLights.GetValue(
+                lightLodInstance,
+                CreateLightReference);
+            return reference.Light;
+        }
+
+        private static LightReference CreateLightReference(object lightLodInstance)
+        {
+            Light light = null;
+
+            try
+            {
+                Type type = lightLodInstance?.GetType();
+                FieldInfo field = type?.GetField(
+                    "myLight",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (field != null)
+                    light = field.GetValue(lightLodInstance) as Light;
+            }
+            catch
+            {
+                // Fall through to the component lookup below.
+            }
+
+            if (light == null && lightLodInstance is Component component)
+            {
+                try
+                {
+                    light = component.GetComponent<Light>();
+                }
+                catch
+                {
+                    // Leave the cached reference empty; this LightLOD is not one we can own.
+                }
+            }
+
+            return new LightReference { Light = light };
         }
 
         private static LightIntensityState CreateLightIntensityState(Light light)
@@ -151,6 +237,7 @@ namespace LeezGrowLights
             {
                 BaseIntensity = intensity,
                 LastAppliedIntensity = intensity,
+                Multiplier = 1f,
                 HasApplied = false
             };
         }
