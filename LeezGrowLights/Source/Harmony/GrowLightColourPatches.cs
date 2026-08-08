@@ -26,6 +26,7 @@ namespace LeezGrowLights
             GrowLightColour selected = foundValue
                 ? GrowLightColourState.Get(value)
                 : GrowLightColourPalette.Default;
+            GrowLightColour offeredColour = GrowLightColourPalette.Next(selected);
             GrowLightBrightness brightness = foundValue
                 ? GrowLightColourState.GetBrightness(value)
                 : GrowLightBrightnessPalette.Default;
@@ -36,8 +37,8 @@ namespace LeezGrowLights
             if (hasColour)
             {
                 BlockActivationCommand existing = __result[colourIndex];
-                existing.text = BuildColourCommandId(selected);
-                existing.iconColor = GrowLightColourPalette.ToUnityColour(selected);
+                existing.text = BuildColourCommandId(offeredColour);
+                existing.iconColor = GrowLightColourPalette.ToUnityColour(offeredColour);
                 __result[colourIndex] = EnsureEnabled(existing);
             }
 
@@ -64,13 +65,13 @@ namespace LeezGrowLights
 
             if (!hasColour)
             {
-                // V3.1 treats BlockActivationCommand.text as the command/localization token.
-                // The radial menu resolves blockcommand_<token>, so use one stable token per
-                // colour rather than embedding display text directly in this field.
+                // The activation handler cycles from the current colour to the next colour,
+                // so advertise that next colour in the radial menu. This keeps the command
+                // label/icon aligned with the colour the click will actually apply.
                 BlockActivationCommand colourCommand = new BlockActivationCommand
                 {
-                    text = BuildColourCommandId(selected),
-                    iconColor = GrowLightColourPalette.ToUnityColour(selected),
+                    text = BuildColourCommandId(offeredColour),
+                    iconColor = GrowLightColourPalette.ToUnityColour(offeredColour),
                     activateTime = 0f,
                     highlighted = false
                 };
@@ -80,7 +81,7 @@ namespace LeezGrowLights
 
                 LeezLog.Info(
                     "Grow-light colour command exposed at index " + insertIndex +
-                    " as token '" + colourCommand.text + "' (" + selected + ").");
+                    " as token '" + colourCommand.text + "' (" + offeredColour + ").");
                 insertIndex++;
             }
 
