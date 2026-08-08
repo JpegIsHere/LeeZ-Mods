@@ -86,4 +86,63 @@ namespace LeezGrowLights
             }
         }
     }
+
+    internal enum GrowLightBrightness : byte
+    {
+        Dim = 0,
+        Normal = 1,
+        Bright = 2,
+        VeryBright = 3,
+        Maximum = 4
+    }
+
+    internal static class GrowLightBrightnessPalette
+    {
+        private static readonly GrowLightBrightness[] AllowedBrightness =
+        {
+            GrowLightBrightness.Dim,
+            GrowLightBrightness.Normal,
+            GrowLightBrightness.Bright,
+            GrowLightBrightness.VeryBright,
+            GrowLightBrightness.Maximum
+        };
+
+        public static GrowLightBrightness Default => GrowLightBrightness.Normal;
+
+        public static GrowLightBrightness Next(GrowLightBrightness current)
+        {
+            for (int i = 0; i < AllowedBrightness.Length; i++)
+            {
+                if (AllowedBrightness[i] == current)
+                    return AllowedBrightness[(i + 1) % AllowedBrightness.Length];
+            }
+
+            return Default;
+        }
+
+        public static string ToDisplayName(GrowLightBrightness brightness)
+        {
+            return brightness == GrowLightBrightness.VeryBright
+                ? "Very Bright"
+                : brightness.ToString();
+        }
+
+        public static float ToIntensityMultiplier(GrowLightBrightness brightness)
+        {
+            switch (brightness)
+            {
+                case GrowLightBrightness.Dim:
+                    return 0.35f;
+                case GrowLightBrightness.Bright:
+                    return 1.50f;
+                case GrowLightBrightness.VeryBright:
+                    return 2.00f;
+                case GrowLightBrightness.Maximum:
+                    return 3.00f;
+                case GrowLightBrightness.Normal:
+                default:
+                    return 1.00f;
+            }
+        }
+    }
 }
