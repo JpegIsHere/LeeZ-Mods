@@ -6,7 +6,9 @@ namespace LeezGrowLights
     internal static class GrowLightColourPatches
     {
         private const string ColourCommandIdPrefix = "growlightcolour_";
+        private const string BrightnessCommandIdPrefix = "growlightbrightness_";
         private const string LegacyColourCommandPrefix = "Grow light colour:";
+        private const string LegacyBrightnessCommandPrefix = "Grow light brightness:";
 
         public static void ActivationCommandsPostfix(
             object __instance,
@@ -17,16 +19,6 @@ namespace LeezGrowLights
             if (!IsGrowLight(block))
                 return;
 
-            if (TryFindExistingColourCommand(__result, out int existingIndex))
-            {
-                BlockActivationCommand existing = __result[existingIndex];
-                existing = EnsureEnabled(existing);
-                __result[existingIndex] = existing;
-                return;
-            }
-
-            int originalLength = __result != null ? __result.Length : 0;
-
             BlockValue value = FindBlockValue(__args, out bool foundValue)
                 ? FindLastBlockValue(__args)
                 : default(BlockValue);
@@ -34,32 +26,84 @@ namespace LeezGrowLights
             GrowLightColour selected = foundValue
                 ? GrowLightColourState.Get(value)
                 : GrowLightColourPalette.Default;
+            GrowLightBrightness brightness = foundValue
+                ? GrowLightColourState.GetBrightness(value)
+                : GrowLightBrightnessPalette.Default;
 
-            // V3.1 treats BlockActivationCommand.text as the command/localization token.
-            // The radial menu resolves blockcommand_<token>, so use one stable token per
-            // colour rather than embedding display text directly in this field.
-            BlockActivationCommand colourCommand = new BlockActivationCommand
+            bool hasColour = TryFindExistingColourCommand(__result, out int colourIndex);
+            bool hasBrightness = TryFindExistingBrightnessCommand(__result, out int brightnessIndex);
+
+            if (hasColour)
             {
-                text = BuildColourCommandId(selected),
-                iconColor = GrowLightColourPalette.ToUnityColour(selected),
-                activateTime = 0f,
-                highlighted = false
-            };
+                BlockActivationCommand existing = __result[colourIndex];
+                existing.text = BuildColourCommandId(selected);
+                existing.iconColor = GrowLightColourPalette.ToUnityColour(selected);
+                __result[colourIndex] = EnsureEnabled(existing);
+            }
 
-            colourCommand = EnsureEnabled(colourCommand);
+            if (hasBrightness)
+            {
+                BlockActivationCommand existing = __result[brightnessIndex];
+                existing.text = BuildBrightnessCommandId(brightness);
+                existing.iconColor = GrowLightColourPalette.ToUnityColour(selected);
+                __result[brightnessIndex] = EnsureEnabled(existing);
+            }
 
+            int additions = (hasColour ? 0 : 1) + (hasBrightness ? 0 : 1);
+            if (additions == 0)
+                return;
+
+            int originalLength = __result != null ? __result.Length : 0;
             BlockActivationCommand[] expanded =
-                new BlockActivationCommand[originalLength + 1];
+                new BlockActivationCommand[originalLength + additions];
 
             if (__result != null && __result.Length > 0)
                 Array.Copy(__result, expanded, __result.Length);
 
-            expanded[originalLength] = colourCommand;
-            __result = expanded;
+            int insertIndex = originalLength;
 
-            LeezLog.Info(
-                "Grow-light colour command exposed at index " + originalLength +
-                " as token '" + colourCommand.text + "' (" + selected + ").");
+            if (!hasColour)
+            {
+                // V3.1 treats BlockActivationCommand.text as the command/localization token.
+                // The radial menu resolves blockcommand_<token>, so use one stable token per
+                // colour rather than embedding display text directly in this field.
+                BlockActivationCommand colourCommand = new BlockActivationCommand
+                {
+                    text = BuildColourCommandId(selected),
+                    iconColor = GrowLightColourPalette.ToUnityColour(selected),
+                    activateTime = 0f,
+                    highlighted = false
+                };
+
+                colourCommand = EnsureEnabled(colourCommand);
+                expanded[insertIndex] = colourCommand;
+
+                LeezLog.Info(
+                    "Grow-light colour command exposed at index " + insertIndex +
+                    " as token '" + colourCommand.text + "' (" + selected + ").");
+                insertIndex++;
+            }
+
+            if (!hasBrightness)
+            {
+                BlockActivationCommand brightnessCommand = new BlockActivationCommand
+                {
+                    text = BuildBrightnessCommandId(brightness),
+                    iconColor = GrowLightColourPalette.ToUnityColour(selected),
+                    activateTime = 0f,
+                    highlighted = false
+                };
+
+                brightnessCommand = EnsureEnabled(brightnessCommand);
+                expanded[insertIndex] = brightnessCommand;
+
+                LeezLog.Info(
+                    "Grow-light brightness command exposed at index " + insertIndex +
+                    " as token '" + brightnessCommand.text + "' (" +
+                    GrowLightBrightnessPalette.ToDisplayName(brightness) + ").");
+            }
+
+            __result = expanded;
         }
 
         public static bool ActivatedPrefix(
@@ -76,18 +120,23 @@ namespace LeezGrowLights
                 return true;
 
             // V3.1 BlockPoweredLight.OnBlockActivated identifies radial commands by the
-            // string _commandName. dev8 uses stable growlightcolour_<colour> tokens, while
-            // the legacy display-text prefix remains accepted for dev7 compatibility.
-            if (!IsColourCommandName(commandName))
+            // string _commandName. dev8 uses stable growlightcolour_<colour> and
+            // growlightbrightness_<level> tokens; legacy display-text prefixes remain
+            // accepted for compatibility with already-open dev7 radial menus.
+            bool isColourCommand = IsColourCommandName(commandName);
+            bool isBrightnessCommand = IsBrightnessCommandName(commandName);
+            if (!isColourCommand && !isBrightnessCommand)
                 return true;
 
+            string action = isColourCommand ? "colour" : "brightness";
             LeezLog.Info(
-                "Grow-light colour activation recognized: command='" + commandName + "'.");
+                "Grow-light " + action + " activation recognized: command='" + commandName + "'.");
 
             WorldBase world = FindFirst<WorldBase>(__args);
             if (world == null || !TryGetFirstVector3i(__args, out Vector3i position))
             {
-                LeezLog.Warning("Grow-light colour command could not resolve world/position.");
+                LeezLog.Warning(
+                    "Grow-light " + action + " command could not resolve world/position.");
                 __result = false;
                 return false;
             }
@@ -99,7 +148,8 @@ namespace LeezGrowLights
             if (!foundValue && value.Block == null)
             {
                 LeezLog.Warning(
-                    "Grow-light colour command resolved an empty block value at " + position + ".");
+                    "Grow-light " + action + " command resolved an empty block value at " +
+                    position + ".");
                 __result = false;
                 return false;
             }
@@ -107,29 +157,58 @@ namespace LeezGrowLights
             if (world.IsRemote())
             {
                 LeezLog.Warning(
-                    "Remote grow-light colour request ignored until server command routing is enabled.");
+                    "Remote grow-light " + action +
+                    " request ignored until server command routing is enabled.");
                 __result = false;
                 return false;
             }
 
-            GrowLightColour current = GrowLightColourState.Get(value);
-            GrowLightColour next = GrowLightColourPalette.Next(current);
-            bool changed = GrowLightColourState.TrySet(world, position, value, next);
+            bool changed;
+            BlockValue updatedValue;
 
-            if (changed)
+            if (isColourCommand)
             {
-                BlockValue updatedValue = GrowLightColourState.WithColour(value, next);
-                GrowLightColourVisual.TryApplyCached(position, updatedValue);
+                GrowLightColour current = GrowLightColourState.Get(value);
+                GrowLightColour next = GrowLightColourPalette.Next(current);
+                changed = GrowLightColourState.TrySet(world, position, value, next);
+                updatedValue = GrowLightColourState.WithColour(value, next);
 
-                LeezLog.Info(
-                    "Grow-light colour at " + position +
-                    " changed " + current + " -> " + next + ".");
+                if (changed)
+                {
+                    GrowLightColourVisual.TryApplyCached(position, updatedValue);
+                    LeezLog.Info(
+                        "Grow-light colour at " + position +
+                        " changed " + current + " -> " + next + ".");
+                }
+                else
+                {
+                    LeezLog.Warning(
+                        "Grow-light colour state update returned false at " + position +
+                        " for " + current + " -> " + next + ".");
+                }
             }
             else
             {
-                LeezLog.Warning(
-                    "Grow-light colour state update returned false at " + position +
-                    " for " + current + " -> " + next + ".");
+                GrowLightBrightness current = GrowLightColourState.GetBrightness(value);
+                GrowLightBrightness next = GrowLightBrightnessPalette.Next(current);
+                changed = GrowLightColourState.TrySetBrightness(world, position, value, next);
+                updatedValue = GrowLightColourState.WithBrightness(value, next);
+
+                if (changed)
+                {
+                    GrowLightColourVisual.TryApplyCached(position, updatedValue);
+                    LeezLog.Info(
+                        "Grow-light brightness at " + position +
+                        " changed " + GrowLightBrightnessPalette.ToDisplayName(current) +
+                        " -> " + GrowLightBrightnessPalette.ToDisplayName(next) + ".");
+                }
+                else
+                {
+                    LeezLog.Warning(
+                        "Grow-light brightness state update returned false at " + position +
+                        " for " + GrowLightBrightnessPalette.ToDisplayName(current) +
+                        " -> " + GrowLightBrightnessPalette.ToDisplayName(next) + ".");
+                }
             }
 
             __result = changed;
@@ -161,13 +240,18 @@ namespace LeezGrowLights
             {
                 GrowLightColourVisual.Apply(blockEntityData, value);
                 LeezLog.Warning(
-                    "Grow-light visual hook applied colour but could not cache block position for live refresh.");
+                    "Grow-light visual hook applied colour/brightness but could not cache block position for live refresh.");
             }
         }
 
         private static string BuildColourCommandId(GrowLightColour colour)
         {
             return ColourCommandIdPrefix + colour.ToString().ToLowerInvariant();
+        }
+
+        private static string BuildBrightnessCommandId(GrowLightBrightness brightness)
+        {
+            return BrightnessCommandIdPrefix + brightness.ToString().ToLowerInvariant();
         }
 
         private static bool TryGetCommandName(
@@ -220,6 +304,19 @@ namespace LeezGrowLights
                        StringComparison.OrdinalIgnoreCase);
         }
 
+        private static bool IsBrightnessCommandName(string commandName)
+        {
+            if (string.IsNullOrWhiteSpace(commandName))
+                return false;
+
+            return commandName.StartsWith(
+                       BrightnessCommandIdPrefix,
+                       StringComparison.OrdinalIgnoreCase) ||
+                   commandName.StartsWith(
+                       LegacyBrightnessCommandPrefix,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
         private static ParameterInfo[] SafeParameters(MethodBase method)
         {
             if (method == null)
@@ -265,14 +362,14 @@ namespace LeezGrowLights
                 catch (Exception ex)
                 {
                     LeezLog.Warning(
-                        "Could not enable grow-light colour command through member '" +
+                        "Could not enable grow-light visual command through member '" +
                         memberName + "': " + ex.Message);
                 }
             }
 
             LeezLog.Warning(
                 "BlockActivationCommand exposes no writable enabled/isEnabled member; " +
-                "colour command visibility depends on the V3.1 default.");
+                "grow-light visual-command visibility depends on the V3.1 default.");
             return command;
         }
 
@@ -288,6 +385,27 @@ namespace LeezGrowLights
             {
                 string text = commands[i].text;
                 if (IsColourCommandName(text))
+                {
+                    index = i;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryFindExistingBrightnessCommand(
+            BlockActivationCommand[] commands,
+            out int index)
+        {
+            index = -1;
+            if (commands == null)
+                return false;
+
+            for (int i = 0; i < commands.Length; i++)
+            {
+                string text = commands[i].text;
+                if (IsBrightnessCommandName(text))
                 {
                     index = i;
                     return true;
