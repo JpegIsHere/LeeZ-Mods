@@ -6,12 +6,18 @@ using System.Reflection;
 namespace LeezGrowLights
 {
     /// <summary>
-    /// Stores the selected LeeZ colour and cosmetic brightness in BlockValue.meta2.
+    /// Stores the selected LeeZ colour and cosmetic brightness in BlockValue metadata.
+    ///
+    /// V3.1 exposes meta2 as only four bits, so it cannot directly hold the 0..30
+    /// colour/brightness state range. dev9 stores the low four bits in meta2 and uses
+    /// BlockValue.meta3 (raw bit 21) as the fifth bit. The meta3 bit is separate from
+    /// the five rotation bits (raw bits 16..20), so changing brightness does not alter
+    /// block rotation.
     ///
     /// Stored value 0 is reserved for legacy/uninitialised blocks and maps to
     /// White + Normal. Existing dev7 values 1..6 keep their original colours and
-    /// also map to Normal brightness. The remaining values encode the same six
-    /// colours at Dim, Bright, Very Bright, and Maximum brightness.
+    /// also map to Normal brightness. Values 7..30 encode the remaining brightness
+    /// buckets while preserving the existing six-colour order.
     ///
     /// Electrical toggle state remains in TileEntityPoweredBlock.isToggled;
     /// changing this metadata therefore does not replace the powered tile entity.
@@ -21,10 +27,16 @@ namespace LeezGrowLights
         private const byte StorageOffset = 1;
         private const int ColourCount = 6;
         private const byte MaxStoredValue = 30;
+        private const byte LowStorageMask = 0x0F;
+
+        // V3.1 BlockValue.Metadata3Mask, confirmed against V3.1.0 b14.
+        // This is deliberately kept local rather than depending on an internal game
+        // constant so the source remains explicit about the bit it owns.
+        private const uint BrightnessHighBitMask = 0x00200000u;
 
         public static GrowLightColour Get(BlockValue blockValue)
         {
-            if (!TryDecode(blockValue.meta2, out GrowLightColour colour, out _))
+            if (!TryDecode(ReadStoredValue(blockValue), out GrowLightColour colour, out _))
                 return GrowLightColourPalette.Default;
 
             return colour;
@@ -32,7 +44,7 @@ namespace LeezGrowLights
 
         public static GrowLightBrightness GetBrightness(BlockValue blockValue)
         {
-            if (!TryDecode(blockValue.meta2, out _, out GrowLightBrightness brightness))
+            if (!TryDecode(ReadStoredValue(blockValue), out _, out GrowLightBrightness brightness))
                 return GrowLightBrightnessPalette.Default;
 
             return brightness;
@@ -41,8 +53,7 @@ namespace LeezGrowLights
         public static BlockValue WithColour(BlockValue blockValue, GrowLightColour colour)
         {
             GrowLightBrightness brightness = GetBrightness(blockValue);
-            blockValue.meta2 = Encode(colour, brightness);
-            return blockValue;
+            return WriteStoredValue(blockValue, Encode(colour, brightness));
         }
 
         public static BlockValue WithBrightness(
@@ -50,8 +61,7 @@ namespace LeezGrowLights
             GrowLightBrightness brightness)
         {
             GrowLightColour colour = Get(blockValue);
-            blockValue.meta2 = Encode(colour, brightness);
-            return blockValue;
+            return WriteStoredValue(blockValue, Encode(colour, brightness));
         }
 
         public static bool TrySet(
@@ -78,6 +88,29 @@ namespace LeezGrowLights
                 position,
                 currentValue,
                 WithBrightness(currentValue, brightness));
+        }
+
+        private static byte ReadStoredValue(BlockValue blockValue)
+        {
+            int low = blockValue.meta2 & LowStorageMask;
+            int high = (blockValue.rawData & BrightnessHighBitMask) != 0 ? 0x10 : 0;
+            return (byte)(low | high);
+        }
+
+        private static BlockValue WriteStoredValue(BlockValue blockValue, byte stored)
+        {
+            // meta2 is four bits in V3.1. Writing values >=16 directly wraps and was
+            // the dev8 cause of brightness changes apparently changing colour.
+            blockValue.meta2 = (byte)(stored & LowStorageMask);
+
+            // Preserve type, rotation, meta/meta2, damage and every other rawData bit.
+            // Only the single V3.1 meta3 bit is used as state bit 4.
+            if ((stored & 0x10) != 0)
+                blockValue.rawData |= BrightnessHighBitMask;
+            else
+                blockValue.rawData &= ~BrightnessHighBitMask;
+
+            return blockValue;
         }
 
         private static bool TryPersistUpdatedValue(
