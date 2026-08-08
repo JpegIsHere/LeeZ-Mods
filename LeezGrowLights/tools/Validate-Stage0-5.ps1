@@ -55,7 +55,7 @@ Write-Host ""
 Assert-Equal $modInfo.xml.Version.value "0.5.3.0" "Stage 0 package version"
 
 $initSource = Read-Text "LeezGrowLights\Source\Harmony\Init.cs"
-Assert-True ($initSource.Contains("v0.5.3-dev5")) "Stage 0 runtime banner is dev5"
+Assert-True ($initSource.Contains("v0.5.3-dev6")) "Stage 0 runtime banner is dev6"
 
 # Stage 1: explicit old-style project compile manifest and hook wiring.
 [xml]$project = Read-Text "LeezGrowLights\Source\LeezGrowLights.csproj"
@@ -124,9 +124,12 @@ foreach ($tier in 1..6) {
     Assert-Equal $properties["RequiredPower"] "10" "Stage 2 $name power request"
     Assert-Equal $properties["LeezGrowTier"] "$tier" "Stage 2 $name tier metadata"
     Assert-Equal $properties["LeezGrowMultiplier"] $expectedMultipliers[$name] "Stage 4 $name multiplier"
-    Assert-Equal $properties["LeezGrowRadius"] "2" "Stage 3 $name horizontal radius"
-    Assert-Equal $properties["LeezGrowMinFarmBlockVerticalOffset"] "1" "Stage 3 $name minimum vertical offset"
-    Assert-Equal $properties["LeezGrowMaxFarmBlockVerticalOffset"] "10" "Stage 3 $name maximum vertical offset"
+    Assert-Equal $properties["LeezGrowRadius"] "2" "Stage 3 $name downward horizontal radius"
+    Assert-Equal $properties["LeezGrowMinFarmBlockVerticalOffset"] "2" "Stage 3 $name downward minimum vertical offset"
+    Assert-Equal $properties["LeezGrowMaxFarmBlockVerticalOffset"] "10" "Stage 3 $name downward maximum vertical offset"
+    Assert-Equal $properties["LeezGrowHorizontalWidth"] "2" "Stage 3 $name horizontal beam width"
+    Assert-Equal $properties["LeezGrowHorizontalDepth"] "2" "Stage 3 $name horizontal beam depth"
+    Assert-Equal $properties["LeezGrowHorizontalFarmBlockVerticalOffset"] "1" "Stage 3 $name horizontal farm vertical alignment"
 }
 
 [xml]$recipesXml = Read-Text "LeezGrowLights\Config\recipes.xml"
@@ -150,17 +153,25 @@ foreach ($tier in 1..6) {
     }
 }
 
-# Stages 3-4: scanner geometry and highest-tier-wins rule.
+# Stages 3-4: orientation-aware geometry and highest-tier-wins rule.
 $scanner = Read-Text "LeezGrowLights\Source\Runtime\GrowLightScanner.cs"
-Assert-True ($scanner.Contains("DefaultRadius = 2")) "Stage 3 scanner radius is 2"
-Assert-True ($scanner.Contains("DefaultMinVerticalOffsetFromFarm = 1")) "Stage 3 scanner minimum vertical offset is 1"
-Assert-True ($scanner.Contains("DefaultMaxVerticalOffsetFromFarm = 10")) "Stage 3 scanner maximum vertical offset is 10"
+Assert-True ($scanner.Contains("DefaultRadius = 2")) "Stage 3 downward scanner radius is 2"
+Assert-True ($scanner.Contains("DefaultMinVerticalOffsetFromFarm = 2")) "Stage 3 downward minimum vertical offset is 2"
+Assert-True ($scanner.Contains("DefaultMaxVerticalOffsetFromFarm = 10")) "Stage 3 downward maximum vertical offset is 10"
+Assert-True ($scanner.Contains("DefaultHorizontalWidth = 2")) "Stage 3 horizontal beam width is 2"
+Assert-True ($scanner.Contains("DefaultHorizontalDepth = 2")) "Stage 3 horizontal beam depth is 2"
+Assert-True ($scanner.Contains("GrowLightOrientationResolver")) "Stage 3 scanner resolves placed-lamp orientation"
+Assert-True ($scanner.Contains("if (emissionDirection.y < 0)")) "Stage 3 down-facing branch is explicit"
+Assert-True ($scanner.Contains("if (emissionDirection.y > 0)")) "Stage 3 up-facing lamps are explicitly rejected"
+Assert-True ($scanner.Contains("forward < 1 || forward > horizontalDepth")) "Stage 3 horizontal coverage is directional/forward-only"
+Assert-True ($scanner.Contains("sideMin") -and $scanner.Contains("sideMax")) "Stage 3 horizontal beam width is bounded"
 Assert-True ($scanner.Contains("if (multiplier > best)")) "Stage 4 scanner uses highest active multiplier"
-Assert-True ($scanner.Contains("HasActiveSunlightReplacement") -and $scanner.Contains("ScanFarmFootprint")) "Stage 3 sunlight replacement delegates to farm-footprint scanning"
+Assert-True ($scanner.Contains("HasActiveSunlightReplacement") -and $scanner.Contains("ScanFarmFootprint")) "Stage 3 sunlight replacement delegates to the same orientation-aware scan"
 Assert-True ($scanner.Contains("GetBestActiveMultiplierQuietExcluding") -and $scanner.Contains("SamePosition(lightPos, excludedLightPos)")) "Stage 5 removal scan can exclude the lamp being removed"
 
 # Stage 5: shared transition/equality guard and remaining-work conversion.
 $transition = Read-Text "LeezGrowLights\Source\Runtime\GrowLightTransitionRescheduler.cs"
+Assert-True ($transition.Contains("for (int verticalOffset = 1;")) "Stage 5 transition capture includes horizontal farm alignment"
 Assert-True ($transition.Contains("Math.Abs(newMultiplier - plant.OldMultiplier) <= 0.0001f")) "Stage 5 unchanged effective multiplier skips reschedule"
 Assert-True ($transition.Contains("TickerScheduleAccessor.RescheduleRemainingWork")) "Stage 5 shared transition calls ticker rescheduler"
 Assert-True ($transition.Contains("ExcludeLampOnApply") -and $transition.Contains("GetBestActiveMultiplierQuietExcluding")) "Stage 5 removal transition applies an exclusion-aware re-scan"
