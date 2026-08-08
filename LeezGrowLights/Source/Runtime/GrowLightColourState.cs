@@ -55,9 +55,6 @@ namespace LeezGrowLights
 
             try
             {
-                // Prefer a direct V3.1 SetBlockRPC overload that carries the block position
-                // and BlockValue. This avoids depending on a particular BlockChangeInfo
-                // constructor shape, which differs from the assumptions made in dev4.
                 if (TryInvokeDirectSetBlockRpc(world, position, updatedValue))
                     return true;
 
@@ -80,8 +77,6 @@ namespace LeezGrowLights
                     return true;
                 }
 
-                // V3.1 also exposes GameManager.SetBlocksRPC. Keep this reflection fallback
-                // so minor signature changes do not force the colour feature to replace blocks.
                 GameManager manager = GameManager.Instance;
                 if (manager == null)
                     return false;
@@ -207,8 +202,49 @@ namespace LeezGrowLights
 
         private static BlockChangeInfo CreateBlockChange(Vector3i position, BlockValue value)
         {
-            ConstructorInfo[] constructors = typeof(BlockChangeInfo)
-                .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            const BindingFlags flags =
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+            object boxed = Activator.CreateInstance(typeof(BlockChangeInfo));
+            FieldInfo blockValueRefField = typeof(BlockChangeInfo).GetField("blockValueRef", flags);
+            FieldInfo blockValueField = typeof(BlockChangeInfo).GetField("blockValue", flags);
+            FieldInfo changeBlockValueField = typeof(BlockChangeInfo).GetField("bChangeBlockValue", flags);
+
+            if (blockValueRefField == null ||
+                blockValueField == null ||
+                changeBlockValueField == null)
+            {
+                throw new MissingFieldException(
+                    "V3.1 BlockChangeInfo is missing blockValueRef/bChangeBlockValue/blockValue fields.");
+            }
+
+            object blockValueRef = CreateBlockValueRef(position, value, blockValueRefField.FieldType);
+            blockValueRefField.SetValue(boxed, blockValueRef);
+            blockValueField.SetValue(boxed, value);
+            changeBlockValueField.SetValue(boxed, true);
+
+            FieldInfo updateLightField = typeof(BlockChangeInfo).GetField("bUpdateLight", flags);
+            if (updateLightField != null && updateLightField.FieldType == typeof(bool))
+                updateLightField.SetValue(boxed, true);
+
+            LeezLog.Info(
+                "Grow-light BlockChangeInfo prepared with BlockValueRef for " + position + ".");
+            return (BlockChangeInfo)boxed;
+        }
+
+        private static object CreateBlockValueRef(
+            Vector3i position,
+            BlockValue value,
+            Type blockValueRefType)
+        {
+            if (blockValueRefType == null)
+                throw new ArgumentNullException(nameof(blockValueRefType));
+
+            const BindingFlags flags =
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+            ConstructorInfo[] constructors = blockValueRefType
+                .GetConstructors(flags)
                 .OrderBy(c => SafeParameters(c).Length)
                 .ToArray();
 
@@ -216,8 +252,7 @@ namespace LeezGrowLights
             {
                 ParameterInfo[] parameters = SafeParameters(constructor);
                 bool hasPosition = parameters.Any(p => p.ParameterType == typeof(Vector3i));
-                bool hasValue = parameters.Any(p => p.ParameterType == typeof(BlockValue));
-                if (!hasPosition || !hasValue)
+                if (!hasPosition)
                     continue;
 
                 object[] args = new object[parameters.Length];
@@ -232,65 +267,124 @@ namespace LeezGrowLights
                         args[i] = DefaultValue(type);
                 }
 
-                return (BlockChangeInfo)constructor.Invoke(args);
+                object created = constructor.Invoke(args);
+                LeezLog.Info(
+                    "Grow-light BlockValueRef created through " + DescribeConstructor(constructor) + ".");
+                return created;
             }
 
-            // BlockChangeInfo can be a value-type/data-carrier with no explicit constructor.
-            // In that shape Activator.CreateInstance gives the default value, after which its
-            // position and BlockValue members can be populated directly.
-            object boxed = Activator.CreateInstance(typeof(BlockChangeInfo));
-            bool positionAssigned = false;
-            bool valueAssigned = false;
-            const BindingFlags flags =
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
-            foreach (FieldInfo field in typeof(BlockChangeInfo).GetFields(flags))
+            object boxed = Activator.CreateInstance(blockValueRefType);
+            bool positionAssigned = TryAssignPosition(boxed, blockValueRefType, position, flags);
+            if (positionAssigned)
             {
-                if (!positionAssigned && field.FieldType == typeof(Vector3i))
-                {
-                    field.SetValue(boxed, position);
-                    positionAssigned = true;
-                }
-                else if (!valueAssigned && field.FieldType == typeof(BlockValue))
-                {
-                    field.SetValue(boxed, value);
-                    valueAssigned = true;
-                }
-            }
-
-            foreach (PropertyInfo property in typeof(BlockChangeInfo).GetProperties(flags))
-            {
-                if (!property.CanWrite)
-                    continue;
-
-                if (!positionAssigned && property.PropertyType == typeof(Vector3i))
-                {
-                    property.SetValue(boxed, position, null);
-                    positionAssigned = true;
-                }
-                else if (!valueAssigned && property.PropertyType == typeof(BlockValue))
-                {
-                    property.SetValue(boxed, value, null);
-                    valueAssigned = true;
-                }
-            }
-
-            if (positionAssigned && valueAssigned)
-            {
-                LeezLog.Info("Grow-light BlockChangeInfo created through writable V3.1 members.");
-                return (BlockChangeInfo)boxed;
+                TryAssignBlockValue(boxed, blockValueRefType, value, flags);
+                LeezLog.Info(
+                    "Grow-light BlockValueRef created through writable V3.1 members.");
+                return boxed;
             }
 
             string fields = string.Join(
                 ", ",
-                typeof(BlockChangeInfo)
-                    .GetFields(flags)
+                blockValueRefType.GetFields(flags)
                     .Select(f => f.FieldType.Name + " " + f.Name)
                     .ToArray());
+            string constructorsText = string.Join(
+                "; ",
+                constructors.Select(DescribeConstructor).ToArray());
 
             throw new MissingMethodException(
-                "BlockChangeInfo exposes no usable Vector3i/BlockValue constructor or writable member pair. " +
-                "Fields=[" + fields + "]");
+                "BlockValueRef exposes no usable position constructor or writable position members. " +
+                "Fields=[" + fields + "] Constructors=[" + constructorsText + "]");
+        }
+
+        private static bool TryAssignPosition(
+            object boxed,
+            Type type,
+            Vector3i position,
+            BindingFlags flags)
+        {
+            foreach (FieldInfo field in type.GetFields(flags))
+            {
+                if (field.FieldType == typeof(Vector3i))
+                {
+                    field.SetValue(boxed, position);
+                    return true;
+                }
+            }
+
+            foreach (PropertyInfo property in type.GetProperties(flags))
+            {
+                if (property.CanWrite && property.PropertyType == typeof(Vector3i))
+                {
+                    property.SetValue(boxed, position, null);
+                    return true;
+                }
+            }
+
+            bool x = TryAssignCoordinate(boxed, type, "x", position.x, flags);
+            bool y = TryAssignCoordinate(boxed, type, "y", position.y, flags);
+            bool z = TryAssignCoordinate(boxed, type, "z", position.z, flags);
+            return x && y && z;
+        }
+
+        private static bool TryAssignCoordinate(
+            object boxed,
+            Type type,
+            string axis,
+            int value,
+            BindingFlags flags)
+        {
+            string[] names =
+            {
+                axis,
+                "block" + axis.ToUpperInvariant(),
+                "pos" + axis.ToUpperInvariant(),
+                "position" + axis.ToUpperInvariant()
+            };
+
+            foreach (string name in names)
+            {
+                FieldInfo field = type.GetField(name, flags | BindingFlags.IgnoreCase);
+                if (field != null && field.FieldType == typeof(int))
+                {
+                    field.SetValue(boxed, value);
+                    return true;
+                }
+
+                PropertyInfo property = type.GetProperty(name, flags | BindingFlags.IgnoreCase);
+                if (property != null && property.CanWrite && property.PropertyType == typeof(int))
+                {
+                    property.SetValue(boxed, value, null);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void TryAssignBlockValue(
+            object boxed,
+            Type type,
+            BlockValue value,
+            BindingFlags flags)
+        {
+            foreach (FieldInfo field in type.GetFields(flags))
+            {
+                if (field.FieldType == typeof(BlockValue))
+                {
+                    field.SetValue(boxed, value);
+                    return;
+                }
+            }
+
+            foreach (PropertyInfo property in type.GetProperties(flags))
+            {
+                if (property.CanWrite && property.PropertyType == typeof(BlockValue))
+                {
+                    property.SetValue(boxed, value, null);
+                    return;
+                }
+            }
         }
 
         private static string DescribeMethod(MethodInfo method)
@@ -300,6 +394,16 @@ namespace LeezGrowLights
 
             ParameterInfo[] parameters = SafeParameters(method);
             return method.DeclaringType?.Name + "." + method.Name +
+                   "(" + string.Join(", ", parameters.Select(p => p.ParameterType.Name + " " + p.Name).ToArray()) + ")";
+        }
+
+        private static string DescribeConstructor(ConstructorInfo constructor)
+        {
+            if (constructor == null)
+                return "<null>";
+
+            ParameterInfo[] parameters = SafeParameters(constructor);
+            return constructor.DeclaringType?.Name +
                    "(" + string.Join(", ", parameters.Select(p => p.ParameterType.Name + " " + p.Name).ToArray()) + ")";
         }
 
