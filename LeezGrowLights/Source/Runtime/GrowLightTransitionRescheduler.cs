@@ -39,7 +39,7 @@ namespace LeezGrowLights
             if (!GrowLightScanner.TryGetGrowLightCoverage(
                     lampBlock,
                     out int radius,
-                    out int minVerticalOffset,
+                    out _,
                     out int maxVerticalOffset))
             {
                 return null;
@@ -52,8 +52,11 @@ namespace LeezGrowLights
                 ExcludeLampOnApply = excludeLampOnApply
             };
 
-            // Current XML: at most 5*5*10 = 250 possible farm positions for one lamp.
-            for (int verticalOffset = minVerticalOffset;
+            // Conservative candidate capture: downward lights use Y+2..Y+10, while a horizontal
+            // panel can illuminate crops whose farm block is one block below the lamp. Capturing
+            // from offset 1 is safe because Apply still reschedules only when the effective
+            // multiplier actually changes.
+            for (int verticalOffset = 1;
                  verticalOffset <= maxVerticalOffset;
                  verticalOffset++)
             {
