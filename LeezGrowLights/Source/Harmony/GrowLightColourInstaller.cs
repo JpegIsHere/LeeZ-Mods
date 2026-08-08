@@ -29,6 +29,9 @@ namespace LeezGrowLights
             MethodInfo visualPostfix = AccessTools.Method(
                 typeof(GrowLightColourPatches),
                 nameof(GrowLightColourPatches.VisualPostfix));
+            MethodInfo lightLodFramePostfix = AccessTools.Method(
+                typeof(GrowLightColourVisual),
+                nameof(GrowLightColourVisual.LightLodFramePostfix));
 
             int interactionHooks = 0;
             int visualHooks = 0;
@@ -67,6 +70,26 @@ namespace LeezGrowLights
                 null,
                 visualPostfix);
 
+            // V3.1 LightLOD.FrameUpdate owns the final Unity Light.intensity and rewrites it
+            // continuously. Reapply the LeeZ multiplier after that vanilla calculation. The
+            // postfix itself filters to Light components registered by GrowLightColourVisual,
+            // so unrelated LightLOD instances remain untouched.
+            Type lightLodType = AccessTools.TypeByName("LightLOD");
+            if (lightLodType != null && lightLodFramePostfix != null)
+            {
+                visualHooks += PatchNamed(
+                    harmony,
+                    lightLodType,
+                    "FrameUpdate",
+                    null,
+                    lightLodFramePostfix);
+            }
+            else
+            {
+                LeezLog.Warning(
+                    "LightLOD.FrameUpdate could not be resolved; grow-light brightness may be overwritten by vanilla LOD updates.");
+            }
+
             if (interactionHooks > 0)
             {
                 LeezLog.Info(
@@ -80,11 +103,11 @@ namespace LeezGrowLights
             if (visualHooks > 0)
             {
                 LeezLog.Info(
-                    "Grow-light colour visual refresh armed on " + visualHooks + " method(s).");
+                    "Grow-light colour/brightness visual refresh armed on " + visualHooks + " method(s).");
             }
             else
             {
-                LeezLog.Warning("No grow-light colour visual refresh methods could be patched.");
+                LeezLog.Warning("No grow-light colour/brightness visual refresh methods could be patched.");
             }
         }
 
@@ -154,7 +177,7 @@ namespace LeezGrowLights
             catch (Exception ex)
             {
                 LeezLog.Warning(
-                    "Could not enumerate BlockPoweredLight." + methodName + ": " + ex.Message);
+                    "Could not enumerate " + type.Name + "." + methodName + ": " + ex.Message);
                 return 0;
             }
 
@@ -186,7 +209,7 @@ namespace LeezGrowLights
                     postfix: postfix != null ? new HarmonyMethod(postfix) : null);
 
                 LeezLog.Info(
-                    "Grow-light colour hook installed: " +
+                    "Grow-light colour/brightness hook installed: " +
                     method.DeclaringType?.Name + "." + method.Name +
                     " [token 0x" + method.MetadataToken.ToString("X8") + "]");
                 return true;
