@@ -3,8 +3,8 @@
 Target game build: **7 Days to Die V3.1.0 (b14)**.
 
 Current development branch: **`dev/colour-system`**  
-Current runtime candidate: **v0.7.0-dev7**  
-Known-good colour code baseline: **`c7f70f408ba72d8657422caf131a9d2404e5457a`**
+Current runtime candidate: **v0.7.0-dev8**  
+Known-good colour code baseline: **`0a1967e94dcd153e8ad8ff40de545b8b9245903b`**
 
 Legend: `PASS` = observed in-game/build output; `STATIC VERIFIED` = source/XML/project structure proves the intended rule but exact gameplay still needs a live run; `IMPLEMENTED` = code path exists and is wired but the exact scenario still needs validation; `PENDING` = not complete.
 
@@ -15,7 +15,7 @@ For the detailed earlier Stage 0-5 history, see `docs/STAGE_0_5_STATUS.md` and `
 | Test | Status | Notes |
 |---|---|---|
 | V3.1 build/startup | PASS | Current development DLL builds against the installed V3.1 assemblies and loads as `LeezGrowLights 0.7.0.0` |
-| runtime banner | PASS | dev7 reports `Loading V3.1 grow-light runtime candidate v0.7.0-dev7` |
+| runtime banner | PASS | dev8 reports `Loading V3.1 grow-light runtime candidate v0.7.0-dev8` |
 | crop scheduling/tick hooks | PASS | Installed successfully during repeated colour-development runs |
 | sunlight substitution hooks | PASS | Installed successfully during repeated colour-development runs |
 | electrical transition hooks | PASS | Existing transition hooks continued loading during colour-development runs |
@@ -49,8 +49,8 @@ See `docs/STAGE_0_5_STATUS.md` for detailed evidence and exact ratios.
 | V3.1 command activation recognized | PASS | working path matches `_commandName:String`, not a numeric index |
 | White/default state | PASS | legacy/uninitialised metadata maps to White |
 | colour state advances | PASS | user observed cycling through colour names |
-| Blue | PASS | included in successful live dev7 cycle |
-| Green | PASS | included in successful live dev7 cycle |
+| Blue | PASS | included in successful live dev7/dev8 cycle |
+| Green | PASS | included in successful live dev7/dev8 cycle |
 | Red | PASS | included in successful live dev7 cycle |
 | Purple | PASS | included in successful live dev7 cycle |
 | White | PASS | included in successful live dev7 cycle |
@@ -60,7 +60,8 @@ See `docs/STAGE_0_5_STATUS.md` for detailed evidence and exact ratios.
 | visual colour after world load | PASS | persisted Green reapplied after restart |
 | immediate live visual refresh | PASS | dev7 user result: lights cycle through the colours perfectly |
 | normal electrical toggle still separate | PASS | colour uses block metadata; electrical state remains tile-entity toggle state |
-| friendly radial-menu localization | FAIL (cosmetic) | UI can still display `blockcommand_growlightcolour: Blue`-style text |
+| friendly radial-menu localization | PASS | dev8 displays `Grow light colour: Blue` and advances cleanly to `Grow light colour: Green` |
+| dev8 menu + visual regression | PASS | user confirmed selecting once changes both Blue -> Green label and lamp immediately |
 | remote-client colour authoring | PENDING | intentionally rejected until server routing exists |
 | dedicated-server colour synchronization | PENDING | not yet claimed |
 
@@ -73,11 +74,11 @@ See `docs/STAGE_0_5_STATUS.md` for detailed evidence and exact ratios.
 - dev5: runtime diagnostics exposed `BlockChangeInfo.blockValueRef`, `bChangeBlockValue`, and `blockValue`.
 - dev6: `BlockValueRef` persistence worked; colour survived restart, but live visuals waited for a rebuild.
 - dev7: cached live `BlockEntityData` and immediately reapplied the selected tint after each successful write. Live cycle passed.
+- dev8: replaced the raw key-style colour menu with stable per-colour localization tokens. User confirmed `Grow light colour: Blue`, then a single selection advanced both menu and lamp to Green immediately.
 
 ## Remaining correctness / release tests
 
 - Dedicated-server / remote-client colour command routing and synchronization.
-- Fix or redesign dynamic colour-command localization so the radial menu shows a friendly label.
 - Final regression sweep across Stage 0-5 after colour work.
 - Long-duration sealed-room crop survival under normal play.
 - Performance with dense farms / many lamps.
