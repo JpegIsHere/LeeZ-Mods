@@ -1,15 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace LeezGrowLights
 {
     internal static class GrowLightColourPatches
     {
-        private static readonly object Sync = new object();
-        private static readonly Dictionary<Block, int> ColourCommandIndices =
-            new Dictionary<Block, int>();
-        private static int LastKnownColourCommandIndex = -1;
+        private const string ColourCommandPrefix = "Grow light colour:";
 
         public static void ActivationCommandsPostfix(
             object __instance,
@@ -25,16 +21,10 @@ namespace LeezGrowLights
                 BlockActivationCommand existing = __result[existingIndex];
                 existing = EnsureEnabled(existing);
                 __result[existingIndex] = existing;
-
-                RememberColourCommandIndex(block, existingIndex);
-
-                LeezLog.Info(
-                    "Grow-light colour command confirmed at index " + existingIndex + ".");
                 return;
             }
 
             int originalLength = __result != null ? __result.Length : 0;
-            RememberColourCommandIndex(block, originalLength);
 
             BlockValue value = FindBlockValue(__args, out bool foundValue)
                 ? FindLastBlockValue(__args)
@@ -46,7 +36,7 @@ namespace LeezGrowLights
 
             BlockActivationCommand colourCommand = new BlockActivationCommand
             {
-                text = "Grow light colour: " + selected,
+                text = ColourCommandPrefix + " " + selected,
                 iconColor = GrowLightColourPalette.ToUnityColour(selected),
                 activateTime = 0f,
                 highlighted = false
@@ -78,46 +68,17 @@ namespace LeezGrowLights
             if (!IsGrowLight(block))
                 return true;
 
-            bool blockSpecificIndex = TryGetColourCommandIndex(block, out int colourCommandIndex);
-            if (!blockSpecificIndex)
-            {
-                lock (Sync)
-                {
-                    colourCommandIndex = LastKnownColourCommandIndex;
-                }
-            }
-
-            if (colourCommandIndex < 0)
-            {
-                LeezLog.Warning(
-                    "Grow-light activation observed but no colour command index is known. " +
-                    DescribeActivation(__originalMethod, __args));
+            if (!TryGetCommandName(__originalMethod, __args, out string commandName))
                 return true;
-            }
 
-            if (!TryGetActivatedCommandIndex(
-                    __originalMethod,
-                    __args,
-                    colourCommandIndex,
-                    out int activatedIndex,
-                    out string indexSource))
-            {
-                LeezLog.Warning(
-                    "Grow-light activation observed but command index could not be resolved; " +
-                    "colourIndex=" + colourCommandIndex + ". " +
-                    DescribeActivation(__originalMethod, __args));
+            // V3.1 BlockPoweredLight.OnBlockActivated identifies radial commands by the
+            // string _commandName, not by an integer index. Vanilla light toggling uses
+            // the command name "light", so only our dynamic colour label is intercepted.
+            if (!IsColourCommandName(commandName))
                 return true;
-            }
 
             LeezLog.Info(
-                "Grow-light activation observed: activatedIndex=" + activatedIndex +
-                " via " + indexSource +
-                ", colourIndex=" + colourCommandIndex +
-                ", indexCache=" + (blockSpecificIndex ? "block" : "fallback") +
-                ". " + DescribeActivation(__originalMethod, __args));
-
-            if (activatedIndex != colourCommandIndex)
-                return true;
+                "Grow-light colour activation recognized: command='" + commandName + "'.");
 
             WorldBase world = FindFirst<WorldBase>(__args);
             if (world == null || !TryGetFirstVector3i(__args, out Vector3i position))
@@ -188,25 +149,12 @@ namespace LeezGrowLights
             GrowLightColourVisual.Apply(blockEntityData, value);
         }
 
-        private static void RememberColourCommandIndex(Block block, int index)
-        {
-            lock (Sync)
-            {
-                if (block != null)
-                    ColourCommandIndices[block] = index;
-                LastKnownColourCommandIndex = index;
-            }
-        }
-
-        private static bool TryGetActivatedCommandIndex(
+        private static bool TryGetCommandName(
             MethodBase originalMethod,
             object[] args,
-            int expectedIndex,
-            out int value,
-            out string source)
+            out string commandName)
         {
-            value = 0;
-            source = null;
+            commandName = null;
             if (args == null)
                 return false;
 
@@ -215,103 +163,37 @@ namespace LeezGrowLights
 
             for (int i = 0; i < count; i++)
             {
-                if (!(args[i] is int integer))
+                if (!(args[i] is string text))
                     continue;
 
-                string name = parameters[i].Name ?? string.Empty;
-                string lower = name.ToLowerInvariant();
-                bool activationIndex =
-                    lower.Contains("indexinblockactivationcommands") ||
-                    (lower.Contains("activation") && lower.Contains("index")) ||
-                    (lower.Contains("command") && lower.Contains("index"));
-
-                if (activationIndex)
+                string parameterName = parameters[i].Name ?? string.Empty;
+                if (parameterName.IndexOf("command", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    value = integer;
-                    source = "parameter '" + name + "'";
+                    commandName = text;
                     return true;
                 }
             }
 
-            int matchingExpected = 0;
-            int matchedValue = 0;
-            for (int i = 0; i < args.Length; i++)
+            foreach (object arg in args)
             {
-                if (args[i] is int integer && integer == expectedIndex)
+                if (arg is string text)
                 {
-                    matchingExpected++;
-                    matchedValue = integer;
+                    commandName = text;
+                    return true;
                 }
-            }
-
-            if (matchingExpected == 1)
-            {
-                value = matchedValue;
-                source = "unique int matching exposed colour index";
-                return true;
-            }
-
-            int intCount = 0;
-            int firstInt = 0;
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i] is int integer)
-                {
-                    if (intCount == 0)
-                        firstInt = integer;
-                    intCount++;
-                }
-            }
-
-            if (intCount == 1)
-            {
-                value = firstInt;
-                source = "only int argument";
-                return true;
-            }
-
-            if (intCount > 0)
-            {
-                value = firstInt;
-                source = "first-int diagnostic fallback";
-                return true;
             }
 
             return false;
         }
 
-        private static string DescribeActivation(MethodBase method, object[] args)
+        private static bool IsColourCommandName(string commandName)
         {
-            string methodName = method != null
-                ? (method.DeclaringType != null ? method.DeclaringType.Name + "." : string.Empty) + method.Name
-                : "<unknown method>";
+            if (string.IsNullOrWhiteSpace(commandName))
+                return false;
 
-            ParameterInfo[] parameters = SafeParameters(method);
-            var parts = new List<string>();
-            if (args != null)
-            {
-                for (int i = 0; i < args.Length; i++)
-                {
-                    string parameterName = i < parameters.Length
-                        ? parameters[i].Name
-                        : "arg" + i;
-                    object arg = args[i];
-                    string typeName = arg != null ? arg.GetType().Name : "null";
-                    string displayValue;
-                    try
-                    {
-                        displayValue = arg != null ? arg.ToString() : "null";
-                    }
-                    catch
-                    {
-                        displayValue = "<ToString failed>";
-                    }
-
-                    parts.Add(parameterName + ":" + typeName + "=" + displayValue);
-                }
-            }
-
-            return methodName + " args=[" + string.Join(", ", parts.ToArray()) + "]";
+            return commandName.StartsWith(
+                ColourCommandPrefix,
+                StringComparison.OrdinalIgnoreCase);
         }
 
         private static ParameterInfo[] SafeParameters(MethodBase method)
@@ -381,8 +263,7 @@ namespace LeezGrowLights
             for (int i = 0; i < commands.Length; i++)
             {
                 string text = commands[i].text;
-                if (!string.IsNullOrEmpty(text) &&
-                    text.StartsWith("Grow light colour:", StringComparison.Ordinal))
+                if (IsColourCommandName(text))
                 {
                     index = i;
                     return true;
@@ -396,14 +277,6 @@ namespace LeezGrowLights
         {
             return block != null &&
                    GrowLightScanner.TryGetGrowLightCoverage(block, out _, out _, out _);
-        }
-
-        private static bool TryGetColourCommandIndex(Block block, out int index)
-        {
-            lock (Sync)
-            {
-                return ColourCommandIndices.TryGetValue(block, out index);
-            }
         }
 
         private static T FindFirst<T>(object[] args) where T : class
