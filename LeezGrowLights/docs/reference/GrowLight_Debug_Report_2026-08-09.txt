@@ -1,0 +1,29 @@
+Growlight Debug Report - 2026-08-09
+Target: 7 Days to Die V3.1.0 b14 / LeezGrowLights
+
+Observed power behavior:
+- Directly wired growlight still consumes 10 W when the growlight is switched OFF.
+- Generator ON / growlight OFF = 10 W draw.
+- If the growlight is connected through a separate electrical switch, power behavior is correct when switched off.
+
+Observed radial/circle menu:
+- 4 slots total.
+- Slot 1: switch icon.
+- Slot 2: hand icon.
+- Slot 3: color selector, no visible icon.
+- Slot 4: brightness selector, no visible icon.
+
+Later follow-up observation:
+- Brightness cycling itself worked, but the radial hover label was one step out of sync with the click action.
+- Example: if the selector said Maximum, clicking it actually wrapped to the lowest setting because Maximum was already the current brightness.
+- Desired behavior: the hover label should show the NEXT brightness level that clicking will apply.
+
+Resolution history:
+- dev11 fixed direct-wired OFF-state power draw and added Color/Brightness radial icons.
+- dev11 regression build was live-tested successfully in game.
+- dev12 changed the Brightness label to advertise Next(current) rather than current.
+
+See:
+- docs/DEV11_DEV12_REGRESSION_HANDOFF.md
+- docs/V31_MODDING_REFERENCE.md
+- docs/RELEASE_0.7.0.2.md
