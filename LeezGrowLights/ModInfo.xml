@@ -2,8 +2,8 @@
 <xml>
     <Name value="LeezGrowLights" />
     <DisplayName value="Leez Grow Lights" />
-    <Version value="0.7.0.0" />
-    <Description value="Six tiers of powered LED-panel grow lights that substitute for sunlight underground, accelerate covered crops, and support selectable panel colours." />
+    <Version value="0.7.0.1" />
+    <Description value="Six tiers of powered LED-panel grow lights that substitute for sunlight underground, accelerate covered crops, support selectable panel colours/brightness, and include the dev11 power/icon regression fixes." />
     <Author value="Leez" />
     <Website value="" />
 </xml>
