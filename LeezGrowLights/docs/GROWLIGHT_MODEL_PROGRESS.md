@@ -1,8 +1,10 @@
 # LeeZ Grow Light model progress
 
-Checkpoint date: **2026-08-09**
+Latest checkpoint date: **2026-08-10**
 
 This file is the continuation checkpoint for the custom 3D model/prefab work for **LeezGrowLights**.
+
+Previous model-design checkpoint: **`b6f230633000815d01f7d3b06d66eea4a2c16f3b`**.
 
 ## Baseline that must not regress
 
@@ -25,15 +27,15 @@ The model phase should initially change only the visual asset path plus any mode
 
 ## Locked visual design
 
-The concept is approved and currently requires no design changes.
+The concept remains approved and requires no design changes at this stage.
 
 ### Overall fixture
 
 - Single-block, ceiling-mounted **square grow light**.
-- Inspired by a clean commercial/hydroponic grow-light fixture rather than a salvaged or sci-fi design.
+- Clean commercial/hydroponic grow-light fixture rather than salvaged or sci-fi styling.
 - Housing colour/style: **dark gunmetal**, clean industrial/hydroponic.
 - Flush or near-flush ceiling mount.
-- Deliberate **top-center origin/pivot** for ceiling placement.
+- Deliberate **top-centre origin/pivot** for ceiling placement.
 - No chains or hanging cables in the first version.
 - Same overall housing shared by T1-T6.
 
@@ -48,19 +50,19 @@ The underside uses **concentric square LED zones**.
 - T5 = 5.
 - T6 = 6 square zones, with the centre element also **square**, not circular.
 
-Higher tiers should therefore be immediately readable from below by the number of square LED zones.
+Higher tiers should be immediately readable from below by the number of square LED zones.
 
 ### LED appearance
 
 - OFF: frosted white / pale diffuser appearance.
 - ON: selected LeeZ colour with a **dotted illuminated LED appearance** if practical.
 - Do **not** model hundreds of individual LED cubes for the finished asset unless testing later proves necessary.
-- Preferred later approach: simple LED ring geometry plus material/texture detail that represents individual diode dots.
+- Preferred later approach: simple LED ring geometry plus material/texture detail representing individual diode dots.
 - Do not solve emissive shaders/material masks during the greybox phase.
 
 ### Detail policy
 
-Bolts, screws, decals, LeeZ branding, vents and other small details are optional later. They are intentionally excluded from the first greybox.
+Bolts, screws, decals, LeeZ branding, vents and other small details remain optional later and are intentionally excluded from the first greybox.
 
 ## Approved target proportions
 
@@ -71,16 +73,16 @@ These are block-relative target dimensions for the first in-game size test, not 
 - Main housing thickness: **0.06 block**.
 - Total final thickness including shallow raised/back components: approximately **0.10-0.12 block**.
 - Available LED region: approximately **0.68 x 0.68 block**.
-- Proposed outer T1 LED square: approximately **0.64 x 0.64 block**.
-- Proposed LED strip width: approximately **0.055 block**.
-- Proposed visible housing border: approximately **0.05-0.06 block**.
-- Proposed LED recess: approximately **0.01-0.015 block**.
+- Outer T1 LED square: approximately **0.64 x 0.64 block**.
+- LED strip width: approximately **0.055 block**.
+- Visible housing border: approximately **0.05-0.06 block**.
+- LED recess: approximately **0.01-0.015 block**.
 
 The greybox must be tested in game before spending time on fine detail.
 
 ## Tier brightness decision
 
-Tier should govern **base visual brightness**, while the existing player brightness selector remains functional.
+Tier governs **base visual brightness**, while the existing player brightness selector remains functional.
 
 Conceptually:
 
@@ -96,41 +98,23 @@ Therefore:
 - Do not yet choose final numeric Unity Light intensities. Tune those after the custom prefab is working in Unity and in game.
 - Tier brightness is visual; do not couple it to crop-growth calculations.
 
-This is compatible with the existing `GrowLightColourVisual` approach, which treats Unity Light intensity as a baseline and layers the selected brightness multiplier over it.
-
-## Planned object structure
-
-The simple conceptual Blender structure is:
-
-```text
-LeeZGrowLight_T1
-  |- Housing_Frame / main housing
-  |- Backplate
-  |- Centre_Panel
-  `- LED_Square_1
-```
-
-Later tiers can reuse the common housing and add `LED_Square_2` through `LED_Square_6`.
-
-The large commercial-style driver box should **not** sit underneath in the centre because it would conflict with the concentric T5/T6 LED layout. Any driver/electronics detail should instead be shallow and integrated into the top/back housing later.
+This remains compatible with the existing `GrowLightColourVisual` approach, which treats Unity Light intensity as a baseline and layers the selected brightness multiplier over it.
 
 ## Blender learning/build approach
 
 The user is a Blender beginner. Continue with explicit, one-step-at-a-time instructions and do not assume knowledge of modes, menus, transforms, dimensions, origins, pivots, UVs, materials, export settings or Unity concepts.
 
-### Current Blender file
-
-Suggested working filename used during the session:
+Working filename used during the session:
 
 `LeeZGrowLight_T1_Greybox.blend`
 
-### Completed Blender setup
+The `.blend` file itself is currently local to the user's machine and is **not stored in this repository checkpoint**.
 
-A conceptual 7DTD reference block has been created:
+## Current Blender scene — verified state
+
+### Reference object
 
 `BlockReference`
-
-Verified values:
 
 ```text
 Location:   X 0, Y 0, Z 0
@@ -139,15 +123,14 @@ Scale:      X 1, Y 1, Z 1
 Dimensions: X 1, Y 1, Z 1
 ```
 
-The scale was explicitly applied with `Ctrl+A -> Scale` after sizing the Blender default cube.
+- Scale was applied with `Ctrl+A -> Scale`.
+- Object Properties -> Viewport Display -> **Display As = Wire**.
+- 3D Viewport itself is in normal **Solid** shading.
+- The reference remains outside the grow-light parent hierarchy.
 
-### Completed first grow-light greybox object
-
-Object:
+### Main housing
 
 `Housing_Greybox`
-
-Verified from the user's Blender screenshot:
 
 ```text
 Location:   X 0, Y 0, Z 0.47
@@ -156,29 +139,175 @@ Scale:      X 1, Y 1, Z 1
 Dimensions: X 0.80, Y 0.80, Z 0.06
 ```
 
-This positions the housing slab at the top of the 1x1 reference block:
+This places the housing slab flush against the top of the conceptual 1x1 block.
 
-- top of conceptual block = Z 0.50
-- slab thickness = 0.06
-- half slab thickness = 0.03
-- slab centre = 0.50 - 0.03 = **Z 0.47**
+### Underside frame
 
-The first scale/orientation check therefore passed visually.
+All frame pieces have applied scale and use separate simple cube geometry.
+
+`Frame_Front`
+
+```text
+Location:   X 0, Y -0.37, Z 0.43
+Dimensions: X 0.80, Y 0.06, Z 0.02
+Scale:      X 1, Y 1, Z 1
+```
+
+`Frame_Back`
+
+```text
+Location:   X 0, Y 0.37, Z 0.43
+Dimensions: X 0.80, Y 0.06, Z 0.02
+Scale:      X 1, Y 1, Z 1
+```
+
+`Frame_Left`
+
+```text
+Location:   X -0.37, Y 0, Z 0.43
+Dimensions: X 0.06, Y 0.68, Z 0.02
+Scale:      X 1, Y 1, Z 1
+```
+
+`Frame_Right`
+
+```text
+Location:   X 0.37, Y 0, Z 0.43
+Dimensions: X 0.06, Y 0.68, Z 0.02
+Scale:      X 1, Y 1, Z 1
+```
+
+The four pieces form a complete rectangular underside frame.
+
+### Recessed centre panel
+
+`Centre_Panel`
+
+```text
+Location:   X 0, Y 0, Z 0.435
+Dimensions: X 0.68, Y 0.68, Z 0.01
+Scale:      X 1, Y 1, Z 1
+```
+
+The panel is recessed slightly above the lower edge of the surrounding frame.
+
+### T1 LED square greybox
+
+The T1 LED zone is represented by four simple strips. All have applied scale.
+
+`LED1_Front`
+
+```text
+Location:   X 0, Y -0.2925, Z 0.4275
+Dimensions: X 0.64, Y 0.055, Z 0.005
+Scale:      X 1, Y 1, Z 1
+```
+
+`LED1_Back`
+
+```text
+Location:   X 0, Y 0.2925, Z 0.4275
+Dimensions: X 0.64, Y 0.055, Z 0.005
+Scale:      X 1, Y 1, Z 1
+```
+
+`LED1_Left`
+
+```text
+Location:   X -0.2925, Y 0, Z 0.4275
+Dimensions: X 0.055, Y 0.53, Z 0.005
+Scale:      X 1, Y 1, Z 1
+```
+
+`LED1_Right`
+
+```text
+Location:   X 0.2925, Y 0, Z 0.4275
+Dimensions: X 0.055, Y 0.53, Z 0.005
+Scale:      X 1, Y 1, Z 1
+```
+
+A visual underside check passed: the ring is centred, square, evenly inset and sits correctly on the recessed centre panel.
+
+## Root/pivot hierarchy — completed and tested
+
+An Empty of type **Plain Axes** was created and named:
+
+`LeeZGrowLight_T1`
+
+Verified root location:
+
+```text
+Location: X 0, Y 0, Z 0.50
+```
+
+This is the deliberate **top-centre mounting pivot** at the upper surface of the fixture.
+
+The following mesh objects are parented to `LeeZGrowLight_T1` using **Object (Keep Transform)**:
+
+```text
+Centre_Panel
+Frame_Back
+Frame_Front
+Frame_Left
+Frame_Right
+Housing_Greybox
+LED1_Back
+LED1_Front
+LED1_Left
+LED1_Right
+```
+
+`BlockReference` is **not** parented to the grow light.
+
+### Pivot validation
+
+The root was temporarily rotated **20 degrees on X**.
+
+Result:
+
+- the complete grow-light fixture moved as one unit;
+- `BlockReference` remained stationary;
+- the fixture visibly hinged around the intended top-centre mounting point.
+
+The test rotation was then cleared with `Alt+R`, returning the fixture to flat orientation, and the Blender file was saved.
+
+This pivot test **passed**.
+
+## Important Blender parenting lesson from this session
+
+Blender Outliner selection caused two temporary incorrect-parent attempts because the intended Empty was not the active object.
+
+The reliable method that worked was:
+
+1. Deselect everything.
+2. In the Outliner, select the continuous range of grow-light mesh objects.
+3. Use **Ctrl + Left Click** on `LeeZGrowLight_T1` so it becomes the active object while preserving the mesh selection.
+4. Move the mouse over the 3D Viewport.
+5. `Ctrl+P -> Object (Keep Transform)`.
+
+Do not assume Shift-clicking the Empty makes it the active object in the required way.
+
+## Current milestone
+
+The **T1 greybox geometry and top-centre parent pivot are complete enough for the first external scale/orientation test**.
+
+Do **not** add materials, textures, UVs, bevels, bolts, branding, vents, detailed diode meshes or emissive work yet.
 
 ## Exact next Blender step
 
-Do **not** jump ahead to detailed modeling, LEDs, UVs or textures.
+Continue one step at a time.
 
-The next action planned was:
+1. Select the root Empty `LeeZGrowLight_T1`.
+2. Verify its current transforms after the successful pivot test and reset:
+   - Location should still be **X 0, Y 0, Z 0.50**.
+   - Rotation should be **X 0, Y 0, Z 0**.
+   - Scale should be **X 1, Y 1, Z 1**.
+3. Verify the fixture remains flat and all intended mesh pieces remain parented to the Empty.
+4. Save.
+5. Only then prepare the first greybox export/scale-orientation test.
 
-1. Select `BlockReference` in the Outliner.
-2. Open **Object Properties**.
-3. Expand **Viewport Display**.
-4. Change **Display As** to **Wire** so only the reference cube is wireframe while `Housing_Greybox` remains solid.
-5. If necessary, enable **In Front** for the reference object so its outline remains visible.
-6. After that, begin constructing the underside/recessed frame from separate simple pieces with exact dimensions, rather than immediately using booleans or complicated mesh edits.
-
-The current `Housing_Greybox` can become the main body/backplate as the greybox develops.
+Do not make a final export-format or transform decision casually: check how the chosen Blender export will preserve the top-centre pivot and object hierarchy before changing the scene.
 
 ## Unity version is still intentionally unresolved
 
@@ -203,8 +332,8 @@ Once the Blender greybox has passed a scale/orientation test, the Unity prefab m
 
 ## Integration order remains unchanged
 
-1. Finish T1 greybox.
-2. Learn/check scale, transforms and origin/pivot.
+1. Finish T1 greybox. **DONE for first scale/orientation test.**
+2. Learn/check scale, transforms and origin/pivot. **Pivot test passed; final export transform check is next.**
 3. Test size/orientation before heavy detailing.
 4. UV unwrap and texture only after greybox success.
 5. Determine exact Unity version from `Player.log`.
