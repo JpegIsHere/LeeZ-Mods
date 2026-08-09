@@ -14,6 +14,13 @@ This manifest is intentionally broader than the runtime package. It identifies t
 - Official tag: `leezgrowlights-v0.7.0.2-v31`
 - V3.1 CI run for release DLL: `31295389819`
 
+## Next development phase: custom GrowLight model
+
+- `docs/GROWLIGHT_MODEL_CREATION_HANDOFF.md` — primary starting point for the **GrowLight Model** chat/project.
+- `docs/images/GrowLightExample.JPG` — existing visual/design reference image.
+
+The model handoff records the current powered-light XML baseline, the runtime requirements for material tinting and child Unity `Light` components, a beginner Blender -> Unity -> asset-bundle workflow, the exact dev12 regression checklist, V3.1 Unity-version verification guidance, and a ready-to-paste starter prompt for a fresh ChatGPT chat.
+
 ## Runtime package files
 
 These are the files needed to assemble the normal drop-in mod together with the compiled DLL:
@@ -76,6 +83,7 @@ The project targets .NET Framework 4.8 and compiles against V3.1 `Assembly-CShar
 
 Start with these when creating another mod:
 
+- `docs/GROWLIGHT_MODEL_CREATION_HANDOFF.md` — custom-model next phase and new-chat handoff.
 - `docs/V31_MODDING_REFERENCE.md` — reusable V3.1 API/Harmony/build lessons.
 - `docs/DEV11_DEV12_REGRESSION_HANDOFF.md` — complete 2026-08-09 power/radial/brightness-label investigation.
 - `docs/RELEASE_0.7.0.2.md` — official dev12 commit, CI and asset hashes.
