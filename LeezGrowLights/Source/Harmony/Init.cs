@@ -9,15 +9,15 @@ namespace LeezGrowLights
         {
             try
             {
-                LeezLog.Info("Loading V3.1 grow-light runtime candidate v0.7.0-dev11-test1");
+                LeezLog.Info("Loading V3.1 grow-light runtime v0.7.0-dev11");
                 Harmony harmony = new Harmony(_modInstance.Name);
                 PatchInstaller.Install(harmony);
                 BlockRemovalInstaller.Install(harmony);
                 GrowLightColourInstaller.Install(harmony);
 
                 // Install after colour/brightness interaction so the final radial-command
-                // postfix can fill the dev10 blank icon names at Priority.Last. The same
-                // installer also fixes direct-wired lamps reserving power while toggled off.
+                // postfix can fill the blank icon names at Priority.Last. The same installer
+                // also fixes directly wired lamps reserving power while toggled off.
                 GrowLightV31Fixes.Install(harmony);
 
                 GrowLightColourNetwork.Install(harmony);
