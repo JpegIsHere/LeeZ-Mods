@@ -55,6 +55,8 @@
 
   <ItemGroup>
     <Compile Include="Harmony\Init.cs" />
+    <Compile Include="Harmony\GrowLightActivationPatches.cs" />
+    <Compile Include="Harmony\GrowLightPowerPatches.cs" />
     <Compile Include="Harmony\PatchInstaller.cs" />
     <Compile Include="Harmony\PlantGrowthPatches.cs" />
     <Compile Include="Harmony\SunlightSubstitutionPatches.cs" />
