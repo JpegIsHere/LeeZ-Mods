@@ -1,33 +1,36 @@
 # LeezGrowLights
 
-A powered grow-light mod for **7 Days to Die V3.1.x** that enables enclosed/underground farming, accelerates crop growth while a qualifying LeeZ grow light is powered and switched on, and now supports per-placed-light colour selection on the development branch.
+A powered grow-light mod for **7 Days to Die V3.1.x** that supports enclosed/underground farming, tiered crop-growth acceleration, per-light colour selection, per-light brightness selection, normal powered-light wiring, and progress-preserving mid-stage power transitions.
 
-**Current development branch:** `dev/colour-system` (`v0.7.0-dev7`, `ModInfo.xml` version `0.7.0.0`)  
-**Known-good colour code baseline:** `c7f70f408ba72d8657422caf131a9d2404e5457a`  
-**Stable main branch:** `0.5.1.0`  
-**Validated game build:** `V 3.1.0 (b14)`  
-**Status:** core underground grow-light behaviour, progress-preserving electrical transitions, per-light colour persistence, save/reload colour restoration, and immediate live colour tinting are proven in-game. Dedicated-server/remote-client colour routing remains pending.
+**Current official release:** `0.7.0.2 / dev12`  
+**Current source branch:** `dev/colour-system`  
+**Validated game build:** `V3.1.0 (b14)`  
+**Validated dev12 source commit:** `1449cba3cb663ab0ae3ea78458e6e02e54b69f13`  
+**Official tag:** `leezgrowlights-v0.7.0.2-v31`
 
-## What works now
+The current code line includes the previously validated colour/brightness runtime plus the live-tested dev11 power/radial-icon fixes and the dev12 brightness-menu label correction.
 
-Verified in-game:
+## Current feature set
+
+Verified during V3.1 development:
 
 - Six grow-light tiers (T1-T6).
-- Normal vanilla electrical wiring and on/off behavior.
-- Artificial sunlight for fully enclosed or underground farm plots.
-- Exact **5x5 horizontal coverage** (radius 2 from the farm plot).
+- Vanilla-style electrical wiring and on/off behavior.
+- Artificial sunlight for enclosed/underground farm plots.
+- Exact **5x5 horizontal coverage** (radius 2).
 - Vertical coverage from **1 through 10 blocks above the farm plot**.
-- Lamps at **11+ blocks above** are outside the effective range by design.
-- Growth-speed multiplier is read from XML.
-- Overlapping lights do not stack; the **highest active multiplier wins**.
-- Power and switch state are checked from the V3.1 powered tile entity APIs.
-- Crop placement/survival/growth light checks remain vanilla-controlled except that an active LeeZ light temporarily satisfies the crop's sunlight threshold.
-- Harmony crop hooks and sunlight-substitution hooks load successfully on V3.1.0 b14.
-- Mid-stage T6 `1x <-> 4x` transitions preserve earned progress and reschedule only remaining crop work.
-- Mid-stage T4 `1x <-> 1.5x` transitions also reschedule proportionally.
-- A per-light radial-menu colour command cycles through Blue, Green, Red, Purple, White and Yellow.
-- Selected colour is stored on the placed block and survives save/quit/restart.
-- Dev7 updates the visible lamp colour immediately while playing; a reload is no longer required.
+- Highest active multiplier wins when multiple LeeZ lights overlap.
+- Progress-preserving mid-stage multiplier transitions.
+- Per-placed-light colour selection.
+- Per-placed-light brightness selection.
+- Colour and brightness persistence through save/reload.
+- Immediate live colour/brightness visual refresh.
+- Brightness remains relative to each light's base/vanilla intensity.
+- Directly wired grow lights draw **0 W while their own toggle is OFF** and restore their configured 10 W when ON.
+- Visible built-in radial icons for Color (`tool`) and Brightness (`wrench`).
+- Brightness radial label now advertises the **next level the click will apply**.
+
+Full evidence status is maintained in [TESTING.md](TESTING.md).
 
 ## Grow-light tiers
 
@@ -40,29 +43,29 @@ Verified in-game:
 | T5 | 60 | 1.6x | 39.375 min |
 | T6 | 75 | 4.0x | 15.75 min |
 
-All tiers use the vanilla flat LED panel geometry and a provisional **10 W** power draw. On `dev/colour-system`, each placed light can be visually tinted independently.
+All current tiers use the vanilla flat LED panel visual and a configured **10 W** draw while switched on.
 
 ## Coverage rules
 
-A LeeZ light affects a farm plot only when all of the following are true:
+A LeeZ light affects a farm plot only when:
 
-1. The light is a LeeZ grow-light block with XML grow-light metadata.
-2. It is powered.
-3. It is switched on.
-4. Its horizontal offset from the farm plot is at most 2 blocks on X and Z (5x5 total area).
-5. Its block is between 1 and 10 blocks above the farm plot.
+1. the block is a LeeZ grow light with the expected XML metadata;
+2. it is powered;
+3. it is switched on;
+4. the farm plot is within 2 blocks on X and Z (5x5 total area);
+5. the light is between 1 and 10 blocks above the farm plot.
 
-If more than one active grow light covers a crop, only the highest multiplier is applied.
+If multiple active grow lights cover a crop, only the highest multiplier is used.
 
 ## Underground farming
 
-An active LeeZ light acts as an artificial sunlight source inside its coverage area. This allows a seed to be planted in a completely enclosed room without a skylight. When no qualifying active light covers the crop, vanilla light requirements apply normally.
+An active LeeZ grow light can temporarily satisfy vanilla crop-light requirements inside its coverage area. This allows seeds/crops to operate in a sealed or underground room without globally disabling the game's sunlight rules.
 
-The mod does **not** globally disable crop sunlight rules.
+When no qualifying active LeeZ light covers the crop, vanilla light requirements remain in control.
 
-## Mid-stage power transitions
+## Mid-stage growth transitions
 
-The development runtime contains a live-validated direct rescheduler. When the effective multiplier changes, it reads the crop's queued scheduled time, converts the remaining ticks back into equivalent vanilla work using the old multiplier, invalidates the old scheduled update, then schedules the remaining work using the new multiplier.
+The runtime preserves already-earned crop progress when the effective grow-light multiplier changes.
 
 Conceptually:
 
@@ -71,112 +74,139 @@ remaining vanilla work = remaining queued ticks * old multiplier
 new remaining ticks    = remaining vanilla work / new multiplier
 ```
 
-Live V3.1 tests have confirmed proportional transitions including T6 `1x <-> 4x` and T4 `1x <-> 1.5x`. Progress already earned before the transition stays earned; only future growth rate changes.
+Live V3.1 testing confirmed transitions including T6 `1x <-> 4x` and T4 `1x <-> 1.5x`.
 
-See [docs/STAGE_0_5_STATUS.md](docs/STAGE_0_5_STATUS.md) and [MIDSTAGE_TESTING.md](MIDSTAGE_TESTING.md) for the detailed evidence.
+See:
 
-## Per-light colour system
+- [MIDSTAGE_TESTING.md](MIDSTAGE_TESTING.md)
+- [docs/STAGE_0_5_STATUS.md](docs/STAGE_0_5_STATUS.md)
 
-The current colour runtime uses six colours:
+## Colour system
 
-`Blue -> Green -> Red -> Purple -> White -> Yellow -> Blue`
+Current colour cycle:
 
-Legacy/uninitialised lights default to White.
+```text
+Blue -> Green -> Red -> Purple -> White -> Yellow -> Blue
+```
 
-Colour is stored in `BlockValue.meta2`, while normal electrical toggle state remains in `TileEntityPoweredBlock.isToggled`. This preserves the powered tile entity and wiring model rather than replacing the block with a different tile-entity type.
+Legacy/uninitialised state defaults to White.
 
-V3.1 radial commands are identified by `_commandName:String`; the working colour handler therefore matches the dynamic `Grow light colour:` command string rather than assuming a numeric command index.
+Colour is stored with the per-block visual state rather than in the powered tile's electrical toggle state. This keeps custom cosmetic state independent from normal wiring/on-off behavior.
 
-The visual path applies the selected tint to `BlockEntityData.SetMaterialColor` and child Unity `Light.color` components. Dev7 caches the live `BlockEntityData` by block position and repaints it immediately after each successful colour write.
+The V3.1 activation handler is driven by a **string command name**. LeezGrowLights therefore uses stable custom command tokens such as `growlightcolour_<colour>` and localizes them through `Config/Localization.csv`.
 
-Live validation on dev7 confirmed:
+## Brightness system
 
-- the colour command cycles all configured colours;
-- the saved colour survives quit/restart;
-- the restored lamp displays the saved colour;
-- live colour changes update the lamp immediately without restarting.
+Current brightness levels:
 
-Known cosmetic issue: the radial menu can still render a key-style label such as `blockcommand_growlightcolour: Blue` even though `Config/Localization.csv` contains a friendly `blockcommand_growlightcolour` entry.
+```text
+Dim -> Normal -> Bright -> Very Bright -> Maximum -> Dim
+```
 
-Remote-client colour authoring is intentionally blocked until proper server command routing is implemented, so multiplayer colour synchronization is **not** yet claimed.
+The radial selector advertises the **destination state**:
 
-See [docs/COLOUR_SYSTEM.md](docs/COLOUR_SYSTEM.md) and [docs/COLOUR_DEV7_HANDOFF.md](docs/COLOUR_DEV7_HANDOFF.md).
+```text
+current Dim         -> menu offers Normal
+current Normal      -> menu offers Bright
+current Bright      -> menu offers Very Bright
+current Very Bright -> menu offers Maximum
+current Maximum     -> menu offers Dim
+```
 
-## Installation / build
+The underlying brightness state/persistence/LightLOD behavior was live-validated during the dev10 brightness work. The dev12 change specifically corrects the selector label to use `Next(current)`.
 
-Copy the `LeezGrowLights/` directory from this repository into your game `Mods/` folder so the game sees:
+## Direct-wired OFF-state power fix
+
+During dev11 testing, a directly wired LeeZ light could still reserve 10 W while the light's own toggle was OFF.
+
+The final fix preserves the configured block/tile wattage and synchronizes only the live `PowerConsumerToggle` load:
+
+```text
+ON  -> configured watts
+OFF -> 0 W
+```
+
+The fix also resynchronizes during power-data initialization/deserialization so the correct OFF-state load survives save/reload.
+
+This behavior and the radial icon repair were live-tested successfully before dev11 was promoted.
+
+See [docs/DEV11_DEV12_REGRESSION_HANDOFF.md](docs/DEV11_DEV12_REGRESSION_HANDOFF.md).
+
+## Installation
+
+For normal use, download the complete package from the GitHub Release tagged:
+
+`leezgrowlights-v0.7.0.2-v31`
+
+Expected game layout:
 
 ```text
 7 Days To Die/
   Mods/
     0_TFP_Harmony/
     LeezGrowLights/
-      Config/
-      Source/
       ModInfo.xml
+      LeezGrowLights.dll
+      Config/
+        blocks.xml
+        Localization.csv
+        progression.xml
+        recipes.xml
 ```
 
-Build from a Visual Studio Developer Command Prompt:
+Source files and development documents are intentionally not required in the installed release package.
+
+## Building from source
+
+The project targets .NET Framework 4.8 and references the real V3.1 game/Harmony assemblies.
+
+From a Visual Studio Developer Command Prompt, an installed-game build can use:
 
 ```bat
 cd /d "C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die"
 msbuild "Mods\LeezGrowLights\Source\LeezGrowLights.csproj" /p:Configuration=Release
 ```
 
-The current development project references:
+Primary references:
 
 - `Assembly-CSharp.dll`
 - `LogLibrary.dll`
 - `UnityEngine.CoreModule.dll`
-- TFP Harmony's `0Harmony.dll`
+- TFP `0Harmony.dll`
 
-A successful Release build writes `LeezGrowLights.dll` into the mod root. The DLL/PDB are ignored by Git.
+For repeatable validation, the repository's GitHub Actions workflow installs a fresh dedicated server and builds against those assemblies automatically:
 
-See [docs/BUILDING.md](docs/BUILDING.md) for custom paths and details.
+- `.github/workflows/build-leezgrowlights-v31.yml`
 
-## Current validation status
+See [docs/BUILDING.md](docs/BUILDING.md).
 
-Confirmed during V3.1 in-game testing:
+## Future-mod reference material
 
-- crop scheduling and tick-rate Harmony hooks install;
-- sunlight substitution hooks install;
-- underground/enclosed planting works with an active grow light;
-- tiered grow-light behaviour works in-game;
-- direct mid-stage multiplier transitions preserve earned progress;
-- save/reload and chunk-unload/reload growth continuity have been exercised during development;
-- grow-light removal and transition plumbing have been added to the V3.1 powered-block path;
-- colour command activation uses the actual V3.1 `_commandName` contract;
-- colour state persists through the V3.1 `BlockChangeInfo`/`BlockValueRef` block-change path;
-- save/quit/restart restores the selected colour;
-- dev7 live visual tint refresh works immediately for colour cycling.
+This project intentionally keeps the investigation notes and API probes because they are useful beyond this single mod.
 
-Still pending or intentionally deferred:
+Start here:
 
-- dedicated-server / remote-client colour routing and synchronization;
-- cleanup/fix of the key-style dynamic colour command label;
-- final release-gate regression sweep across all earlier Stage 0-5 behaviours after colour work;
-- removal or gating of temporary diagnostic logging before a polished release;
-- optional cosmetic brightness interaction, which is the next planned development topic.
+- [docs/V31_MODDING_REFERENCE.md](docs/V31_MODDING_REFERENCE.md) — reusable V3.1 Harmony/API lessons.
+- [docs/DEV11_DEV12_REGRESSION_HANDOFF.md](docs/DEV11_DEV12_REGRESSION_HANDOFF.md) — exact power/radial/brightness-label bug history and fixes.
+- [docs/RELEASE_0.7.0.2.md](docs/RELEASE_0.7.0.2.md) — official asset hashes, commit and CI evidence.
+- [docs/API_VALIDATION_V3.1.md](docs/API_VALIDATION_V3.1.md) — earlier V3.1 API validation.
+- [docs/COLOUR_SYSTEM.md](docs/COLOUR_SYSTEM.md) — colour architecture.
+- [docs/BRIGHTNESS_DEV8_HANDOFF.md](docs/BRIGHTNESS_DEV8_HANDOFF.md) — brightness architecture history.
+- [docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md](docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md) — future multiplayer work.
+- `tools/` — reflection/API/storage/multiplayer probe scripts.
+- `docs/reference/` — retained probe output and raw regression report.
 
-## Repository map
+A broader file index is maintained in [docs/REPOSITORY_MANIFEST.md](docs/REPOSITORY_MANIFEST.md).
 
-```text
-Config/                    XML blocks, recipes, progression and localization
-Source/                    C# runtime and MSBuild project
-  Harmony/                 Harmony installation, crop/electrical/removal/colour hooks
-  Runtime/                 scanning, power, growth scheduling, colour state and visual tint
-docs/                      design, API validation, status and development handoffs
-docs/COLOUR_SYSTEM.md      current colour architecture/status
-docs/COLOUR_DEV7_HANDOFF.md detailed dev7 colour handoff and brightness starting point
-docs/reference/            successful V3.1 API probe output
-docs/images/               early design/reference screenshots
-tools/                     V3.1 API probe scripts
-CHANGELOG.md               version history
-ROADMAP.md                 development stages
-TESTING.md                 verified vs implemented vs pending test matrix
-MIDSTAGE_TESTING.md        mid-stage transition test procedure/results
-ModInfo.xml                7DTD mod metadata
-```
+## Current limitations
+
+- Remote-client colour/brightness authoring and full dedicated-server visual synchronization are still future work.
+- The dev12 label correction passed source review and the complete V3.1 CI pipeline; a separate post-release gameplay confirmation of that UI-only correction is not yet recorded in `TESTING.md`.
+- Dense-farm performance and long-duration sealed-room survival testing can still be expanded.
+
+## Repository policy for binaries
+
+Generated DLL/PDB files are intentionally not committed to the source tree. Official compiled binaries and full drop-in ZIPs are stored as GitHub Release assets. Source, XML, CI workflows, probe tools, evidence and development notes remain version-controlled.
 
 ## License
 
