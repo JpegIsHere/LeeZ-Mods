@@ -31,6 +31,49 @@ namespace LeezGrowLights
 
         private static bool reportedMissingApi;
 
+        public static void Install(Harmony harmony)
+        {
+            int installed = 0;
+
+            MethodInfo tileToggleSetter =
+                AccessTools.PropertySetter(typeof(TileEntityPoweredBlock), "IsToggled");
+            if (tileToggleSetter != null)
+            {
+                harmony.Patch(
+                    tileToggleSetter,
+                    postfix: new HarmonyMethod(
+                        typeof(GrowLightPowerPatches), nameof(TileTogglePostfix)));
+                installed++;
+            }
+
+            MethodInfo consumerToggleSetter =
+                AccessTools.PropertySetter(typeof(PowerConsumerToggle), "IsToggled");
+            if (consumerToggleSetter != null)
+            {
+                harmony.Patch(
+                    consumerToggleSetter,
+                    postfix: new HarmonyMethod(
+                        typeof(GrowLightPowerPatches), nameof(ConsumerTogglePostfix)));
+                installed++;
+            }
+
+            MethodInfo initializePowerData =
+                AccessTools.Method(typeof(TileEntityPowered), "InitializePowerData");
+            if (initializePowerData != null)
+            {
+                harmony.Patch(
+                    initializePowerData,
+                    postfix: new HarmonyMethod(
+                        typeof(GrowLightPowerPatches), nameof(InitializePowerDataPostfix)));
+                installed++;
+            }
+
+            if (installed == 0)
+                LeezLog.Warning("Grow-light power-draw hooks were not found in the V3.1 runtime.");
+            else
+                LeezLog.Info("Grow-light power-draw fix installed on " + installed + " hook(s).");
+        }
+
         public static void TileTogglePostfix(TileEntityPoweredBlock __instance)
         {
             if (__instance == null) return;
