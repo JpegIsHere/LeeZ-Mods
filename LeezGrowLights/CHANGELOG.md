@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Fixed LeeZ grow lights continuing to reserve/draw their configured 10 W while the lamp toggle is OFF when directly wired to a power source.
+- The live `PowerConsumerToggle` now uses 0 W while OFF and restores the configured wattage when switched ON.
+- Added power-load re-synchronization after powered-tile initialization/reload.
+- Added visible built-in icons for the inherited Color and Brightness grow-light radial-menu commands.
+
 ## 0.5.1.0
 
 - Changed the grow-light height rule from fixed Y+6 to Y+1 through Y+10 above the farm plot.
