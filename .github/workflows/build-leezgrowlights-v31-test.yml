@@ -1,0 +1,146 @@
+name: Build LeezGrowLights V3.1 Test Package
+
+on:
+  push:
+    branches:
+      - test/dev10-power-icons
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout test source
+        uses: actions/checkout@v4
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install SteamCMD
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $steamDir = Join-Path $env:RUNNER_TEMP 'steamcmd'
+          New-Item -ItemType Directory -Force -Path $steamDir | Out-Null
+          $zip = Join-Path $env:RUNNER_TEMP 'steamcmd.zip'
+          Invoke-WebRequest 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip' -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath $steamDir -Force
+          $steamCmd = Join-Path $steamDir 'steamcmd.exe'
+
+          $oldNativePreference = $PSNativeCommandUseErrorActionPreference
+          $PSNativeCommandUseErrorActionPreference = $false
+          & $steamCmd +quit
+          Write-Host "SteamCMD bootstrap exit code: $LASTEXITCODE"
+          Start-Sleep -Seconds 4
+          & $steamCmd +quit
+          Write-Host "SteamCMD second bootstrap exit code: $LASTEXITCODE"
+          $PSNativeCommandUseErrorActionPreference = $oldNativePreference
+
+          if (-not (Test-Path $steamCmd)) {
+            throw 'SteamCMD executable was not installed.'
+          }
+
+          "STEAMCMD=$steamCmd" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install 7 Days to Die Dedicated Server references
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $gameDir = Join-Path $env:RUNNER_TEMP '7dtd-server'
+          $oldNativePreference = $PSNativeCommandUseErrorActionPreference
+          $PSNativeCommandUseErrorActionPreference = $false
+
+          $exitCode = 1
+          for ($attempt = 1; $attempt -le 2; $attempt++) {
+            Write-Host "SteamCMD app_update attempt $attempt"
+            & $env:STEAMCMD +force_install_dir $gameDir +login anonymous +app_update 294420 validate +quit
+            $exitCode = $LASTEXITCODE
+            Write-Host "SteamCMD app_update exit code: $exitCode"
+            if ($exitCode -eq 0 -and (Test-Path $gameDir)) {
+              break
+            }
+            Start-Sleep -Seconds 5
+          }
+
+          $PSNativeCommandUseErrorActionPreference = $oldNativePreference
+          if ($exitCode -ne 0) {
+            throw "SteamCMD failed with exit code $exitCode"
+          }
+
+          "GAME_DIR=$gameDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Locate V3.1 managed references
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $managedCandidates = @(
+            (Join-Path $env:GAME_DIR '7DaysToDieServer_Data\Managed'),
+            (Join-Path $env:GAME_DIR '7DaysToDie_Data\Managed')
+          )
+
+          $managed = $managedCandidates |
+            Where-Object { Test-Path (Join-Path $_ 'Assembly-CSharp.dll') } |
+            Select-Object -First 1
+
+          if (-not $managed) {
+            throw 'Could not locate Assembly-CSharp.dll in the dedicated-server installation.'
+          }
+
+          $harmony = Get-ChildItem $env:GAME_DIR -Recurse -Filter 0Harmony.dll |
+            Select-Object -First 1 -ExpandProperty FullName
+
+          if (-not $harmony) {
+            throw 'Could not locate 0Harmony.dll in the dedicated-server installation.'
+          }
+
+          Write-Host "Managed references: $managed"
+          Write-Host "Harmony reference: $harmony"
+          "GAME_MANAGED=$managed" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "HARMONY_DLL=$harmony" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build Release DLL against V3.1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          msbuild 'LeezGrowLights\Source\LeezGrowLights.csproj' /t:Rebuild /p:Configuration=Release /p:Platform=AnyCPU /p:GameManagedPath="$env:GAME_MANAGED" /p:HarmonyPath="$env:HARMONY_DLL" /v:minimal
+          if ($LASTEXITCODE -ne 0) {
+            throw "MSBuild failed with exit code $LASTEXITCODE"
+          }
+          if (-not (Test-Path 'LeezGrowLights\LeezGrowLights.dll')) {
+            throw 'Expected LeezGrowLights.dll was not produced.'
+          }
+
+      - name: Stage drop-in test mod
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $artifactRoot = Join-Path $PWD 'artifact'
+          $modRoot = Join-Path $artifactRoot 'LeezGrowLights'
+          New-Item -ItemType Directory -Force -Path $modRoot | Out-Null
+
+          Copy-Item 'LeezGrowLights\ModInfo.xml' $modRoot
+          Copy-Item 'LeezGrowLights\Config' (Join-Path $modRoot 'Config') -Recurse
+          Copy-Item 'LeezGrowLights\LeezGrowLights.dll' $modRoot
+
+          if (Test-Path 'LeezGrowLights\LeezGrowLights.pdb') {
+            Copy-Item 'LeezGrowLights\LeezGrowLights.pdb' $modRoot
+          }
+
+          $package = Join-Path $artifactRoot 'LeezGrowLights-v0.7.0-dev11-test1-v31.zip'
+          Compress-Archive -Path $modRoot -DestinationPath $package -CompressionLevel Optimal -Force
+
+          Write-Host '=== Test build SHA256 ==='
+          Get-FileHash 'LeezGrowLights\LeezGrowLights.dll' -Algorithm SHA256 | Format-List
+          Get-FileHash $package -Algorithm SHA256 | Format-List
+
+      - name: Upload dev11 test build
+        uses: actions/upload-artifact@v4
+        with:
+          name: LeezGrowLights-v0.7.0-dev11-test1-v31
+          path: |
+            artifact/LeezGrowLights-v0.7.0-dev11-test1-v31.zip
+            artifact/LeezGrowLights/LeezGrowLights.dll
+          if-no-files-found: error
+          retention-days: 14
