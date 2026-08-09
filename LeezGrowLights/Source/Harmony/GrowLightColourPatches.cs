@@ -30,6 +30,7 @@ namespace LeezGrowLights
             GrowLightBrightness brightness = foundValue
                 ? GrowLightColourState.GetBrightness(value)
                 : GrowLightBrightnessPalette.Default;
+            GrowLightBrightness offeredBrightness = GrowLightBrightnessPalette.Next(brightness);
 
             bool hasColour = TryFindExistingColourCommand(__result, out int colourIndex);
             bool hasBrightness = TryFindExistingBrightnessCommand(__result, out int brightnessIndex);
@@ -45,7 +46,7 @@ namespace LeezGrowLights
             if (hasBrightness)
             {
                 BlockActivationCommand existing = __result[brightnessIndex];
-                existing.text = BuildBrightnessCommandId(brightness);
+                existing.text = BuildBrightnessCommandId(offeredBrightness);
                 existing.iconColor = GrowLightColourPalette.ToUnityColour(selected);
                 __result[brightnessIndex] = EnsureEnabled(existing);
             }
@@ -87,9 +88,11 @@ namespace LeezGrowLights
 
             if (!hasBrightness)
             {
+                // Like colour, the activation handler advances from the current brightness
+                // to the next brightness. Advertise the level the click will actually apply.
                 BlockActivationCommand brightnessCommand = new BlockActivationCommand
                 {
-                    text = BuildBrightnessCommandId(brightness),
+                    text = BuildBrightnessCommandId(offeredBrightness),
                     iconColor = GrowLightColourPalette.ToUnityColour(selected),
                     activateTime = 0f,
                     highlighted = false
@@ -101,7 +104,7 @@ namespace LeezGrowLights
                 LeezLog.Info(
                     "Grow-light brightness command exposed at index " + insertIndex +
                     " as token '" + brightnessCommand.text + "' (" +
-                    GrowLightBrightnessPalette.ToDisplayName(brightness) + ").");
+                    GrowLightBrightnessPalette.ToDisplayName(offeredBrightness) + ").");
             }
 
             __result = expanded;
