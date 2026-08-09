@@ -14,6 +14,8 @@ Legend: `PASS` = observed in-game/build output; `IMPLEMENTED` = code path exists
 | crop tick-rate hook | PASS | installed at startup |
 | crop update context hook | PASS | installed at startup |
 | sunlight substitution hooks | PASS | 11 crop/base methods patched during startup |
+| grow-light power-draw hooks | IMPLEMENTED | requires build/startup verification for this fix branch |
+| grow-light radial icon hook | IMPLEMENTED | requires build/startup verification for this fix branch |
 
 ## Electrical behavior
 
@@ -22,7 +24,24 @@ Legend: `PASS` = observed in-game/build output; `IMPLEMENTED` = code path exists
 | vanilla wiring | PASS | tier lights are usable in-game |
 | powered + switched on | PASS | active lamp detected |
 | switched off | PASS | state transition observed during testing |
-| power draw | IMPLEMENTED | XML currently requests 10 W for each tier |
+| configured lamp load | PASS | XML requests 10 W for each tier |
+| direct generator -> light ON | IMPLEMENTED | expected draw: 10 W |
+| direct generator -> light OFF | IMPLEMENTED | expected draw: 0 W; live PowerConsumerToggle load is forced to zero while toggled off |
+| external switch OFF -> light | PASS | troubleshooting observation reported 0 W draw |
+| external switch ON -> light OFF | IMPLEMENTED | expected draw: 0 W |
+| reload world while light OFF | IMPLEMENTED | power load is re-synchronized after tile deserialization |
+| toggle light back ON | IMPLEMENTED | live consumer load restores the configured 10 W |
+
+## Powered-light radial menu
+
+| Command | Status | Notes |
+|---|---|---|
+| Switch | PASS | switch icon already visible |
+| Take | PASS | hand icon already visible |
+| Color selector | IMPLEMENTED | blank inherited icon is filled with built-in `tool` icon |
+| Brightness selector | IMPLEMENTED | blank inherited icon is filled with built-in `wrench` icon |
+
+The icon repair only fills empty icon names on LeeZ grow lights. Existing command text, enabled state, highlighting and activation handlers are preserved.
 
 ## Coverage and underground farming
 
@@ -52,6 +71,11 @@ Overlap behavior is implemented as highest-active-multiplier-wins and should rec
 
 ## Pending correctness tests
 
+- Build the fix branch against the installed V3.1 managed assemblies and confirm zero compile warnings/errors.
+- Direct-wire a grow light to a generator: confirm ON = 10 W and OFF = 0 W.
+- Save/reload with the directly-wired grow light OFF: confirm it remains at 0 W.
+- Toggle the same light ON after reload: confirm draw returns to 10 W.
+- Confirm the color and brightness radial slots display their replacement icons and still open their original functions.
 - Turn light on midway through a crop stage and preserve only earned vanilla progress.
 - Turn light off midway through a crop stage without losing or gifting progress.
 - Remove a lamp midway through a stage.
@@ -72,4 +96,4 @@ Allowed design colours currently stored in XML metadata:
 - White
 - Yellow
 
-Selection UI, persistence, network sync and runtime tinting are not implemented yet.
+Custom LeeZ colour persistence/network sync/runtime tinting remains a future system; the current radial icon repair only restores a visible icon for the inherited powered-light color command.
