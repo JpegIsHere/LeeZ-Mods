@@ -21,6 +21,87 @@ namespace LeezGrowLights
         private static readonly FieldInfo IconField = ResolveStringField("icon");
         private static bool loggedIconRepair;
         private static bool reportedMissingIconField;
+        private static bool reportedUnsupportedArguments;
+
+        public static void Install(Harmony harmony)
+        {
+            Type lightType = AccessTools.TypeByName("BlockPoweredLight");
+            if (lightType == null)
+            {
+                LeezLog.Warning("BlockPoweredLight was not found; grow-light radial icons were not patched.");
+                return;
+            }
+
+            MethodInfo[] candidates;
+            try
+            {
+                candidates = lightType
+                    .GetMethods(CommandMemberFlags)
+                    .Where(method =>
+                        string.Equals(
+                            method.Name,
+                            "GetBlockActivationCommands",
+                            StringComparison.Ordinal))
+                    .Where(method => method.DeclaringType == lightType)
+                    .OrderBy(method => method.MetadataToken)
+                    .ToArray();
+
+                if (candidates.Length == 0)
+                {
+                    candidates = lightType
+                        .GetMethods(CommandMemberFlags)
+                        .Where(method =>
+                            string.Equals(
+                                method.Name,
+                                "GetBlockActivationCommands",
+                                StringComparison.Ordinal))
+                        .OrderBy(method => method.MetadataToken)
+                        .ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                LeezLog.Warning(
+                    "Could not inspect BlockPoweredLight activation commands: " + ex.Message);
+                return;
+            }
+
+            int installed = 0;
+            foreach (MethodInfo method in candidates)
+            {
+                try
+                {
+                    MethodInfo postfix;
+                    if (method.ReturnType == typeof(BlockActivationCommand[]))
+                    {
+                        postfix = AccessTools.Method(
+                            typeof(GrowLightActivationPatches), nameof(ResultPostfix));
+                    }
+                    else if (method.ReturnType == typeof(void))
+                    {
+                        postfix = AccessTools.Method(
+                            typeof(GrowLightActivationPatches), nameof(ArgumentsPostfix));
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    harmony.Patch(method, postfix: new HarmonyMethod(postfix));
+                    installed++;
+                }
+                catch (Exception ex)
+                {
+                    LeezLog.Warning(
+                        "Could not patch powered-light radial commands: " + ex.Message);
+                }
+            }
+
+            if (installed == 0)
+                LeezLog.Warning("No compatible BlockPoweredLight activation-command method was found.");
+            else
+                LeezLog.Info("Grow-light radial icon fix installed on " + installed + " hook(s).");
+        }
 
         public static void ResultPostfix(
             Block __instance,
@@ -31,7 +112,7 @@ namespace LeezGrowLights
         }
 
         /// <summary>
-        /// V3.x API probes can expose GetBlockActivationCommands as a void method with
+        /// V3.x API probes expose GetBlockActivationCommands as a void method with
         /// its command collection carried through an argument. This postfix supports that
         /// shape as well as arrays returned directly by older/current modding APIs.
         /// </summary>
@@ -39,16 +120,33 @@ namespace LeezGrowLights
         {
             if (!GrowLightPowerPatches.IsGrowLight(__instance) || __args == null) return;
 
+            bool foundCollection = false;
             foreach (object argument in __args)
             {
                 if (argument is BlockActivationCommand[] array)
                 {
+                    foundCollection = true;
                     RepairArray(array);
                     continue;
                 }
 
                 if (argument is IList<BlockActivationCommand> list)
+                {
+                    foundCollection = true;
                     RepairList(list);
+                }
+            }
+
+            if (!foundCollection && !reportedUnsupportedArguments)
+            {
+                reportedUnsupportedArguments = true;
+                string argumentTypes = string.Join(
+                    ", ",
+                    __args.Select(argument =>
+                        argument == null ? "<null>" : argument.GetType().FullName));
+                LeezLog.Warning(
+                    "Grow-light radial command hook did not expose a supported command collection. " +
+                    "Argument types: " + argumentTypes);
             }
         }
 
