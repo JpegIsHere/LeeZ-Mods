@@ -68,17 +68,6 @@ namespace LeezGrowLights
                 installed++;
             }
 
-            MethodInfo onReadComplete =
-                AccessTools.Method(typeof(TileEntity), "OnReadComplete");
-            if (onReadComplete != null)
-            {
-                harmony.Patch(
-                    onReadComplete,
-                    postfix: new HarmonyMethod(
-                        typeof(GrowLightPowerPatches), nameof(OnReadCompletePostfix)));
-                installed++;
-            }
-
             if (installed == 0)
                 LeezLog.Warning("Grow-light power-draw hooks were not found in the V3.1 runtime.");
             else
@@ -103,12 +92,6 @@ namespace LeezGrowLights
         }
 
         public static void InitializePowerDataPostfix(TileEntityPowered __instance)
-        {
-            if (__instance is TileEntityPoweredBlock tile)
-                Synchronize(tile, tile.IsToggled);
-        }
-
-        public static void OnReadCompletePostfix(TileEntity __instance)
         {
             if (__instance is TileEntityPoweredBlock tile)
                 Synchronize(tile, tile.IsToggled);
