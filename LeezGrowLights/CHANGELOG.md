@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0.2-dev12
+
+- Fixed the brightness radial-menu label being one step behind the action it performs.
+- The Brightness selector now advertises the next level that clicking will apply: Dim -> Normal, Normal -> Bright, Bright -> Very Bright, Very Bright -> Maximum, and Maximum -> Dim.
+- The actual brightness state machine, persistence, colour independence, visual intensity handling, power-draw fix, and radial icons are unchanged from the validated dev11 build.
+
 ## 0.7.0.1-dev11
 
 - Promoted the validated V3.1 b14 grow-light power and radial-menu fixes to the official dev11 build.
