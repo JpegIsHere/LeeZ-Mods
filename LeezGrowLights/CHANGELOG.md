@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0.1-dev11
+
+- Promoted the validated V3.1 b14 grow-light power and radial-menu fixes to the official dev11 build.
+- Fixed directly wired LeeZ grow lights continuing to reserve/draw their configured 10 W while the lamp toggle was OFF; OFF now uses 0 W and ON restores the configured 10 W load.
+- Re-synchronizes the live electrical consumer after power-data initialization so an OFF grow light remains at 0 W across save/reload.
+- Added visible built-in icons to the LeeZ radial menu: Color uses `tool` and Brightness uses `wrench`.
+- Preserved the validated dev10 colour/brightness cycling, persistence, visual intensity, crop coverage, tier behaviour, and normal powered-light switching.
+- Live in-game validation on 7 Days to Die V3.1.0 b14 confirmed the power-draw fix and both radial-menu icons work correctly.
+
 ## 0.7.0.0-dev7
 
 - Added per-placed LeeZ grow-light colour selection on `dev/colour-system` for V3.1.0 b14.
@@ -8,7 +17,7 @@
 - Persisted colour in `BlockValue.meta2` through the V3.1 block-change/RPC path using `BlockChangeInfo` and `BlockValueRef`.
 - Corrected the V3.1 activation contract: `BlockPoweredLight.OnBlockActivated` identifies radial commands by `_commandName` string rather than a numeric command index.
 - Added runtime visual tinting through `BlockEntityData.SetMaterialColor` and child Unity `Light.color` components.
-- dev7 caches live `BlockEntityData` by block position and immediately reapplies the new colour after a successful state write, removing the previous requirement to reload the world/chunk before the visual changed.
+- dev7 caches live `BlockEntityData` by block position and immediately reapplies the new colour after each successful state write, removing the previous requirement to reload the world/chunk before the visual changed.
 - Live validation confirmed colour names cycle, saved colour survives quit/restart, and dev7 visual colour now updates immediately while playing.
 - Known cosmetic issue: the radial menu may still display key-style text such as `blockcommand_growlightcolour: Blue` despite the localization entry.
 - Remote-client colour authoring remains intentionally blocked until proper server command routing is implemented; multiplayer colour synchronization is not yet claimed.
