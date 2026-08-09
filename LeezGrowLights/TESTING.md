@@ -2,132 +2,148 @@
 
 Target game build: **7 Days to Die V3.1.0 (b14)**.
 
+Current official release: **LeezGrowLights 0.7.0.2 / dev12**  
 Current development branch: **`dev/colour-system`**  
-Current runtime candidate: **v0.7.0-dev8**  
-Known-good colour source baseline: **`0a1967e94dcd153e8ad8ff40de545b8b9245903b`**
+Validated dev12 source commit: **`1449cba3cb663ab0ae3ea78458e6e02e54b69f13`**  
+V3.1 CI run for that commit: **`31295389819`**
 
-Legend: `PASS` = observed in-game/build output; `STATIC VERIFIED` = source/XML/project structure proves the intended rule but exact gameplay still needs a live run; `IMPLEMENTED` = code path exists and is wired but the exact scenario still needs validation; `PENDING` = not complete.
+Legend:
 
-For earlier Stage 0-5 history, see `docs/STAGE_0_5_STATUS.md` and `MIDSTAGE_TESTING.md`. For the current colour architecture, see `docs/COLOUR_DEV7_HANDOFF.md`. For the brightness candidate, see `docs/BRIGHTNESS_DEV8_HANDOFF.md`. Multiplayer routing remains documented in `docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md`.
+- `PASS (LIVE)` = observed in game.
+- `PASS (CI)` = successfully compiled/probed against a fresh V3.1 dedicated-server install.
+- `PASS (STATIC)` = source/state logic directly proves the rule but the exact latest-build gameplay scenario has not been separately rerun.
+- `PENDING` = not yet validated/complete.
+
+For historical stages and architecture, see the documents in `docs/`. The most useful current summaries are `docs/DEV11_DEV12_REGRESSION_HANDOFF.md` and `docs/V31_MODDING_REFERENCE.md`.
 
 ## Build and startup
 
 | Test | Status | Notes |
 |---|---|---|
-| V3.1 build/startup | PASS | Current development DLL builds against the installed V3.1 assemblies and loads as `LeezGrowLights 0.7.0.0` |
-| runtime banner | PASS | dev8 reports `Loading V3.1 grow-light runtime candidate v0.7.0-dev8` |
-| crop scheduling/tick hooks | PASS | Installed successfully during repeated colour-development runs |
-| sunlight substitution hooks | PASS | Installed successfully during repeated colour-development runs |
-| electrical transition hooks | PASS | Existing transition hooks continued loading during colour-development runs |
-| removal hook | PASS (startup) | `BlockPowered.OnBlockRemoved` hook continued loading during colour-development runs |
-| colour/brightness interaction hooks | PASS / IMPLEMENTED | colour activation is live-validated; brightness uses the same patched activation hierarchy but still needs a brightness-specific live run |
-| colour/brightness visual hooks | PASS / IMPLEMENTED | `OnBlockEntityTransformAfterActivated` and `updateLightState` are live-validated for colour; brightness still needs live validation |
+| Fresh V3.1 dedicated-server reference install | PASS (CI) | GitHub Actions installs app 294420 with SteamCMD |
+| Managed/Harmony reference discovery | PASS (CI) | Finds V3.1 `Assembly-CSharp.dll` and TFP `0Harmony.dll` |
+| Light-intensity writer probe | PASS (CI) | Completed in dev12 run 31295389819 |
+| Block metadata capacity probe | PASS (CI) | Completed in dev12 run 31295389819 |
+| Release DLL compile | PASS (CI) | dev12 compiled successfully against the real V3.1 references |
+| Artifact staging/upload | PASS (CI) | dev12 DLL artifact produced successfully |
+| Runtime banner/version | PASS (STATIC) | dev12 source reports `v0.7.0-dev12`; ModInfo/assembly are 0.7.0.2 |
 
-## Core grow-light behaviour
-
-Previously validated and still present on the colour branch:
+## Core grow-light behavior
 
 | Test | Status | Notes |
 |---|---|---|
-| vanilla wiring/on-off | PASS | powered LeeZ lights remain normal powered blocks |
-| enclosed/underground farming | PASS | artificial-sunlight substitution works under active LeeZ coverage |
-| 5x5 footprint | PASS | radius 2 horizontal coverage |
-| vertical range 1..10 | PASS / STATIC VERIFIED | Y+10 was live-validated; source enforces the inclusive 1..10 range |
-| highest active multiplier wins | PASS / IMPLEMENTED | existing overlap rule retained |
-| T6 4x growth | PASS | live runtime validation |
-| progress-preserving power transition | PASS | T6 and T4 proportional rescheduling live-validated |
-| save/reload growth continuity | PASS | exercised during Stage 0-5 development |
-| chunk unload/reload growth continuity | PASS | exercised by travelling thousands of blocks and returning |
+| Six grow-light tiers T1-T6 | PASS (LIVE) | Existing validated gameplay behavior |
+| Vanilla wiring/on-off integration | PASS (LIVE) | LeeZ lights remain powered vanilla-style blocks |
+| Enclosed/underground farming | PASS (LIVE) | Active LeeZ light substitutes for sunlight in coverage |
+| 5x5 horizontal footprint | PASS (LIVE) | radius 2 |
+| Vertical range 1..10 blocks | PASS (LIVE/STATIC) | source enforces inclusive range; live high-range checks performed during earlier stages |
+| Lamps at 11+ blocks ignored | PASS (STATIC/LIVE) | boundary rule retained |
+| Highest active multiplier wins | PASS (LIVE) | overlapping grow lights do not stack additively |
+| T6 4x growth | PASS (LIVE) | validated during stage testing |
+| T4 1.5x growth | PASS (LIVE) | validated during stage testing |
+| Progress-preserving mid-stage power transitions | PASS (LIVE) | T6 `1x <-> 4x` and T4 `1x <-> 1.5x` validated |
+| Save/reload growth continuity | PASS (LIVE) | exercised during earlier development |
+| Chunk unload/reload growth continuity | PASS (LIVE) | exercised during earlier development |
 
-See `docs/STAGE_0_5_STATUS.md` for detailed evidence and exact ratios.
+See `docs/STAGE_0_5_STATUS.md` and `MIDSTAGE_TESTING.md` for detailed evidence.
 
 ## Colour system
 
 | Test | Status | Notes |
 |---|---|---|
-| colour command visible | PASS | first fixed in dev2 |
-| V3.1 command activation recognized | PASS | working path matches `_commandName:String`, not a numeric index |
-| White/default state | PASS | legacy/uninitialised metadata maps to White |
-| colour state advances | PASS | user observed cycling through colour names |
-| Blue | PASS | included in successful live dev7/dev8 cycle |
-| Green | PASS | included in successful live dev7/dev8 cycle |
-| Red | PASS | included in successful live dev7 cycle |
-| Purple | PASS | included in successful live dev7 cycle |
-| White | PASS | included in successful live dev7 cycle |
-| Yellow | PASS | included in successful live dev7 cycle |
-| per-block persistence | PASS | dev6+ writes `BlockValue.meta2` through V3.1 block-change path |
-| save/quit/restart persistence | PASS | light was left Green; after restart it rendered Green |
-| visual colour after world load | PASS | persisted Green reapplied after restart |
-| immediate live visual refresh | PASS | dev7 user result: lights cycle through the colours perfectly |
-| normal electrical toggle still separate | PASS | colour uses block metadata; electrical state remains tile-entity toggle state |
-| friendly radial-menu localization | PASS | dev8 displays `Grow light colour: Blue` and advances cleanly to `Grow light colour: Green` |
-| dev8 menu + visual regression | PASS | user confirmed selecting once changes both Blue -> Green label and lamp immediately |
-| remote-client colour authoring | PENDING | intentionally rejected until server routing exists |
-| dedicated-server colour synchronization | PENDING | Multiplayer Light Sync remains unfinished |
+| Colour radial command visible | PASS (LIVE) | validated during colour development |
+| Friendly/localized colour labels | PASS (LIVE) | stable command tokens/localization validated |
+| Blue/Green/Red/Purple/White/Yellow cycle | PASS (LIVE) | complete colour cycle validated |
+| Per-block colour persistence | PASS (LIVE) | stored in `BlockValue.meta2` |
+| Save/quit/restart restores colour | PASS (LIVE) | observed in game |
+| Immediate live visual refresh | PASS (LIVE) | no chunk/world reload required |
+| Colour preserved while changing brightness | PASS (LIVE) | validated in dev10 brightness testing |
+| Brightness preserved while changing colour | PASS (LIVE) | validated in dev10 brightness testing |
+| Electrical toggle remains independent | PASS (LIVE) | visual metadata is separate from tile toggle state |
+| Color radial icon visible | PASS (LIVE) | dev11 user validation; `tool` icon |
 
-## Brightness dev8 candidate
-
-Brightness is implemented but has not yet been live-validated in V3.1. The current source stores colour + brightness together in `BlockValue.meta2`, preserves dev7 values `1..6`, and applies cosmetic intensity multipliers through the existing cached live block-entity path.
+## Brightness system
 
 | Test | Status | Notes |
 |---|---|---|
-| brightness command visible | IMPLEMENTED | second LeeZ-only radial command using stable `growlightbrightness_<level>` tokens |
-| friendly brightness localization | IMPLEMENTED | localization entries exist for Dim, Normal, Bright, Very Bright and Maximum |
-| legacy/uninitialised default | STATIC VERIFIED | `meta2 = 0` decodes to White + Normal |
-| dev7 compatibility | STATIC VERIFIED | `meta2 = 1..6` keep their existing colours at Normal brightness |
-| Normal -> Bright -> Very Bright -> Maximum -> Dim -> Normal cycle | IMPLEMENTED | palette/state path exists; live radial cycle pending |
-| immediate live brightness refresh | IMPLEMENTED | successful writes call `GrowLightColourVisual.TryApplyCached(...)` |
-| colour preserved while changing brightness | STATIC VERIFIED | `WithBrightness` decodes/re-encodes the existing colour |
-| brightness preserved while changing colour | STATIC VERIFIED | `WithColour` decodes/re-encodes the existing brightness bucket |
-| brightness save/quit/restart | IMPLEMENTED | uses the same block-state persistence path as colour; live validation pending |
-| no intensity compounding on repeated selections | STATIC VERIFIED | per-Unity-Light state tracks base intensity and last modded intensity |
-| powered-light off/on restores selected brightness | IMPLEMENTED | visual postfix runs after powered-light state updates; live toggle test pending |
-| relative intensity across tiers | IMPLEMENTED | candidate multiplies each child light's tracked vanilla/base intensity |
-| crop growth/coverage/sunlight/tier behaviour unchanged | STATIC VERIFIED | brightness state is consumed only by the cosmetic visual layer |
-| electrical power draw unchanged | STATIC VERIFIED | brightness does not mutate powered tile-entity state or power configuration |
-| remote-client brightness authoring | PENDING | intentionally rejected until server routing exists |
+| Brightness radial command visible | PASS (LIVE) | validated in dev10 |
+| Brightness levels Dim/Normal/Bright/Very Bright/Maximum | PASS (LIVE) | cycling/visual behavior validated in dev10 |
+| Immediate brightness visual refresh | PASS (LIVE) | validated |
+| Brightness persistence across save/reload | PASS (LIVE) | validated in dev10 |
+| Powered light OFF/ON restores selected brightness | PASS (LIVE) | validated in dev10 |
+| Relative brightness across tiers | PASS (LIVE) | LightLOD-controlled intensity behavior validated |
+| No progressive intensity compounding | PASS (LIVE) | validated in brightness release testing |
+| Brightness radial icon visible | PASS (LIVE) | dev11 user validation; `wrench` icon |
+| Menu label advertises the next brightness action | PASS (CI/STATIC) | dev12 uses `offeredBrightness = Next(current)` in both existing/new command paths |
+| Latest dev12 label sequence separately rerun in game | PENDING | underlying cycle was already live-validated; only the label correction itself awaits a post-release live confirmation |
 
-Required live gate:
+Expected dev12 label/action sequence:
 
-1. Confirm startup still reports `v0.7.0-dev8` with no Harmony exceptions.
-2. Open a LeeZ grow light radial menu and confirm both colour and brightness commands are present and friendly/localized.
-3. Starting from a legacy/dev7 light, confirm brightness initially shows Normal.
-4. Cycle `Normal -> Bright -> Very Bright -> Maximum -> Dim -> Normal`; verify every step updates visibly without reload.
-5. Select a non-White colour and change brightness several times; verify colour is preserved.
-6. Select a non-Normal brightness and cycle colour; verify brightness is preserved.
-7. Save, quit, restart; verify both colour and brightness restore.
-8. Toggle the powered light off/on several times; verify the chosen brightness returns and does not progressively drift brighter or dimmer.
-9. Repeat on at least two grow-light tiers; verify the multiplier remains relative to each tier's vanilla/base light intensity.
-10. Verify crop growth speed, coverage, artificial sunlight, tier rules and power draw are unchanged.
-11. Verify legacy/dev7 `meta2` values `1..6` restore the same colour at Normal brightness.
+```text
+current Dim         -> menu Normal      -> click Normal
+current Normal      -> menu Bright      -> click Bright
+current Bright      -> menu Very Bright -> click Very Bright
+current Very Bright -> menu Maximum     -> click Maximum
+current Maximum     -> menu Dim         -> click Dim
+```
 
-## Colour implementation milestones
+## Dev11 power-draw regression
 
-- dev1: first runnable colour build; command missing.
-- dev2: command visible; activation not recognized.
-- dev3: activation diagnostics proved there is no numeric command index in the relevant V3.1 call.
-- dev4: `_commandName` handling worked; persistence exposed an invalid `BlockChangeInfo` constructor assumption.
-- dev5: runtime diagnostics exposed `BlockChangeInfo.blockValueRef`, `bChangeBlockValue`, and `blockValue`.
-- dev6: `BlockValueRef` persistence worked; colour survived restart, but live visuals waited for a rebuild.
-- dev7: cached live `BlockEntityData` and immediately reapplied the selected tint after each successful write. Live cycle passed.
-- dev8: replaced the raw key-style colour menu with stable per-colour localization tokens. User confirmed `Grow light colour: Blue`, then a single selection advanced both menu and lamp to Green immediately. The same runtime candidate also contains the unvalidated brightness implementation documented above.
+Original symptom: a grow light connected directly to a generator continued drawing 10 W while the grow light's own toggle was OFF.
 
-## Multiplayer Light Sync
+| Test | Status | Notes |
+|---|---|---|
+| Direct generator -> grow light ON = 10 W | PASS (LIVE) | user validated dev11 test build |
+| Grow light OFF = 0 W | PASS (LIVE) | user validated |
+| ON again restores 10 W | PASS (LIVE) | user validated |
+| Save/reload while OFF remains 0 W | PASS (LIVE) | user validated |
+| Same fixes leave colour/brightness behavior intact | PASS (LIVE) | user reported test build worked perfectly |
 
-Primary pending multiplayer work:
+Implementation: `Source/Harmony/GrowLightV31Fixes.cs`.
 
-- route remote-client colour and brightness commands to the authoritative server;
-- validate and persist visual-state changes server-side;
-- propagate authoritative colour/brightness state to all clients;
-- refresh each client's live lamp visual from replicated state;
-- validate second-client observation, reconnect, and dedicated-server save/restart;
-- preserve vanilla wiring/power and all existing crop behaviour.
+## Multiplayer
 
-See `docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md` for the starting architecture and test gates.
+| Test | Status | Notes |
+|---|---|---|
+| Single-player/host colour authoring | PASS (LIVE) | authoritative local/server path works |
+| Single-player/host brightness authoring | PASS (LIVE) | validated in brightness testing |
+| Remote-client colour authoring | PENDING | intentionally rejected until authoritative routing is complete |
+| Remote-client brightness authoring | PENDING | same limitation |
+| Full dedicated-server visual synchronization | PENDING | see multiplayer handoff/evidence docs |
 
-## Later / release work
+See:
 
-- Final regression sweep across Stage 0-5 after visual-state and multiplayer work.
-- Long-duration sealed-room crop survival under normal play.
-- Performance with dense farms / many lamps.
-- Remove or gate temporary development diagnostics before a polished release.
+- `docs/MULTIPLAYER_LIGHT_SYNC_HANDOFF.md`
+- `docs/MULTIPLAYER_V31_B14_API_EVIDENCE.md`
+- `docs/MULTIPLAYER_RUNTIME_EVIDENCE_2026-08-08.md`
+
+## Official releases relevant to current source
+
+### 0.7.0.1 / dev11
+
+Live-validated regression release containing:
+
+- 0 W direct-wired OFF-state power fix;
+- save/reload power resynchronization;
+- Color radial icon;
+- Brightness radial icon.
+
+### 0.7.0.2 / dev12
+
+Current official release. Adds the one-step brightness menu-label correction.
+
+- Tag: `leezgrowlights-v0.7.0.2-v31`
+- Source commit: `1449cba3cb663ab0ae3ea78458e6e02e54b69f13`
+- CI run: `31295389819`
+- Full ZIP SHA256: `637777f4be2f14b5439b76351cdde3713c0926940283505446d42c85f864946c`
+- DLL SHA256: `dfe2046944362b18dac287cf04aa9dfdac843c3dcbd27c62cece9b9e733f4338`
+
+See `docs/RELEASE_0.7.0.2.md`.
+
+## Remaining release-quality work
+
+- separate in-game confirmation of the dev12 label/action sequence;
+- remote-client colour/brightness routing and synchronization;
+- long-duration sealed-room crop survival testing under normal play;
+- dense-farm / many-light performance testing;
+- review diagnostic log volume before a future polished/stable milestone.
