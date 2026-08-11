@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+    <!--
+      Mirror the vanilla Super Corn schematic's challenge-reward route.
+      V3 keeps this reward in quest_reward_cop_zombie_slayer.
+    -->
+    <insertAfter xpath="/quests/quest[@id='quest_reward_cop_zombie_slayer']/reward[@id='plantedGraceCorn1Schematic']">
+        <reward type="Item" id="plantedLeezBeans1Schematic" ischosen="true" isfixed="true" value="1" />
+    </insertAfter>
+</configs>
