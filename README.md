@@ -14,6 +14,6 @@ See the project README for installation, verified behavior, build instructions, 
 
 ### [Leez Beans Mod](LeezBeansMod/)
 
-Bean plant project for 7 Days to Die. Includes a lightweight editable bean-plant OBJ source mesh, material hints, external model research/attribution, and a scaffold for the future crop/block implementation.
+Playable bean crop project for 7 Days to Die using Super Corn / Grace Corn as the initial farming-mechanics baseline. Includes crop growth and harvesting XML, seed/schematic crafting, acquisition routes, localization, tuning/testing documentation, the editable bean source model, and a Unity AssetBundle build pipeline for the custom plant visuals.
 
-Current development version: **0.1.0.0**.
+Current development version: **0.2.0.0**.
