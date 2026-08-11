@@ -197,7 +197,7 @@ namespace LeezGrowLights
                 return tier;
             }
 
-            // All LeeZ grow lights define LeezGrowTier. Fall back to Normal/T2 intensity
+            // All LeeZ grow lights define LeezGrowTier. Fall back to T2 intensity
             // if a malformed third-party block reaches this path.
             return 2;
         }
@@ -207,17 +207,17 @@ namespace LeezGrowLights
             switch (GetGrowLightTier(block))
             {
                 case 1:
-                    return 1.00f; // Temporary test: T1
+                    return 1.00f; // T1
                 case 2:
-                    return 2.00f; // Temporary test: T2
+                    return 2.00f; // T2
                 case 3:
-                    return 4.00f; // Temporary test: T3
+                    return 3.00f; // T3
                 case 4:
-                    return 6.00f; // Temporary test: T4
+                    return 4.00f; // T4
                 case 5:
-                    return 8.00f; // Temporary test: T5
+                    return 5.00f; // T5
                 case 6:
-                    return 10.00f; // Temporary test: T6
+                    return 6.00f; // T6
                 default:
                     return 1.00f;
             }
