@@ -1,0 +1,13 @@
+Key,File,Type,UsedInMainMenu,NoTranslate,KeepLoaded,english,Context / Alternate Text,german,spanish,french,italian,japanese,koreana,polish,brazilian,russian,turkish,schinese,tchinese
+foodCropLeezBeans,items,Item,,,,Leez Beans,,,,,,,,,,,,,
+foodCropLeezBeansDesc,items,Item,,,,Fresh green beans harvested from a Leez bean plant. Initial gameplay balance intentionally matches Super Corn so attributes can be tuned as the mod develops.,,,,,,,,,,,,,
+plantedLeezBeans1,blocks,Farming,,,,Leez Beans (Seed),,,,,,,,,,,,,
+plantedLeezBeans1Desc,blocks,Farming,,,,Plant these seeds on a Farm Plot to grow Leez Beans. The initial growth and harvest mechanics match Super Corn.,,,,,,,,,,,,,
+plantedLeezBeans2,blocks,Farming,,,,Leez Beans (Growing),,,,,,,,,,,,,
+plantedLeezBeans2Desc,blocks,Farming,,,,A growing Leez bean plant.,,,,,,,,,,,,,
+plantedLeezBeans3Harvest,blocks,Farming,,,,Leez Beans 3 (POI),,,,,,,,,,,,,
+plantedLeezBeans3HarvestDesc,blocks,Farming,,,,Leez Beans,,,,,,,,,,,,,
+plantedLeezBeans3HarvestPlayer,blocks,Farming,,,,Leez Beans,,,,,,,,,,,,,
+plantedLeezBeans3HarvestPlayerDesc,blocks,Farming,,,,Mature Leez Beans ready to harvest.,,,,,,,,,,,,,
+plantedLeezBeans1Schematic,items,Book,,,,Leez Beans (Seed) Recipe,,,,,,,,,,,,
+plantedLeezBeans1SchematicDesc,items,Book,,,,Read this recipe to unlock crafting Leez Bean Seeds from five harvested Leez Beans.,,,,,,,,,,,,,
