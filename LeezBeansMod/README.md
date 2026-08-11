@@ -6,10 +6,10 @@ A new **7 Days to Die** mod project for bean plants.
 
 `Source/Models/leez_bean_plant.obj` is a lightweight, original bean-plant source mesh created for this project.
 
-- Approximate height: 0.95 m
-- Approximate width: 0.95 m
-- 508 vertices
-- 744 faces
+- Approximate height: 0.94 m
+- Approximate width: 0.81 m
+- 130 vertices
+- 140 faces
 - Y-up, origin at soil level
 - Separate material groups for stem, leaves and pods
 - ASCII Wavefront OBJ so the source remains easy to inspect and version in Git
