@@ -1,0 +1,18 @@
+# Leez Beans Mod material hints
+newmtl Stem
+Ka 0.10 0.16 0.05
+Kd 0.28 0.50 0.14
+Ks 0.02 0.02 0.02
+Ns 8.0
+
+newmtl Leaf
+Ka 0.08 0.18 0.04
+Kd 0.20 0.58 0.12
+Ks 0.03 0.03 0.03
+Ns 12.0
+
+newmtl Pod
+Ka 0.09 0.20 0.05
+Kd 0.24 0.62 0.15
+Ks 0.04 0.04 0.04
+Ns 16.0
