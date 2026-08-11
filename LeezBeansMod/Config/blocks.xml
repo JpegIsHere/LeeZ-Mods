@@ -20,7 +20,7 @@
                 <property name="FertileLevel" value="15" />
                 <property name="IsRandom" value="false" />
             </property>
-            <drop event="Destroy" count="0" />
+            <drop event="Destroy" name="plantedLeezBeans1" count="1" />
         </block>
 
         <block name="plantedLeezBeans2">
