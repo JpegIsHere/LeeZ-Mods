@@ -74,8 +74,7 @@ namespace LeezGrowLights
             LeezLog.Info(
                 "Grow-light live visual refresh applied at " + position +
                 " as " + GrowLightColourState.Get(blockValue) +
-                " / " + GrowLightBrightnessPalette.ToDisplayName(
-                    GrowLightColourState.GetBrightness(blockValue)) + ".");
+                " / T" + GetGrowLightTier(blockValue.Block) + " fixed brightness.");
             return true;
         }
 
@@ -108,7 +107,7 @@ namespace LeezGrowLights
                 return;
 
             // FrameUpdate has just supplied the current vanilla LOD/power value. Keep it
-            // as the fresh baseline and layer the selected cosmetic multiplier on top.
+            // as the fresh baseline and layer the fixed tier multiplier on top.
             state.BaseIntensity = currentIntensity;
             float targetIntensity = currentIntensity * state.Multiplier;
             light.intensity = targetIntensity;
@@ -130,7 +129,7 @@ namespace LeezGrowLights
             }
 
             GrowLightColour selected = GrowLightColourState.Get(blockValue);
-            GrowLightBrightness brightness = GrowLightColourState.GetBrightness(blockValue);
+            float tierBrightnessMultiplier = GetTierIntensityMultiplier(block);
             Color colour = GrowLightColourPalette.ToUnityColour(selected);
 
             try
@@ -155,7 +154,7 @@ namespace LeezGrowLights
                         continue;
 
                     light.color = colour;
-                    ApplyBrightness(light, brightness);
+                    ApplyBrightness(light, tierBrightnessMultiplier);
                 }
             }
             catch (Exception ex)
@@ -166,7 +165,7 @@ namespace LeezGrowLights
 
         private static void ApplyBrightness(
             Light light,
-            GrowLightBrightness brightness)
+            float tierBrightnessMultiplier)
         {
             LightIntensityState state = LightIntensityStates.GetValue(
                 light,
@@ -177,16 +176,51 @@ namespace LeezGrowLights
                 !Mathf.Approximately(currentIntensity, state.LastAppliedIntensity))
             {
                 // Vanilla may change the light intensity when power/toggle/LOD state changes.
-                // Treat that post-vanilla value as the new baseline so cosmetic brightness
-                // remains a multiplier rather than replacing powered-light behaviour.
+                // Treat that post-vanilla value as the new baseline so tier brightness remains
+                // a multiplier rather than replacing powered-light behaviour.
                 state.BaseIntensity = currentIntensity;
             }
 
-            state.Multiplier = GrowLightBrightnessPalette.ToIntensityMultiplier(brightness);
+            state.Multiplier = tierBrightnessMultiplier;
             float targetIntensity = state.BaseIntensity * state.Multiplier;
             light.intensity = targetIntensity;
             state.LastAppliedIntensity = targetIntensity;
             state.HasApplied = true;
+        }
+
+        private static int GetGrowLightTier(Block block)
+        {
+            if (block?.Properties?.Values != null &&
+                block.Properties.Values.TryGetValue("LeezGrowTier", out string tierText) &&
+                int.TryParse(tierText, out int tier))
+            {
+                return tier;
+            }
+
+            // All LeeZ grow lights define LeezGrowTier. Fall back to Normal/T2 intensity
+            // if a malformed third-party block reaches this path.
+            return 2;
+        }
+
+        private static float GetTierIntensityMultiplier(Block block)
+        {
+            switch (GetGrowLightTier(block))
+            {
+                case 1:
+                    return 0.35f; // Dim
+                case 2:
+                    return 1.00f; // Normal
+                case 3:
+                    return 1.50f; // Bright
+                case 4:
+                    return 2.00f; // Very Bright
+                case 5:
+                    return 3.00f; // Maximum
+                case 6:
+                    return 4.00f; // T6 fixed level above Maximum
+                default:
+                    return 1.00f;
+            }
         }
 
         private static Light ResolveLightLodLight(object lightLodInstance)
