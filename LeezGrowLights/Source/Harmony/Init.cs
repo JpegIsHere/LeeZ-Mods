@@ -20,6 +20,11 @@ namespace LeezGrowLights
                 // also fixes directly wired lamps reserving power while toggled off.
                 GrowLightV31Fixes.Install(harmony);
 
+                // Brightness is now fixed by grow-light tier. Keep the legacy selectable
+                // brightness implementation compiled for future reuse, but strip its radial
+                // command after the existing interaction/icon patches have completed.
+                GrowLightTierBrightness.Install(harmony);
+
                 GrowLightColourNetwork.Install(harmony);
             }
             catch (Exception ex)
