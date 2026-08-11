@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+    <append xpath="/recipes">
+        <!-- Super Corn seed recipe parity: 5 harvested crop -> 1 seed, inventory craft. -->
+        <recipe name="plantedLeezBeans1" count="1" craft_time="1" tags="learnable">
+            <ingredient name="foodCropLeezBeans" count="5" />
+        </recipe>
+    </append>
+</configs>
