@@ -20,6 +20,11 @@ namespace LeezGrowLights
                 // also fixes directly wired lamps reserving power while toggled off.
                 GrowLightV31Fixes.Install(harmony);
 
+                // Custom T1 prefabs can contain Unity Light components outside the exact
+                // MainLight/Point light + LightLOD branches that vanilla updateLightState owns.
+                // Mirror the validated powered+toggled state only onto those unmanaged lights.
+                GrowLightPowerVisualSync.Install(harmony);
+
                 // Brightness is now fixed by grow-light tier. Keep the legacy selectable
                 // brightness implementation compiled for future reuse, but strip its radial
                 // command after the existing interaction/icon patches have completed.
