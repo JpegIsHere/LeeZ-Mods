@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+    <!--
+      Leez Beans crop chain.
+      The vanilla Super Corn / Grace Corn blocks are the parent definitions so the
+      crop keeps the same placement, light/fertility, timing and interaction model.
+      Bean-specific Next links and drops prevent any Super Corn items leaking into
+      the custom crop.
+    -->
+    <append xpath="/blocks">
+        <block name="plantedLeezBeans1">
+            <property name="Extends" value="plantedGraceCorn1" />
+            <property name="CreativeMode" value="Player" />
+            <property name="CustomIcon" value="plantedGraceCorn3Harvest" />
+            <property name="DescriptionKey" value="plantedLeezBeans1Desc" />
+            <property name="UnlockedBy" value="plantedLeezBeans1Schematic" />
+            <property class="PlantGrowing">
+                <property name="Next" value="plantedLeezBeans2" />
+                <property name="GrowthRate" value="63.0" />
+                <property name="FertileLevel" value="15" />
+                <property name="IsRandom" value="false" />
+            </property>
+            <drop event="Destroy" count="0" />
+        </block>
+
+        <block name="plantedLeezBeans2">
+            <property name="Extends" value="plantedGraceCorn2" />
+            <property name="CreativeMode" value="None" />
+            <property name="CustomIcon" value="plantedGraceCorn3Harvest" />
+            <property name="DescriptionKey" value="plantedLeezBeans2Desc" />
+            <property class="PlantGrowing">
+                <property name="Next" value="plantedLeezBeans3HarvestPlayer" />
+                <property name="GrowthRate" value="63.0" />
+                <property name="FertileLevel" value="15" />
+                <property name="IsRandom" value="false" />
+            </property>
+            <drop event="Destroy" name="plantedLeezBeans1" count="1" />
+        </block>
+
+        <!-- POI/world version retained for future prefab placement. -->
+        <block name="plantedLeezBeans3Harvest">
+            <property name="Extends" value="plantedGraceCorn3Harvest" />
+            <property name="CreativeMode" value="Dev" />
+            <property name="CustomIcon" value="plantedGraceCorn3Harvest" />
+            <property name="DescriptionKey" value="plantedLeezBeans3HarvestDesc" />
+            <drop event="Harvest" name="foodCropLeezBeans" count="1" tag="wildCropsHarvest" />
+            <drop event="Destroy" count="0" />
+        </block>
+
+        <!--
+          Player-grown mature stage.
+          This mirrors Super Corn/vanilla crop harvest behavior:
+          2 base crop, +1 bonus crop roll affected by the crop-harvest tag,
+          and 50% seed return when the mature plant is destroyed/harvested.
+        -->
+        <block name="plantedLeezBeans3HarvestPlayer">
+            <property name="Extends" value="plantedGraceCorn3HarvestPlayer" />
+            <property name="CreativeMode" value="None" />
+            <property name="CustomIcon" value="plantedGraceCorn3Harvest" />
+            <property name="DescriptionKey" value="plantedLeezBeans3HarvestPlayerDesc" />
+            <drop event="Harvest" name="foodCropLeezBeans" count="2" tag="cropHarvest" />
+            <drop event="Harvest" name="foodCropLeezBeans" prob="0.5" count="1" tag="bonusCropHarvest" />
+            <drop event="Destroy" name="plantedLeezBeans1" count="1" prob="0.5" />
+        </block>
+    </append>
+</configs>
