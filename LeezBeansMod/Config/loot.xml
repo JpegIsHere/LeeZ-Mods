@@ -4,4 +4,17 @@
     <insertAfter xpath="/lootcontainers/lootgroup[@name='booksRareOnlyScaled']/item[@name='plantedGraceCorn1Schematic']">
         <item name="plantedLeezBeans1Schematic" loot_prob_template="veryLow" />
     </insertAfter>
+
+    <!--
+      Bootstrap route matching Super Corn's special footlocker:
+      the Bob's Boars / Carl's Corn Super Corn cache also supplies the first
+      Leez Bean seeds and the recipe so a survival-world player is not forced
+      to use Creative Mode to start the crop loop.
+    -->
+    <insertAfter xpath="/lootcontainers/lootgroup[@name='groupSuperCornFootlocker']/item[@name='plantedGraceCorn1']">
+        <item name="plantedLeezBeans1" count="5" />
+    </insertAfter>
+    <insertAfter xpath="/lootcontainers/lootgroup[@name='groupSuperCornFootlocker']/item[@name='plantedGraceCorn1Schematic']">
+        <item name="plantedLeezBeans1Schematic" count="1" />
+    </insertAfter>
 </configs>
