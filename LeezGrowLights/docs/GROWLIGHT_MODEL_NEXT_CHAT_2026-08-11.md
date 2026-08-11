@@ -1,46 +1,46 @@
-# LeeZ Grow Lights — next-chat handoff for 2026-08-11
-
-Use this together with:
-
-- `LeezGrowLights/docs/GROWLIGHT_MODEL_PROGRESS.md`
-- `LeezGrowLights/docs/GROWLIGHT_MODEL_UNITY_INGAME_CHECKPOINT_2026-08-10.md`
-
-Branch: `dev/colour-system`
-
-Latest Unity/in-game checkpoint commit at end of 2026-08-10 session: `cb7691097721a83034f3fb793356307d7493ed72`
-
-## Copy/paste prompt for a new ChatGPT conversation
+# LeeZ Grow Lights — next-chat prompt after T1 Test6
 
 We are continuing my **LeeZ Grow Lights** custom 3D model/prefab work for **7 Days to Die V3.1.0 b14**.
 
-Repository: `JpegIsHere/LeeZ-Mods`
+Repository: `JpegIsHere/LeeZ-Mods`  
 Branch: `dev/colour-system`
 
-Before giving me any instructions, read these two repo files and treat them as the source of truth:
+Before giving me instructions, read the latest versions of:
 
 1. `LeezGrowLights/docs/GROWLIGHT_MODEL_PROGRESS.md`
-2. `LeezGrowLights/docs/GROWLIGHT_MODEL_UNITY_INGAME_CHECKPOINT_2026-08-10.md`
+2. `LeezGrowLights/docs/GROWLIGHT_MODEL_UNITY_INGAME_CHECKPOINT_2026-08-11.md`
+3. `LeezGrowLights/docs/GROWLIGHT_MODEL_NEXT_CHAT_2026-08-11.md`
 
-The second file contains the latest Unity and first in-game T1 smoke-test checkpoint. Its commit is `cb7691097721a83034f3fb793356307d7493ed72`.
+Treat the **2026-08-11 checkpoint as the latest source of truth** where it supersedes older checkpoint/next-step text.
 
 Important working rules:
 
-- I am a Blender/Unity beginner. Give me **one single explicit step at a time** and wait for me to confirm before continuing.
-- Keep the first integration **T1-only**. Do not touch T2-T6 yet.
-- Preserve all existing LeezGrowLights v0.7.0.2/dev12 behaviour.
-- Do not add materials, textures, UVs, bevels, bolts, branding, vents, detailed diode meshes, emissive work or other cosmetic detail yet.
-- Do not assume old A21/V1 Unity tags/layers apply to V3.1 without verification.
+- I am a Blender/Unity beginner. Give me small, explicit chunks of instructions. If I get stuck, backtrack and make the steps more granular.
+- Keep integration **T1-only**. Do not touch T2-T6.
+- Preserve all existing LeezGrowLights **v0.7.0.2/dev12** functionality.
+- Do not add materials, textures, UVs, bevels, bolts, branding, vents, detailed diode meshes, emissive work, or cosmetic detail yet.
+- Do not move ahead to later regression stages until the current one is confirmed.
+- Existing regression order is: collider/hit/select, wiring, 10W ON/0W OFF, toggle, colour, brightness, persistence, crop-light.
 
-Current state at end of last session:
+Current validated T1 state:
 
 - Exact Unity editor: **2022.3.62f2**.
-- T1 FBX import passed scale/orientation/hierarchy/top-centre pivot validation.
-- T1 prefab `LeeZGrowLight_T1_Prefab` exists with root Box Collider and child Unity Light.
-- T1 asset bundle `LeeZGrowLights_T1_Test.unity3d` was successfully built and is installed locally under the mod `Resources` folder.
-- Local test `blocks.xml` points **T1 only** at that custom prefab; T1 still has old vanilla `ModelOffset 0,.545,0`.
-- First in-game test successfully loaded the custom square T1 model with correct scale/orientation and visible Unity lighting, but it hangs too far below the ceiling because of that old offset.
-- The first smoke test accidentally used an older installed **0.7.0.1/dev11-test1** DLL.
-- Before stopping, I backed up the modified local mod folder as `LeezGrowLights_T1_Test_Backup`, replaced the installed `LeezGrowLights.dll` and `ModInfo.xml` with the official **0.7.0.2/dev12** release versions, preserved the custom T1 `blocks.xml` and asset bundle, and verified installed `ModInfo.xml` now says `<Version value="0.7.0.2" />`.
-- **The game has not been relaunched since that dev12 replacement.**
+- Working prefab: `LeeZGrowLight_T1_Prefab`.
+- Working bundle: `LeeZGrowLights_T1_Test6.unity3d`.
+- T1 XML model path:
+  `#@modfolder:Resources/LeeZGrowLights_T1_Test6.unity3d?LeeZGrowLight_T1_Prefab`
+- T1 `ModelOffset` is **`0,1,0`** and mounts correctly against the ceiling.
+- T2-T6 remain on the vanilla `@:Entities/Electrical/lightPanelLEDPrefab.prefab`.
+- Prefab root uses:
+  - Tag `T_Block`
+  - Layer `Default`
+  - Box Collider enabled
+  - Is Trigger off
+  - Collider Center `0,-0.04,0`
+  - Collider Size `0.8,0.08,0.8`
+- The crucial fix for zero interaction/hit/damage was replacing the Unity project's `ProjectSettings/TagManager.asset` with the **V1TagManager** version from the 7D2D Templates-and-Utilities package. Manually creating `T_Block` in the clean Unity project was not enough.
+- After rebuilding Test6 with that TagManager, **T1 interaction/hit/damage works in game**.
+- Placement, rotation, scale, mounting and collider/hit/select are therefore passed.
+- Keep Test6 as the known-good T1 prefab baseline.
 
-Start from the exact next step in the latest checkpoint: launch V3.1.0 b14, stop at the **main menu**, and verify the new runtime log is actually loading **0.7.0.2/dev12** before we change `ModelOffset`. Do not change the offset until that verification passes.
+Start with the **next regression stage: wiring**. Do not alter the prefab or XML before testing the known-good Test6 wiring behavior.

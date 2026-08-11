@@ -15,8 +15,8 @@
             <property name="Extends" value="ceilingLight01_player" />
             <property name="CreativeMode" value="Player" />
             <property name="CustomIcon" value="lightPanelLEDWhite" />
-            <property name="Model" value="@:Entities/Electrical/lightPanelLEDPrefab.prefab" />
-            <property name="ModelOffset" value="0,.545,0" />
+            <property name="Model" value="#@modfolder:Resources/LeeZGrowLights_T1_Test6.unity3d?LeeZGrowLight_T1_Prefab" />
+            <property name="ModelOffset" value="0,1,0" />
             <property name="HandleFace" value="Top" />
             <property name="RequiredPower" value="10" />
             <property name="DescriptionKey" value="leezGrowLightT1Desc" />
