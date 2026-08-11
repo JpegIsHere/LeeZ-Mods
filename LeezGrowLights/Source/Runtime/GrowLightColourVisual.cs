@@ -207,17 +207,17 @@ namespace LeezGrowLights
             switch (GetGrowLightTier(block))
             {
                 case 1:
-                    return 0.35f; // Dim
+                    return 1.00f; // Temporary test: T1
                 case 2:
-                    return 1.00f; // Normal
+                    return 2.00f; // Temporary test: T2
                 case 3:
-                    return 1.50f; // Bright
+                    return 4.00f; // Temporary test: T3
                 case 4:
-                    return 2.00f; // Very Bright
+                    return 6.00f; // Temporary test: T4
                 case 5:
-                    return 3.00f; // Maximum
+                    return 8.00f; // Temporary test: T5
                 case 6:
-                    return 4.00f; // T6 fixed level above Maximum
+                    return 10.00f; // Temporary test: T6
                 default:
                     return 1.00f;
             }
