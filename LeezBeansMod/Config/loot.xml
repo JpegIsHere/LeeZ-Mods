@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+    <!-- Mirror Super Corn's rare-book schematic route. -->
+    <insertAfter xpath="/lootcontainers/lootgroup[@name='booksRareOnlyScaled']/item[@name='plantedGraceCorn1Schematic']">
+        <item name="plantedLeezBeans1Schematic" loot_prob_template="veryLow" />
+    </insertAfter>
+</configs>
