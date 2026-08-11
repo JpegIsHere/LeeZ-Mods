@@ -2,8 +2,8 @@
 <xml>
     <Name value="LeezBeansMod" />
     <DisplayName value="Leez Beans Mod" />
-    <Version value="0.1.0.0" />
-    <Description value="Bean plant project for 7 Days to Die, beginning with a lightweight source mesh and asset research." />
+    <Version value="0.2.0.0" />
+    <Description value="Leez bean crop for 7 Days to Die using Super Corn-based growth, harvest, seed and schematic mechanics with a custom bean asset pipeline." />
     <Author value="Leez" />
     <Website value="" />
 </xml>
