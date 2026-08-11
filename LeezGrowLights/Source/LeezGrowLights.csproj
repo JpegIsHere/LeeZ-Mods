@@ -62,6 +62,7 @@
     <Compile Include="Harmony\BlockRemovalPatches.cs" />
     <Compile Include="Harmony\GrowLightColourInstaller.cs" />
     <Compile Include="Harmony\GrowLightColourPatches.cs" />
+    <Compile Include="Harmony\GrowLightTierBrightness.cs" />
     <Compile Include="Harmony\GrowLightV31Fixes.cs" />
     <Compile Include="Harmony\Init.cs" />
     <Compile Include="Harmony\PatchInstaller.cs" />
