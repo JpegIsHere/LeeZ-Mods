@@ -1,0 +1,117 @@
+
+
+1 - For the first working LeeZ Grow Light model, I recommend we make it:
+
+a single-block, ceiling-mounted square grow light fixture
+inspired by the commercial grow-light look in your first image
+but with the underside using concentric square LED zones like your second image
+
+So instead of trying to literally recreate the hanging bar fixture, we make a compact square version that fits 7DTD block placement much better and is much easier for a beginner to model.
+
+That also fits your modding workflow better, because the current blocks are ceiling-mounted powered lights with HandleFace="Top" and a simple ModelOffset, so a compact top-mounted fixture is the lowest-risk path.
+
+
+Yes, Sounds Good
+
+
+
+
+
+
+
+2 - You just said:
+
+i would also like the brightness levels to be governed by the tier level. with tier 6 obviously being the brightest.
+
+That is possible, and we can do it in a way that still respects your earlier requirement not to break the working brightness runtime.
+
+
+Because you said the LEDs themselves should be square, I would change your T6 center from a circle to a small square center tile, not a circle.  - (Yes, sounds good)
+
+Housing style - color: matte black or very dark gunmetal - (I like the gunmetal look)
+
+look: clean industrial / hydroponic - (Yes, sounds good)
+
+underside LEDs: frosted white when OFF, coloured when ON - (frosted white when OFF, Dotted illuminated Colours when ON ,(if possible)
+
+small screws or corner bolts are optional later, not necessary in the greybox - (Yes, sounds good)
+
+Mounting - flush or near-flush ceiling mount - (Yes, sounds good)
+
+top-center pivot/origin - (Yes, sounds good)
+
+no chains/hanging cables for the first version - (Yes, sounds good)
+
+
+That is important because we want reliable ceiling placement and simple collision first. The handoff specifically warns us not to assume pivot/offset is correct until tested in-game.
+
+Proposed dimensions for the first greybox
+
+Since we’re still in the design phase, I suggest these target in-game proportions: - (Yes, sounds good)
+
+Footprint: 0.80 x 0.80 block
+Main frame thickness: 0.06 block
+Total thickness including center box: 0.10 to 0.12 block
+LED area: about 0.68 x 0.68 block
+Center driver box: about 0.16 x 0.16 x 0.06 block
+ - (Yes, sounds good)
+
+This makes it:
+
+big enough to read clearly from below
+small enough not to feel like it spills unrealistically beyond the block
+simple to test against ceiling placement
+Best way to build it later
+ - (Yes, sounds good)
+
+When we get to modeling, I recommend we structure it as separate simple parts:
+
+Housing_Frame
+Backplate
+Center_Driver
+LED_Square_1
+LED_Square_2
+LED_Square_3
+LED_Square_4
+LED_Square_5
+LED_Square_6
+ - (Yes, sounds good)
+
+
+That gives you a very easy upgrade path later:
+
+T1 uses only LED_Square_1
+T2 uses LED_Square_1 + 2
+…
+T6 uses all six
+ - (Yes, sounds good)
+
+This is a very beginner-friendly plan.
+
+My recommendation on tier differences
+
+For now, I recommend:
+
+same housing for all tiers
+different LED square count per tier
+higher tier = higher base light intensity
+maybe later: tiny trim/decal differences if you want
+ - (Yes, sounds good)
+
+That keeps T2–T6 manageable after T1 is proven.
+
+Decision I need from you
+
+If you agree, I think we should formally lock the concept as:
+
+“A square, ceiling-mounted LeeZ grow light with a dark industrial housing and concentric square LED zones on the underside, where each tier adds another square zone and higher tiers are visually brighter.”
+
+Please tell me which of these you want:
+
+Yes, lock this design - (Yes, sounds good with the minor changes if possible)
+
+
+If you want, once you confirm the concept, my next step will be:
+
+Step 2: turn this into a very simple written model specification for T1
+(not Blender instructions yet — just the exact shape, parts, and dimensions we will build first). - (Yes, sounds good)

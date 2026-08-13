@@ -1,0 +1,143 @@
+This chat is dedicated to the development and maintenance of my 7 Days to Die mod project: LeezGrowLights.
+
+PROJECT LOCATION
+Local repository:
+C:\LeeZ_NWO\LeeZ-Mods
+
+Project:
+C:\LeeZ_NWO\LeeZ-Mods\LeezGrowLights
+
+Repository:
+LeeZ-Mods
+
+Current Git branch:
+dev/colour-system
+
+GitHub remote:
+https://github.com/JpegIsHere/LeeZ-Mods.git
+
+The repository is a monorepo, with LeezGrowLights currently being the active mod project.
+
+IMPORTANT PROJECT STRUCTURE
+
+LeezGrowLights/
+├── Config/
+├── Source/
+│   ├── Harmony/
+│   └── Runtime/
+├── docs/
+├── tools/
+├── README.md
+├── CONTRIBUTING.md
+├── TESTING.md
+├── ROADMAP.md
+└── ModInfo.xml
+
+The C# project targets .NET Framework 4.8 and references the real 7 Days to Die V3.1.x assemblies and TFP Harmony.
+
+PROJECT PURPOSE
+
+LeezGrowLights is a 7 Days to Die mod providing powered, tiered grow lights with:
+- 5x5 horizontal crop coverage
+- vertical coverage from Y+1 through Y+10 above farm plots
+- artificial/underground sunlight behaviour
+- configurable growth multipliers
+- tiered brightness behaviour
+- selectable lighting colours
+- power-state integration
+- persistence of colour/brightness state
+
+IMPORTANT DEVELOPMENT RULES
+
+An AGENTS.md exists at the repository root and is the primary Codex instruction file. Follow it.
+
+In particular:
+- Preserve the established XML configuration / C# runtime architecture.
+- Inspect existing code and documentation before making changes.
+- Prefer small, targeted changes.
+- Avoid speculative refactoring.
+- Do not modify unrelated files.
+- Do not delete files or substantially change architecture without explaining why.
+- Keep gameplay balance values in XML when they are already represented there.
+- Preserve 5x5 grow-light geometry unless there is an explicit reason to change it.
+- Power-dependent growth must remain server-authoritative.
+- Unknown power/tile shapes must fail safely.
+- Overlapping lights use the highest active multiplier; they must not stack.
+- Colour/brightness cosmetic state must remain separate from the normal powered-light toggle state.
+- Preserve the documented BlockValue.meta2/meta3 compatibility contract.
+- Do not claim something is multiplayer-safe, validated, or complete without evidence.
+- Follow the documented build and testing procedures.
+- Do not create Git commits unless I explicitly ask.
+- Do not push to GitHub unless I explicitly ask.
+
+GIT WORKFLOW
+
+GitHub remains the remote source/repository.
+
+My local development repository is:
+C:\LeeZ_NWO\LeeZ-Mods
+
+I want to retain control over commits and pushes.
+
+Normal workflow should be:
+
+1. Discuss/investigate the change.
+2. Inspect the relevant existing code and documentation.
+3. Make the smallest appropriate change.
+4. Build/test/validate.
+5. Review the Git diff.
+6. I decide whether to commit.
+7. I explicitly decide whether to push to GitHub.
+
+Do not automatically commit or push.
+
+HOW I WANT YOU TO WORK WITH ME
+
+I am not looking for generic coding advice. Treat this as an ongoing development project.
+
+When I ask about a feature or bug:
+- First understand the existing implementation.
+- Use the repository documentation and source code as the primary source of truth.
+- Identify the relevant files and code paths.
+- Explain your reasoning in practical terms.
+- Distinguish clearly between documented behaviour, source-code facts, and your interpretation.
+- Before making significant changes, tell me what you intend to change and why.
+- After changes, tell me exactly which files changed and what validation was performed.
+
+If documentation and code disagree:
+- Do not silently assume which one is correct.
+- Identify the discrepancy.
+- Investigate the actual implementation.
+- Tell me what evidence supports each interpretation.
+- Recommend the safest next step.
+
+MULTIPLAYER / SAVE COMPATIBILITY
+
+Be especially cautious with:
+- networking
+- dedicated-server behaviour
+- power-state handling
+- crop growth
+- scheduled tick/rescheduling behaviour
+- BlockValue metadata
+- colour/brightness persistence
+- save compatibility
+- Harmony patches
+- electrical behaviour
+
+Changes in these areas require explicit discussion of compatibility risks.
+
+CURRENT PROJECT STATUS
+
+The repository has already been connected to the local Codex workflow.
+
+The local repository contains a committed AGENTS.md describing the project's development rules.
+
+Current branch:
+dev/colour-system
+
+Before beginning any development task, inspect the current repository state rather than assuming that the code is unchanged from an earlier conversation.
+
+For this chat, assume that continuity and careful change management are more important than making large changes quickly.
+
+Start by acknowledging this project context and briefly summarising how you will work with me.
