@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+    <!--
+      Unlock plan:
+      T1=10, T2=20, T3=30, T4=45, T5=60, T6=75 Wiring 101 magazines.
+      T2-T5 are provisional because only T1 and T6 were specified in the design brief.
+    -->
+    <append xpath="/progression/crafting_skills/crafting_skill[@name='craftingElectrician']">
+        <display_entry icon="lightPanelLEDWhite" name_key="leezGrowLightUnlockT1" has_quality="false" unlock_level="10">
+            <unlock_entry item="leezGrowLightT1" unlock_tier="1" />
+        </display_entry>
+        <display_entry icon="lightPanelLEDWhite" name_key="leezGrowLightUnlockT2" has_quality="false" unlock_level="20">
+            <unlock_entry item="leezGrowLightT2" unlock_tier="1" />
+        </display_entry>
+        <display_entry icon="lightPanelLEDWhite" name_key="leezGrowLightUnlockT3" has_quality="false" unlock_level="30">
+            <unlock_entry item="leezGrowLightT3" unlock_tier="1" />
+        </display_entry>
+        <display_entry icon="lightPanelLEDWhite" name_key="leezGrowLightUnlockT4" has_quality="false" unlock_level="45">
+            <unlock_entry item="leezGrowLightT4" unlock_tier="1" />
+        </display_entry>
+        <display_entry icon="lightPanelLEDWhite" name_key="leezGrowLightUnlockT5" has_quality="false" unlock_level="60">
+            <unlock_entry item="leezGrowLightT5" unlock_tier="1" />
+        </display_entry>
+        <display_entry icon="lightPanelLEDWhite" name_key="leezGrowLightUnlockT6" has_quality="false" unlock_level="75">
+            <unlock_entry item="leezGrowLightT6" unlock_tier="1" />
+        </display_entry>
+    </append>
+
+    <append xpath="/progression/crafting_skills/crafting_skill[@name='craftingElectrician']/effect_group">
+        <passive_effect name="RecipeTagUnlocked" operation="base_set" level="10,100" value="1" tags="leezGrowLightT1" />
+        <passive_effect name="RecipeTagUnlocked" operation="base_set" level="20,100" value="1" tags="leezGrowLightT2" />
+        <passive_effect name="RecipeTagUnlocked" operation="base_set" level="30,100" value="1" tags="leezGrowLightT3" />
+        <passive_effect name="RecipeTagUnlocked" operation="base_set" level="45,100" value="1" tags="leezGrowLightT4" />
+        <passive_effect name="RecipeTagUnlocked" operation="base_set" level="60,100" value="1" tags="leezGrowLightT5" />
+        <passive_effect name="RecipeTagUnlocked" operation="base_set" level="75,100" value="1" tags="leezGrowLightT6" />
+    </append>
+</configs>

@@ -1,0 +1,5 @@
+When the growlights are switched off while wired directly to a power source, the growlights still consuming power from the power source: Generator on - Light off = 10w power draw
+
+If the growlights a connected via a switch, then the power functions correct: Generator on - Switch on - Light = 0 power draw.
+
+The circle menu does not have any icon/markings to let the player know what they are interacting with. instead the show 2 circle shaped place holders that are empty: In the circle menu there are now 4 place holders - 1=Switch icon (switch on/off function), 2=Hand icon (Take function), 3=no icon (Color selector fuction), 4=no icon (Brightness Selector).

@@ -1,0 +1,299 @@
+We are continuing development/testing of **LeeZ Grow Lights** for **7 Days to Die V3.1.0 b14**.
+
+## Repository / branch
+
+* GitHub repo: `JpegIsHere/LeeZ-Mods`
+* Working branch: `dev/colour-system`
+* Mod: `LeezGrowLights`
+* Unity: **2022.3.62f2**
+* Current custom-model work remains **T1-only**.
+* Do not modify T2–T6 model assets unless I explicitly ask.
+
+## Important working style
+
+I am a Blender/Unity beginner. Give me instructions in **small, explicit steps** and do not skip ahead.
+
+Regression order is:
+
+**collider/hit/select → wiring → 10W ON/0W OFF → toggle → colour → brightness → persistence → crop-light**
+
+If something fails, backtrack and fix that stage before continuing.
+
+Do not add materials, textures, UVs, bevels, bolts, branding, vents, detailed diode meshes, emissive cosmetics, or other model polish yet.
+
+---
+
+# Known-good T1 custom model
+
+Prefab:
+
+`LeeZGrowLight_T1_Prefab`
+
+Asset bundle:
+
+`LeeZGrowLights_T1_Test6.unity3d`
+
+T1 model path:
+
+`#@modfolder:Resources/LeeZGrowLights_T1_Test6.unity3d?LeeZGrowLight_T1_Prefab`
+
+T1:
+
+`ModelOffset = 0,1,0`
+
+Known-good Test6 bundle SHA-256:
+
+`8f7850e4ce7f314067f173afae5b07d84359e433202a5a71598be585bf489477`
+
+Prefab root:
+
+* Tag: `T_Block`
+* Layer: `Default`
+* Box Collider enabled
+* Is Trigger OFF
+* Center: `0,-0.04,0`
+* Size: `0.8,0.08,0.8`
+
+Critical prior fix:
+The Unity project had to use the 7DTD **V1TagManager** `TagManager.asset`. Manually creating the `T_Block` tag in a stock Unity project did not work.
+
+Test6 successfully fixed selection, hits, interaction, damage, placement, rotation, scale and ceiling mounting.
+
+**Do not change Test6.**
+
+---
+
+# Current blocks.xml baseline
+
+I accidentally broke my local `blocks.xml`, so the previous chat regenerated the known-good version.
+
+T1:
+
+* Extends: `ceilingLight01_player`
+* Model: Test6 custom prefab
+* ModelOffset: `0,1,0`
+* RequiredPower: `10`
+* LeezGrowTier: `1`
+* LeezGrowMultiplier: `1.2`
+* Radius: `2`
+* Valid farm vertical offset: `1–10`
+
+T2–T6 still use:
+
+`@:Entities/Electrical/lightPanelLEDPrefab.prefab`
+
+Their `ModelOffset` remains:
+
+`0,.545,0`
+
+All tiers currently use `RequiredPower=10`.
+
+Growth multipliers:
+
+* T1 = 1.2x
+* T2 = 1.3x
+* T3 = 1.4x
+* T4 = 1.5x
+* T5 = 1.6x
+* T6 = 4.0x
+
+Coverage is exactly **5×5**.
+
+Valid vertical range is **1–10 blocks above the supporting farm plot**.
+
+11+ blocks is invalid.
+
+Colours:
+
+* Blue
+* Green
+* Red
+* Purple
+* White
+* Yellow
+
+---
+
+# Brightness design — FINAL
+
+Selectable brightness has been removed from the radial wheel.
+
+The old selectable-brightness source code is deliberately preserved for possible reuse in another project, but the live grow lights now use **fixed brightness by tier**.
+
+Final visual brightness multipliers:
+
+* **T1 = 1×**
+* **T2 = 2×**
+* **T3 = 3×**
+* **T4 = 4×**
+* **T5 = 5×**
+* **T6 = 6×**
+
+These are Unity Light intensity multipliers and are unrelated to the crop growth multipliers.
+
+The fixed brightness is implemented in:
+
+`LeezGrowLights/Source/Runtime/GrowLightColourVisual.cs`
+
+Current final-brightness commit before the latest visual-power fix was:
+
+`8f329b104382468492aac9c9a3ae7f29cf80e8c9`
+
+Brightness radial removal works.
+
+Colour selection still works.
+
+---
+
+# Regression results so far
+
+Passed:
+
+* T1 prefab/bundle loading
+* placement
+* rotation
+* scale
+* ceiling mounting
+* collider
+* selection
+* normal interaction
+* hits/damage
+* structural support/falling observed
+* wiring
+* direct wiring
+* switches/relays
+* daisy chaining light-to-light
+* 10W ON
+* 0W OFF
+* electrical toggle behavior
+* colour selector
+* fixed tier brightness
+* brightness radial option removal
+* colour persistence
+* toggle persistence
+* power-state persistence
+
+However, I then noticed an important regression:
+
+## CURRENT BLOCKER
+
+The **T1 custom light remained visibly illuminated even when it was not connected to power**.
+
+Electrical behavior itself remained correct:
+
+* Power draw was correct
+* toggle worked
+* colour selector worked
+* 10W / 0W worked
+* wiring worked
+
+The problem was specifically that the visible Unity `Light` stayed illuminated.
+
+---
+
+# Cause found
+
+The previous chat inspected the V3.1 `BlockPoweredLight.updateLightState` IL.
+
+Vanilla only automatically switches lights under direct children named:
+
+`MainLight`
+
+or:
+
+`Point light`
+
+and those branches need a `LightLOD`.
+
+The custom Test6 T1 Unity `Light` is outside that vanilla-managed hierarchy.
+
+Therefore our colour/brightness runtime was finding and modifying the custom Unity `Light`, but vanilla was never disabling that custom Light when electrical power was removed.
+
+---
+
+# Latest runtime fix — NEEDS LIVE TESTING NEXT
+
+A new runtime patch was added:
+
+`LeezGrowLights/Source/Harmony/GrowLightPowerVisualSync.cs`
+
+It patches:
+
+`BlockPoweredLight.updateLightState`
+
+with a late postfix.
+
+It:
+
+* detects LeeZ grow lights
+* resolves the `BlockEntityData`
+* gets the already-validated electrical state through `PowerStateResolver.IsActive`
+* uses **powered AND toggled**
+* finds custom Unity `Light` components
+* skips vanilla-managed `MainLight` / `Point light` + `LightLOD` branches
+* sets custom `light.enabled = active`
+
+This avoids modifying Test6 or the prefab.
+
+The final source commit for this visual-power test build is:
+
+`7dd6e96df5fd835964888db9c819148e531fe746`
+
+CI V3.1 compile passed successfully.
+
+The test artifact produced was:
+
+`LeezGrowLights_T1_VisualPowerSync_Test.zip`
+
+DLL SHA-256:
+
+`baa154c7456889adb8b62197b525b65c4ab0abbb455da9a21365434f4c63e496`
+
+The final brightness mapping **1/2/3/4/5/6 remains unchanged** in this build.
+
+---
+
+# NEXT ACTION — START HERE
+
+Do NOT start crop-light testing yet.
+
+First, I need to test the **visual-power-sync DLL**.
+
+Walk me through only this test:
+
+1. T1 with **no power connected** → should be visually dark.
+2. Connect power → should illuminate.
+3. Confirm power draw = **10W**.
+4. Toggle OFF → should become visually dark and consume **0W**.
+5. Toggle ON → should illuminate and consume **10W**.
+6. Disconnect wire → should become visually dark.
+7. Reconnect → should illuminate.
+8. While ON, change colour → colour selection should still work.
+9. Save/reload if necessary and confirm visual state still agrees with electrical state.
+
+If all of those pass, mark:
+
+**Visual power state = PASS**
+
+Then re-confirm persistence if needed.
+
+Only after that should we proceed to the final T1 gameplay regression:
+
+## Crop-light test
+
+* Powered + toggled ON substitutes for sunlight.
+* OFF/unpowered does not.
+* 5×5 coverage.
+* Height 1 works.
+* Height 10 works.
+* Height 11 does not.
+* T1 growth multiplier = 1.2x.
+
+After crop-light passes:
+
+1. Freeze a new known-good T1 checkpoint.
+2. Update the relevant model/testing/checkpoint docs.
+3. Then return to actual Blender/Unity model development.
+4. Remain T1-only until I explicitly approve moving to other tiers.
+
+Do not alter Test6, T1 ModelOffset, collider, V1TagManager setup, T2–T6 model paths, final brightness values, growth multipliers, wiring behavior or power draw unless a regression specifically requires it.
